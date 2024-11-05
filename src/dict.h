@@ -24,6 +24,10 @@ typedef struct Dictionary {
 } Dictionary;
 
 
+// Teste inicial
+void exibir_mensagem();
+
+
 // Funções Daniel
 void addWord(Dictionary *dict, const char *portuguese_Word, const char *english_word, const char *unit);
 bool deleteEnglishWord(Dictionary *dict, const char *english_word, const char *unit);
