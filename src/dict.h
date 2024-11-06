@@ -50,4 +50,7 @@ void freePortugueseTree(PortugueseNode *root);
 
 // Feitas
 
+// Testes
+void viewWordsTest(PortugueseNode *dict);
+
 #endif 

@@ -1,8 +1,18 @@
 #include "src/dict.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-int main()
-{
+int main() {
+    Dictionary *dict = (Dictionary *)malloc(sizeof(Dictionary));  
+    dict->root = NULL;  
+    
     exibir_mensagem();
-    return 1;
+    
+    addWord(dict, "Carro", "Car", "Unidade 1");
+    
+    viewWordsTest(dict->root);
+    
+    free(dict);
+
+    return 0;
 }
