@@ -1,4 +1,4 @@
-#include "src/dict.h"
+#include "dict.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,3 +7,4 @@ int main() {
 
     return 0;
 }
+

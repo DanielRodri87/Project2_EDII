@@ -5,7 +5,9 @@
 
 void test()
 {
+	int espera;
     printf("oi mundo");
+	scanf("%d", &espera);
 }
 
 int ehFolha(PortugesIngles *no){
@@ -62,7 +64,7 @@ PortugesIngles* quebraNo(PortugesIngles **no,Info valor,Info *promove,PortugesIn
 
 PortugesIngles* inserirPalavraPortugues(PortugesIngles **no, Info info, Info *promove, PortugesIngles **pai){
 	PortugesIngles *maiorNo;
-	Info promove1;
+	Info  promove1;
 	maiorNo = NULL;
 
 	if(*no == NULL){

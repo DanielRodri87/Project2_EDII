@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "-g",               // Ativa informações de depuração
+        "-o", "output/main", // Arquivo de saída
+        "main.c",           // Arquivo principal
+        "dict.c"            // Outro arquivo fonte necessário
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}
