@@ -1,30 +1,28 @@
 #ifndef DICT_H
 #define DICT_H
 
-typedef struct inglesPortugues{
-    char *palavra;
-    struct inglesPortugues *dir,*esq;
-}InglesPortugues;
+typedef struct EnglishPortuguese {
+    char *word;
+    struct EnglishPortuguese *right, *left;
+} EnglishPortuguese;
 
-typedef struct info{
-    char *palavraPortugues;
-    int unidade;
-    InglesPortugues *traducaoIngles;
-}Info;
+typedef struct Info {
+    char *portugueseWord;
+    int unit;
+    EnglishPortuguese *englishTranslation;
+} Info;
 
-typedef struct portuguesIngles{
-    Info info1,info2;
+typedef struct PortugueseEnglish {
+    Info info1, info2;
+    int infoCount;
+    struct PortugueseEnglish *right, *center, *left;
+} PortugueseEnglish;
 
-    int qtdInfo;
-    struct portuguesIngles *dir,*cen,*esq;
-}PortugesIngles;
+PortugueseEnglish* createNode(Info info, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild);
+PortugueseEnglish* splitNode(PortugueseEnglish **node, Info value, Info *promote, PortugueseEnglish **child);
+PortugueseEnglish* addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child);
+int isLeaf(PortugueseEnglish *node);
+PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Info *promote, PortugueseEnglish **parent);
+void displayWords(PortugueseEnglish *root);
 
-
-PortugesIngles* criaNo(Info info,PortugesIngles *filhoEsq,PortugesIngles *filhoCen);
-PortugesIngles* quebraNo(PortugesIngles **no,Info valor,Info *promove,PortugesIngles **filho);
-// PortugesIngles* adicionaChave(PortugesIngles *no,Info info,PortugesIngles *filho);
-int ehFolha(PortugesIngles *no);
-PortugesIngles* inserirPalavraPortugues(PortugesIngles **no, Info info, Info *promove, PortugesIngles **Pai);
-void test();
-
-#endif 
+#endif
