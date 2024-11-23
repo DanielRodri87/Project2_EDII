@@ -19,10 +19,15 @@ typedef struct PortugueseEnglish {
 } PortugueseEnglish;
 
 PortugueseEnglish* createNode(Info info, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild);
+
 PortugueseEnglish* splitNode(PortugueseEnglish **node, Info value, Info *promote, PortugueseEnglish **child);
 PortugueseEnglish* addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child);
 int isLeaf(PortugueseEnglish *node);
+
 PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Info *promote, PortugueseEnglish **parent);
 void displayWords(PortugueseEnglish *root);
+void printWordsByUnit(PortugueseEnglish *root, int unit);
+void findEnglishByPortuguese(PortugueseEnglish *root, const char *portugueseWord);
+
 
 #endif
