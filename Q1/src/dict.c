@@ -3,24 +3,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-void test() {
+void test()
+{
     int wait;
     printf("Hello World");
     scanf("%d", &wait);
 }
 
-int isLeaf(PortugueseEnglish *node) {
+int isLeaf(PortugueseEnglish *node)
+{
     return node->left == NULL;
 }
 
-PortugueseEnglish* createNode(const Info information, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild) {
-    PortugueseEnglish *node = (PortugueseEnglish*)malloc(sizeof(PortugueseEnglish));
+PortugueseEnglish *createNode(const Info information, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild)
+{
+    PortugueseEnglish *node = (PortugueseEnglish *)malloc(sizeof(PortugueseEnglish));
 
-    if (!node) {
+    if (!node)
+    {
         printf("Failed to create node\n");
     }
 
-    if (node) {
+    if (node)
+    {
         node->info1 = information;
         node->left = leftChild;
         node->center = centerChild;
@@ -30,11 +35,15 @@ PortugueseEnglish* createNode(const Info information, PortugueseEnglish *leftChi
     return node;
 }
 
-PortugueseEnglish* addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child) {
-    if (strcmp(info.portugueseWord, node->info1.portugueseWord) > 0) {
+PortugueseEnglish *addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child)
+{
+    if (strcmp(info.portugueseWord, node->info1.portugueseWord) > 0)
+    {
         node->info2 = info;
         node->right = child;
-    } else {
+    }
+    else
+    {
         node->info2 = node->info1;
         node->right = node->center;
         node->info1 = info;
@@ -45,22 +54,28 @@ PortugueseEnglish* addKey(PortugueseEnglish *node, Info info, PortugueseEnglish 
     return node;
 }
 
-PortugueseEnglish* splitNode(PortugueseEnglish **node, const Info information, Info *promote, PortugueseEnglish **child) {
+PortugueseEnglish *splitNode(PortugueseEnglish **node, const Info information, Info *promote, PortugueseEnglish **child)
+{
     PortugueseEnglish *greater;
 
-    if (strcmp(information.portugueseWord, (*node)->info2.portugueseWord) > 0) {
+    if (strcmp(information.portugueseWord, (*node)->info2.portugueseWord) > 0)
+    {
         *promote = (*node)->info2;
         if (child)
             greater = createNode(information, (*node)->right, *child);
         else
             greater = createNode(information, (*node)->right, NULL);
-    } else if (strcmp(information.portugueseWord, (*node)->info1.portugueseWord) > 0) {
+    }
+    else if (strcmp(information.portugueseWord, (*node)->info1.portugueseWord) > 0)
+    {
         *promote = information;
         if (child)
             greater = createNode((*node)->info2, *child, (*node)->right);
         else
             greater = createNode((*node)->info2, NULL, (*node)->right);
-    } else {
+    }
+    else
+    {
         *promote = (*node)->info1;
         greater = createNode((*node)->info2, (*node)->center, (*node)->center);
         (*node)->info1 = information;
@@ -71,43 +86,65 @@ PortugueseEnglish* splitNode(PortugueseEnglish **node, const Info information, I
     return greater;
 }
 
-PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Info *promote, PortugueseEnglish **parent) {
+PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Info *promote, PortugueseEnglish **parent)
+{
     PortugueseEnglish *greaterNode;
     Info promote1;
     greaterNode = NULL;
 
-    if (*node == NULL) {
+    if (*node == NULL)
+    {
         *node = createNode(info, NULL, NULL);
-    } else {
-        if (isLeaf(*node)) {
-            if ((*node)->infoCount == 1) {
+    }
+    else
+    {
+        if (isLeaf(*node))
+        {
+            if ((*node)->infoCount == 1)
+            {
                 *node = addKey(*node, info, NULL);
-            } else {
+            }
+            else
+            {
                 greaterNode = splitNode(node, info, promote, NULL);
-                if (parent != NULL && *parent == NULL) {
+                if (parent != NULL && *parent == NULL)
+                {
                     *node = createNode(*promote, *node, greaterNode);
                     greaterNode = NULL;
                 }
             }
-        } else {
-            if (strcmp(info.portugueseWord, (*node)->info1.portugueseWord) < 0) {
+        }
+        else
+        {
+            if (strcmp(info.portugueseWord, (*node)->info1.portugueseWord) < 0)
+            {
                 greaterNode = insertPortugueseWord(&((*node)->left), info, promote, node);
-            } else {
-                if (((*node)->infoCount == 1) || (strcmp(info.portugueseWord, (*node)->info2.portugueseWord) < 0)) {
+            }
+            else
+            {
+                if (((*node)->infoCount == 1) || (strcmp(info.portugueseWord, (*node)->info2.portugueseWord) < 0))
+                {
                     greaterNode = insertPortugueseWord(&((*node)->center), info, promote, node);
-                } else {
+                }
+                else
+                {
                     greaterNode = insertPortugueseWord(&((*node)->right), info, promote, node);
                 }
             }
         }
 
-        if (greaterNode) {
-            if ((*node)->infoCount == 1) {
+        if (greaterNode)
+        {
+            if ((*node)->infoCount == 1)
+            {
                 *node = addKey(*node, *promote, greaterNode);
                 greaterNode = NULL;
-            } else {
+            }
+            else
+            {
                 greaterNode = splitNode(node, *promote, &promote1, &greaterNode);
-                if (*parent) {
+                if (*parent)
+                {
                     *node = createNode(promote1, *node, greaterNode);
                     greaterNode = NULL;
                 }
@@ -118,179 +155,117 @@ PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
     return greaterNode;
 }
 
-void displayWords(PortugueseEnglish *root) {
-    if (root != NULL) {
-        if (root->infoCount != 2) {
-            printf("\n\n%% Unit %d:\n", root->info1.unit);
-            printf("English: %s | Portuguese: %s\n", root->info1.englishTranslation->word, root->info1.portugueseWord);
+int LargestUnit(PortugueseEnglish *root)
+{
+    int bigger = 0;
+    if (root != NULL)
+    {
+        if (root->infoCount != 2)
+        {
+            if (root->info1.unit > bigger)
+                bigger = root->info1.unit;
+
             displayWords(root->left);
             displayWords(root->center);
-        } else {
-            printf("English: %s | Portuguese: %s\n", root->info2.englishTranslation->word, root->info2.portugueseWord);
+        }
+        else
+        {
+            if (root->info2.unit > bigger)
+                bigger = root->info2.unit;
+
+            displayWords(root->left);
+            displayWords(root->center);
+            displayWords(root->right);
+        }
+    }
+
+    return (bigger);
+}
+
+void displayWords(PortugueseEnglish *root)
+{
+    if (root != NULL)
+    {
+        if (root->infoCount >= 1)
+        {
+            printf("\n\n%% Unidade %d:\n", root->info1.unit);
+            printf("Inglês: %s | Português: %s\n", root->info1.englishTranslation->word, root->info1.portugueseWord);
+        }
+
+        if (root->infoCount == 2)
+        {
+            printf("\n\n%% Unidade %d:\n", root->info1.unit);
+            printf("Inglês: %s | Português: %s\n", root->info2.englishTranslation->word, root->info2.portugueseWord);
+        }
+
+        displayWords(root->left);
+        displayWords(root->center);
+
+        if (root->infoCount == 2)
+        {
             displayWords(root->right);
         }
     }
 }
 
-// PortugueseEnglish eh_info1(PortugueseEnglish node, PortugueseEnglish *info)
-// {
-//     return info == node.info1.portugueseWord;
-// }
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+// I - informar uma unidade e então imprima todas as palavras da unidade em português seguida das
+// equivalentes em inglês
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+void printWordsByUnit(PortugueseEnglish *root, int unit)
+{
+    if (root != NULL)
+    {
+        if (root->infoCount >= 1 && root->info1.unit == unit)
+        {
+            printf("Português: %s | Inglês: %s\n",
+                   root->info1.portugueseWord,
+                   root->info1.englishTranslation->word);
+        }
+        if (root->infoCount == 2 && root->info2.unit == unit)
+        {
+            printf("Português: %s | Inglês: %s\n",
+                   root->info2.portugueseWord,
+                   root->info2.englishTranslation->word);
+        }
+        printWordsByUnit(root->left, unit);
+        printWordsByUnit(root->center, unit);
+        if (root->infoCount == 2)
+        {
+            printWordsByUnit(root->right, unit);
+        }
+    }
+}
 
-// PortugueseEnglish eh_info2(PortugueseEnglish node, int info)
-// {
-//     return no.n_infos == 2 && info == no.info2.numero;
-// }
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+// II - informar uma palavra em português e então imprima todas as palavras em inglês equivalente à palavra em
+// português dada, independente da unidade
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+void findEnglishByPortuguese(PortugueseEnglish *root, const char *portugueseWord)
+{
+    if (root != NULL)
+    {
+        if (root->infoCount >= 1 && strcmp(root->info1.portugueseWord, portugueseWord) == 0)
+            printf("Inglês: %s\n", root->info1.englishTranslation->word);
+        if (root->infoCount == 2 && strcmp(root->info2.portugueseWord, portugueseWord) == 0)
+            printf("Inglês: %s\n", root->info2.englishTranslation->word);
 
-// int possivel_remover(PortugueseEnglish *raiz)
-// {
-//     int possivel = 0;
+        findEnglishByPortuguese(root->left, portugueseWord);
+        findEnglishByPortuguese(root->center, portugueseWord);
+        if (root->infoCount == 2)
+            findEnglishByPortuguese(root->right, portugueseWord);
+    }
+}
 
-//     if(raiz != NULL)
-//     {
-//         possivel = raiz->infoCount == 2;
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+// III - informar uma palavra em inglês e a unidade a qual a mesma pertence removê-la das árvores binárias
+// das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da
+// árvore 2-3
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
 
-//         if(!possivel)
-//         {
-//             possivel = possivel_remover(raiz->center);
-
-//             if(!possivel)
-//                 possivel = possivel_remover(raiz->left);
-//         }
-//     }
-
-//     return possivel;
-// }
-
-// int arvore23_remover(PortugueseEnglish **raiz, int info, PortugueseEnglish *pai, PortugueseEnglish **origem)
-// {
-//     int removeu = 0;
-
-//     if(*raiz != NULL)
-//     {
-//         int info1 = eh_info1(**raiz, info);
-//         int info2 = eh_info2(**raiz, info);
-
-//         if(info1 || info2)
-//         {
-//             removeu = 1;
-//             if(eh_folha(**raiz))
-//             {
-//                 if((*raiz)->infoCount == 2)
-//                 {
-//                     if(info1)
-//                         troca_infos(&((*raiz)->info1), &((*raiz)->info2));
-
-//                     (*raiz)->infoCount = 1;
-//                 }
-//                 else
-//                 {
-//                     if(pai != NULL)
-//                     {
-//                         if(*raiz == pai->left)
-//                             movimento_onda(pai->info1, &((*raiz)->info1), NULL, origem, origem);
-//                         else
-//                         {
-//                             if(pai->infoCount == 2)
-//                             {
-//                                 if(*raiz == pai->center)
-//                                     movimento_onda(pai->info2, &((*raiz)->info1), NULL, origem, origem);
-//                                 else
-//                                     movimento_onda(pai->info2, &(pai->center->info2), NULL, origem, origem);
-//                             }
-//                             else
-//                                 movimento_onda(pai->info1, &(pai->left->info2), NULL, origem, origem);
-//                         }
-//                     }
-//                     else
-//                     {
-//                         free(*raiz);
-//                         *raiz = NULL;
-//                     }
-//                 }
-//             }
-//             else
-//             {
-//                 PortugueseEnglish *pai_aux, *filho;
-//                 pai_aux = *raiz;
-//                 Info info_aux;
-//                 int juntar = 0;
-
-//                 if(info2)
-//                 {
-//                     if(possivel_remover((*raiz)->right))
-//                         filho = buscar_menor_filho((*raiz)->right, &pai_aux, &info_aux);
-//                     else if(possivel_remover((*raiz)->center))
-//                         filho = buscar_maior_filho((*raiz)->center, &pai_aux, &info_aux);
-//                     else
-//                     {
-//                         no23_juntar((*raiz)->center, (*raiz)->center, &(*raiz)->center);
-//                         (*raiz)->infoCount = 1;
-//                         juntar = 1;
-//                     }
-
-//                     if(!juntar)
-//                         movimento_onda(info_aux, &((*raiz)->info2), pai_aux, origem, &filho);
-//                 }
-//                 else if(info1)
-//                 {
-//                     if(possivel_remover((*raiz)->left))
-//                         filho = buscar_maior_filho((*raiz)->left, &pai_aux, &info_aux);
-//                     else if(possivel_remover((*raiz)->center))
-//                         filho = buscar_menor_filho((*raiz)->center, &pai_aux, &info_aux);
-//                     else if((*raiz)->infoCount == 1)
-//                     {
-//                         if(pai != NULL)
-//                         {
-//                             if(*raiz == pai->left || (pai->infoCount == 2 && (*raiz == pai->center)))
-//                             {
-//                                 filho = buscar_menor_filho((*raiz)->center, &pai_aux, &info_aux);
-//                                 pai_aux = buscar_pai(*origem, pai->info1.portugueseWord);
-
-//                                 if(*raiz == pai->left)
-//                                     movimento_onda(pai->info1, &(filho->info2), pai_aux, origem, origem);
-//                                 else
-//                                     movimento_onda(pai->info2, &(filho->info2), pai_aux, origem, origem);
-//                             }
-//                             else
-//                             {
-//                                 filho = buscar_maior_filho((*raiz)->left, &pai_aux, &info_aux);
-//                                 pai_aux = buscar_pai(*origem, pai->info1.portugueseWord);
-
-//                                 filho->info2 = filho->info1;
-//                                 if(pai->infoCount == 2 && (*raiz == pai->right))
-//                                     movimento_onda(pai->info2, &(filho->info1), pai_aux, origem, origem);
-//                                 else
-//                                     movimento_onda(pai->info1, &(filho->info1), pai_aux, origem, origem);
-//                             }
-//                         }
-//                         else
-//                         {
-//                             PortugueseEnglish *aux;
-//                             aux = *raiz;
-
-//                             no23_juntar((*raiz)->left, (*raiz)->center, raiz);
-//                             juntar = 1;
-                            
-//                             no23_desalocar(&aux);
-//                         }
-//                     }
-
-//                     if(pai != NULL && !juntar)
-//                         movimento_onda(info_aux, &((*raiz)->info1), pai_aux, origem, &filho);
-//                 }
-//             }
-//         }
-//         else
-//         {
-//             if(info < (*raiz)->info1.portugueseWord)
-//                 removeu = arvore23_remover(&(*raiz)->left, info, *raiz, origem);
-//             else if((*raiz)->infoCount == 1 || info < (*raiz)->info2.portugueseWord)
-//                 removeu = arvore23_remover(&(*raiz)->center, info, *raiz, origem);
-//             else
-//                 removeu = arvore23_remover(&(*raiz)->right, info, *raiz, origem);
-//         }
-//     }
-
-//     return removeu;
-// }
+// ---------------------------------------------------- XXXXXX -------------------------------------------------
+// IV - informar uma palavra em português e a unidade a qual a mesma pertence e então removê-la, para isto
+// deve remover a palavra em inglês da árvore binária correspondente a palavra em português da mesma
+// unidade. Caso ela seja a única palavra na árvore binária, a palavra em português deve ser removida da
+// árvore 2-3 */
+// ---------------------------------------------------- XXXXXX -------------------------------------------------

@@ -26,22 +26,36 @@ int main() {
     insertPortugueseWord(&root, createInfo("house", "casa", 1), &promote, NULL);
     insertPortugueseWord(&root, createInfo("car", "carro", 1), &promote, NULL);
     insertPortugueseWord(&root, createInfo("cat", "gato", 2), &promote, NULL);
+    
     insertPortugueseWord(&root, createInfo("dog", "cachorro", 2), &promote, NULL);
     insertPortugueseWord(&root, createInfo("tree", "árvore", 3), &promote, NULL);
     insertPortugueseWord(&root, createInfo("computer", "computador", 3), &promote, NULL);
+    
     insertPortugueseWord(&root, createInfo("book", "livro", 3), &promote, NULL);
     insertPortugueseWord(&root, createInfo("window", "janela", 4), &promote, NULL);
     insertPortugueseWord(&root, createInfo("door", "porta", 4), &promote, NULL);
+    
     insertPortugueseWord(&root, createInfo("table", "mesa", 4), &promote, NULL);
     insertPortugueseWord(&root, createInfo("chair", "cadeira", 4), &promote, NULL);
+    insertPortugueseWord(&root, createInfo("chair", "poltrona", 4), &promote, NULL);
+
     insertPortugueseWord(&root, createInfo("phone", "telefone", 5), &promote, NULL);
+    
     insertPortugueseWord(&root, createInfo("keyboard", "teclado", 5), &promote, NULL);
     insertPortugueseWord(&root, createInfo("notebook", "caderno", 5), &promote, NULL);
     insertPortugueseWord(&root, createInfo("pen", "caneta", 5), &promote, NULL);
 
-    // Display words in the tree
-    printf("Words in the tree:\n");
-    displayWords(root);
+
+    for (int i = 1; i <= 5; i++)
+    {
+        printf("\n--------------------\n");
+        printf("Palavras da Unidade %d\n", i);
+        printWordsByUnit(root, i);
+        printf("\n--------------------\n\n");
+    }
+
+
+    findEnglishByPortuguese(root, "cadeira");
 
     return 0;
 }
