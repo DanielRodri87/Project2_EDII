@@ -1,57 +1,81 @@
-#ifndef DICT_H
-#define DICT_H
+#ifndef DICTIONARY_H
+#define DICTIONARY_H
 
-typedef struct st_info_ArvoreBinaria
+typedef struct BinaryTreeInfo
 {
-  char *palavra_ingles;
-  char *nome_unidade;
-} InfoArvoreBinaria;
+    char *englishWord;
+    char *unitName;
+} BinaryTreeInfo;
 
-typedef struct st_ArvoreBinaria
+typedef struct BinaryTree
 {
-  InfoArvoreBinaria info;
-  struct st_ArvoreBinaria *esquerda;
-  struct st_ArvoreBinaria *direita;
-} ArvoreBinaria;
+    BinaryTreeInfo info;
+    struct BinaryTree *left;
+    struct BinaryTree *right;
+} BinaryTree;
 
-
-typedef enum en_COR
+typedef enum Color
 {
-  VERMELHO = 0,
-  PRETO = 1
-} Cor;
+    Red = 0,
+    Black = 1
+} Color;
 
-typedef struct st_InfoMain
+typedef struct MainInfo
 {
-  ArvoreBinaria *arv_binaria_palavra_ingles;
-  char *palavra_portugues;
-} InfoMain;
+    BinaryTree *binaryTreeEnglishWord;
+    char *portugueseWord;
+} MainInfo;
 
-typedef struct st_ArvoreVermelhoPreto
+typedef struct RedBlackTree
 {
-  InfoMain info;
+    MainInfo info;
+    Color color;
+    struct RedBlackTree *left;
+    struct RedBlackTree *right;
+} RedBlackTree;
 
-  Cor cor;
-  struct st_ArvoreVermelhoPreto *esq;
-  struct st_ArvoreVermelhoPreto *dir;
-} ArvoreVermelhoPreto;
+typedef enum InputType
+{
+    UnitName,
+    EnglishPortugueseWord,
+} InputType;
 
+// File Handling
+InputType ReadIdentifyLine(const char *line);
+int PopulateTreeFromLine(RedBlackTree **root, const char *line, char *unitName);
+int ReadBlocks(RedBlackTree **root);
 
-void aloca_arvore_vermelho_preto(ArvoreVermelhoPreto **raiz);
-void free_arvore_vermelho_preto(ArvoreVermelhoPreto **raiz);
-void def_arvore_vermelho_preto(ArvoreVermelhoPreto *raiz, char *plv_ingles, char *plv_portugues, char *nome_unidade);
-void show_arvore_vermelho_preto(const ArvoreVermelhoPreto *raiz);
-int inserir_arvore_vermelho_preto(ArvoreVermelhoPreto **raiz, ArvoreVermelhoPreto *new_node);
-int remover_arvore_vermelho_preto(ArvoreVermelhoPreto **raiz, char *plv_ingles);
+// Red-black tree
+void AllocateRedBlackTree(RedBlackTree **root);
+void FreeRedBlackTree(RedBlackTree **root);
+void DefineRedBlackTree(RedBlackTree *root, char *engWord, char *portWord, char *unitName);
+void DisplayRedBlackTree(const RedBlackTree *root);
+int InsertRedBlackTree(RedBlackTree **root, RedBlackTree *newNode);
+int RemoveRedBlackTree(RedBlackTree **root, char *engWord);
 
-void aloca_arvore_binaria(ArvoreBinaria **raiz);
-void def_arvore_binaria(ArvoreBinaria *raiz, char *palavra_ingles, char *nome_unidade);
-void show_arvore_binaria(ArvoreBinaria *raiz);
-void free_arvore_binaria(ArvoreBinaria **raiz);
-int atualizar_nome_unidade(ArvoreBinaria *raiz, char *nome_unidade);
-int insercao_arvore_binaria(ArvoreBinaria **raiz, ArvoreBinaria *new_node);
-ArvoreBinaria *so_um_filho(ArvoreBinaria **raiz);
-ArvoreBinaria *menor_filho(ArvoreBinaria **raiz);
-int remocao_arvore_binaria(ArvoreBinaria **raiz, const char *palavra_ingles);
+// Display Functions
+void DisplayRedBlackTreeByUnit(const RedBlackTree *root, const char *unit);
+void DisplayRedBlackTreeByPortugueseWord(const RedBlackTree *root, const char *word);
+void ShowBinaryTree(BinaryTree *root);
 
-#endif
+// Binary Tree Functions
+void AllocateBinaryTree(BinaryTree **root);
+void DefineBinaryTree(BinaryTree *root, char *englishWord, char *unitName);
+void FreeBinaryTreeInfo(BinaryTreeInfo *info);
+void FreeBinaryTree(BinaryTree **root);
+int UpdateUnitName(BinaryTree *root, char *unitName);
+int InsertBinaryTree(BinaryTree **root, BinaryTree *newNode);
+BinaryTree *OnlyOneChild(BinaryTree **root);
+int IsLeaf(BinaryTree **root);
+BinaryTree *SmallestChild(BinaryTree **root);
+void FreeValue(BinaryTree **root);
+int RemoveBinaryTree(BinaryTree **root, const char *englishWord);
+
+// Auxiliary Functions
+int StringLength(char *string);
+int AllocateString(char **string, int size);
+int NamePresent(const char *nameToFind, const char *names);
+void JoinNameWithComma(char *oldName, char *newName, char **merged);
+void RemoveComma(char *word);
+
+#endif // DICTIONARY_H
