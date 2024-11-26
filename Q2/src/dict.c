@@ -150,8 +150,6 @@ void ShowBinaryTree(BinaryTree *root)
   }
 }
 
-
-
 void AllocateRedBlackTreeNode(RedBlackTree **root)
 {
     *root = (RedBlackTree *)malloc(sizeof(RedBlackTree));
