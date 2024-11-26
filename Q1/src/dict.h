@@ -19,6 +19,8 @@ typedef struct PortugueseEnglish {
 } PortugueseEnglish;
 
 PortugueseEnglish* createNode(Info info, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild);
+int LargestUnit(PortugueseEnglish *root);
+void removeWord(PortugueseEnglish **root, const char *word, int unit);
 
 PortugueseEnglish* splitNode(PortugueseEnglish **node, Info value, Info *promote, PortugueseEnglish **child);
 PortugueseEnglish* addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child);
@@ -28,6 +30,5 @@ PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
 void displayWords(PortugueseEnglish *root);
 void printWordsByUnit(PortugueseEnglish *root, int unit);
 void findEnglishByPortuguese(PortugueseEnglish *root, const char *portugueseWord);
-
 
 #endif

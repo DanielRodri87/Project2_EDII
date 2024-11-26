@@ -12,7 +12,7 @@ void test()
 
 int isLeaf(PortugueseEnglish *node)
 {
-    return node->left == NULL;
+    return (node->left == NULL);
 }
 
 PortugueseEnglish *createNode(const Info information, PortugueseEnglish *leftChild, PortugueseEnglish *centerChild)
@@ -20,9 +20,7 @@ PortugueseEnglish *createNode(const Info information, PortugueseEnglish *leftChi
     PortugueseEnglish *node = (PortugueseEnglish *)malloc(sizeof(PortugueseEnglish));
 
     if (!node)
-    {
         printf("Failed to create node\n");
-    }
 
     if (node)
     {
@@ -32,7 +30,7 @@ PortugueseEnglish *createNode(const Info information, PortugueseEnglish *leftChi
         node->infoCount = 1;
     }
 
-    return node;
+    return (node);
 }
 
 PortugueseEnglish *addKey(PortugueseEnglish *node, Info info, PortugueseEnglish *child)
@@ -51,7 +49,7 @@ PortugueseEnglish *addKey(PortugueseEnglish *node, Info info, PortugueseEnglish 
     }
 
     node->infoCount = 2;
-    return node;
+    return (node);
 }
 
 PortugueseEnglish *splitNode(PortugueseEnglish **node, const Info information, Info *promote, PortugueseEnglish **child)
@@ -83,7 +81,62 @@ PortugueseEnglish *splitNode(PortugueseEnglish **node, const Info information, I
     }
     (*node)->infoCount = 1;
 
-    return greater;
+    return (greater);
+}
+
+void addEnglishTranslation(EnglishPortuguese **translations, const char *englishWord)
+{
+    EnglishPortuguese *current = *translations;
+
+    while (current)
+    {
+        if (strcmp(current->word, englishWord) == 0)
+            return; // Palavra já existe, não adicionar novamente.
+
+        if (strcmp(current->word, englishWord) > 0)
+        {
+            if (!current->left)
+                break;
+            current = current->left;
+        }
+        else
+        {
+            if (!current->right)
+                break;
+            current = current->right;
+        }
+    }
+
+    EnglishPortuguese *newTranslation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
+    newTranslation->word = strdup(englishWord);
+    newTranslation->left = newTranslation->right = NULL;
+
+    if (!current)
+        *translations = newTranslation;
+    else if (strcmp(current->word, englishWord) > 0)
+        current->left = newTranslation;
+    else
+        current->right = newTranslation;
+}
+
+int updateExistingTranslation(PortugueseEnglish *node, Info info)
+{
+    int controle = 0;
+    if (node != NULL)
+    {
+        if (strcmp(node->info1.portugueseWord, info.portugueseWord) == 0)
+        {
+            addEnglishTranslation(&(node->info1.englishTranslation), info.englishTranslation->word);
+            controle = 1;
+        }
+
+        if (node->infoCount == 2 && strcmp(node->info2.portugueseWord, info.portugueseWord) == 0)
+        {
+            addEnglishTranslation(&(node->info2.englishTranslation), info.englishTranslation->word);
+            controle = 1;
+        }
+    }
+    return (controle);
 }
 
 PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Info *promote, PortugueseEnglish **parent)
@@ -93,17 +146,16 @@ PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
     greaterNode = NULL;
 
     if (*node == NULL)
-    {
         *node = createNode(info, NULL, NULL);
-    }
     else
     {
+        if (updateExistingTranslation(*node, info))
+            return NULL;
+
         if (isLeaf(*node))
         {
             if ((*node)->infoCount == 1)
-            {
                 *node = addKey(*node, info, NULL);
-            }
             else
             {
                 greaterNode = splitNode(node, info, promote, NULL);
@@ -117,19 +169,13 @@ PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
         else
         {
             if (strcmp(info.portugueseWord, (*node)->info1.portugueseWord) < 0)
-            {
                 greaterNode = insertPortugueseWord(&((*node)->left), info, promote, node);
-            }
             else
             {
                 if (((*node)->infoCount == 1) || (strcmp(info.portugueseWord, (*node)->info2.portugueseWord) < 0))
-                {
                     greaterNode = insertPortugueseWord(&((*node)->center), info, promote, node);
-                }
                 else
-                {
                     greaterNode = insertPortugueseWord(&((*node)->right), info, promote, node);
-                }
             }
         }
 
@@ -152,35 +198,9 @@ PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
         }
     }
 
-    return greaterNode;
+    return (greaterNode);
 }
 
-int LargestUnit(PortugueseEnglish *root)
-{
-    int bigger = 0;
-    if (root != NULL)
-    {
-        if (root->infoCount != 2)
-        {
-            if (root->info1.unit > bigger)
-                bigger = root->info1.unit;
-
-            displayWords(root->left);
-            displayWords(root->center);
-        }
-        else
-        {
-            if (root->info2.unit > bigger)
-                bigger = root->info2.unit;
-
-            displayWords(root->left);
-            displayWords(root->center);
-            displayWords(root->right);
-        }
-    }
-
-    return (bigger);
-}
 
 void displayWords(PortugueseEnglish *root)
 {
@@ -202,9 +222,29 @@ void displayWords(PortugueseEnglish *root)
         displayWords(root->center);
 
         if (root->infoCount == 2)
-        {
             displayWords(root->right);
-        }
+    }
+}
+
+int LargestUnit(PortugueseEnglish *root)
+{
+    if (root != NULL)
+    {
+        int currentMax = (root->infoCount == 2) ? (root->info1.unit > root->info2.unit ? root->info1.unit : root->info2.unit) : root->info1.unit;
+
+        int leftMax = LargestUnit(root->left);
+        int centerMax = LargestUnit(root->center);
+        int rightMax = (root->infoCount == 2) ? LargestUnit(root->right) : 0;
+
+        int bigger = currentMax;
+        if (leftMax > bigger)
+            bigger = leftMax;
+        if (centerMax > bigger)
+            bigger = centerMax;
+        if (rightMax > bigger)
+            bigger = rightMax;
+
+        return (bigger);
     }
 }
 
@@ -217,23 +257,20 @@ void printWordsByUnit(PortugueseEnglish *root, int unit)
     if (root != NULL)
     {
         if (root->infoCount >= 1 && root->info1.unit == unit)
-        {
-            printf("Português: %s | Inglês: %s\n",
-                   root->info1.portugueseWord,
-                   root->info1.englishTranslation->word);
-        }
+            printf("%s: %s;\n",
+                   root->info1.englishTranslation->word,
+                   root->info1.portugueseWord);
+        
         if (root->infoCount == 2 && root->info2.unit == unit)
-        {
-            printf("Português: %s | Inglês: %s\n",
-                   root->info2.portugueseWord,
-                   root->info2.englishTranslation->word);
-        }
+            printf("%s: %s;\n",
+                   root->info2.englishTranslation->word,
+                   root->info2.portugueseWord);
+
         printWordsByUnit(root->left, unit);
         printWordsByUnit(root->center, unit);
+
         if (root->infoCount == 2)
-        {
             printWordsByUnit(root->right, unit);
-        }
     }
 }
 
@@ -262,6 +299,8 @@ void findEnglishByPortuguese(PortugueseEnglish *root, const char *portugueseWord
 // das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da
 // árvore 2-3
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
+
+
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // IV - informar uma palavra em português e a unidade a qual a mesma pertence e então removê-la, para isto
