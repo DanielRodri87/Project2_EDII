@@ -16,30 +16,27 @@ Info *CreateInfo(int start, int end, int status)
     return (info);
 }
 
-Memory *CreateNode(Info *info, Memory *leftNode, Memory *leftCenterNode)
+Memory *createNode(const Info *information, Memory *leftChild, Memory *centerChild)
 {
     Memory *node = (Memory *)malloc(sizeof(Memory));
-    
-    node->info1 = info;
-    node->numKeys = 1;
-    node->left = leftNode;
-    node->leftCenter = leftCenterNode;
-    node->center = NULL;
-    node->rightCenter = NULL;
-    node->right = NULL;
+
+    if (!node)
+        printf("Falha ao criar o Nó!\n");
+
+    if (node)
+    {
+        node->info1 = information;
+        node->left = leftChild;
+        node->center = centerChild;
+        node->numKeys = 1;
+    }
 
     return (node);
 }
 
-int IsLeaf(Memory *node)
+int isLeaf(Memory *node)
 {
-    int status;
-    if (node->left == NULL)
-        status = 1;
-    else
-        status = 0;
-
-    return (status);
+    return (node->left == NULL);
 }
 
 
@@ -47,160 +44,111 @@ void AddInfo(Memory **node, Info *info, Memory *child)
 {
     if ((*node)->numKeys == 1)
     {
-        if (info->status == (*node)->info1->status)
-        {
-            (*node)->info1->end = info->end;
-        }
-        else if (info->start > (*node)->info1->start)
+        if (info->start > (*node)->info1->start)
         {
             (*node)->info2 = info;
-            (*node)->center = child;
-            (*node)->numKeys = 2;
+            (*node)->right = child;
         }
         else
         {
             (*node)->info2 = (*node)->info1;
             (*node)->info1 = info;
-            (*node)->center = (*node)->leftCenter;
-            (*node)->leftCenter = child;
-            (*node)->numKeys = 2;
+            (*node)->right = (*node)->center;
+            (*node)->center = child;
         }
+        (*node)->numKeys = 2;
     }
     else if ((*node)->numKeys == 2)
     {
-        if (info->status == (*node)->info2->status)
+        Memory *newNode = (Memory *)malloc(sizeof(Memory));
+        newNode->numKeys = 1;
+        newNode->left = NULL;
+        newNode->center = NULL;
+        newNode->right = NULL;
+
+        if (info->start > (*node)->info2->start)
         {
-            (*node)->info2->end = info->end;
-        }
-        else if (info->start > (*node)->info2->start)
-        {
-            (*node)->info3 = info;
-            (*node)->rightCenter = child;
-            (*node)->numKeys = 3;
-        }
-        else if (info->start > (*node)->info1->start && info->start < (*node)->info2->start)
-        {
-            (*node)->info3 = (*node)->info2;
-            (*node)->info2 = info;
-            (*node)->rightCenter = (*node)->center;
-            (*node)->center = child;
-            (*node)->numKeys = 3;
-        }
-        else
-        {
-            (*node)->info3 = (*node)->info2;
-            (*node)->info2 = (*node)->info1;
-            (*node)->info1 = info;
-            (*node)->rightCenter = (*node)->center;
-            (*node)->center = (*node)->leftCenter;
-            (*node)->leftCenter = child;
-            (*node)->numKeys = 3;
-        }
-    }
-    else
-    {
-        if (info->status == (*node)->info3->status)
-        {
-            (*node)->info3->end = info->end;
-        }
-        else if (info->start > (*node)->info3->start)
-        {
-            (*node)->info4 = info;
-            (*node)->right = child;
-            (*node)->numKeys = 4;
-        }
-        else if (info->start > (*node)->info2->start && info->start < (*node)->info3->start)
-        {
-            (*node)->info4 = (*node)->info3;
-            (*node)->info3 = info;
-            (*node)->right = (*node)->rightCenter;
-            (*node)->rightCenter = child;
-            (*node)->numKeys = 4;
+            newNode->info1 = info;
+            newNode->left = (*node)->right;
+            newNode->center = child;
+            (*node)->numKeys = 1;
         }
         else if (info->start > (*node)->info1->start && info->start < (*node)->info2->start)
         {
-            (*node)->info4 = (*node)->info3;
-            (*node)->info3 = (*node)->info2;
-            (*node)->info2 = info;
-            (*node)->right = (*node)->rightCenter;
-            (*node)->rightCenter = (*node)->center;
-            (*node)->center = child;
-            (*node)->numKeys = 4;
+            newNode->info1 = (*node)->info2;
+            newNode->left = child;
+            newNode->center = (*node)->right;
+            (*node)->info2 = NULL;
+            (*node)->numKeys = 1;
         }
         else
         {
-            (*node)->info4 = (*node)->info3;
-            (*node)->info3 = (*node)->info2;
+            newNode->info1 = (*node)->info2;
             (*node)->info2 = (*node)->info1;
             (*node)->info1 = info;
-            (*node)->right = (*node)->rightCenter;
-            (*node)->rightCenter = (*node)->center;
-            (*node)->center = (*node)->leftCenter;
-            (*node)->leftCenter = child;
-            (*node)->numKeys = 4;
+            newNode->left = (*node)->center;
+            newNode->center = (*node)->right;
+            (*node)->center = child;
+            (*node)->numKeys = 1;
         }
+
+        Split splitResult;
+        splitResult.largestNode = newNode;
+        splitResult.promote = (*node)->info2;
+
     }
 }
 
+
 Split SplitNode(Memory **root, Info *info, Memory *child)
 {
-    Memory *largestNode;
+    Memory *largestNode = (Memory *)malloc(sizeof(Memory));
     Info *promote = NULL;
     Split itBroke;
 
-    if (info->start > (*root)->info4->start && (*root)->info4 != NULL)
+    // Inicializando o novo nó para armazenar a chave promovida
+    largestNode->info1 = NULL;
+    largestNode->info2 = NULL;
+    largestNode->left = NULL;
+    largestNode->center = NULL;
+    largestNode->right = NULL;
+    largestNode->numKeys = 1;
+
+    if (info->start > (*root)->info2->start)
     {
-        promote = CreateInfo((*root)->info3->start, (*root)->info3->end, (*root)->info3->status);
-        largestNode = CreateNode((*root)->info4, (*root)->rightCenter, (*root)->right);
-        largestNode->info2 = info;
+        promote = (*root)->info2;
+        (*root)->info2 = NULL;
+        (*root)->numKeys = 1;
+
+        largestNode->info1 = info;
+        largestNode->left = (*root)->center;
         largestNode->center = child;
-        largestNode->numKeys = 2;
-    }
-    else if (info->start > (*root)->info3->start)
-    {
-        promote = (*root)->info3;
-        largestNode = CreateNode(info, (*root)->rightCenter, child);
-        largestNode->info2 = (*root)->info4;
-        largestNode->center = (*root)->right;
-        largestNode->numKeys = 2;
-    }
-    else if (info->start > (*root)->info2->start)
-    {
-        promote = info;
-        largestNode = CreateNode((*root)->info3, (*root)->center, (*root)->rightCenter);
-        largestNode->info2 = (*root)->info4;
-        largestNode->center = (*root)->right;
-        largestNode->numKeys = 2;
     }
     else if (info->start > (*root)->info1->start)
     {
-        promote = (*root)->info2;
-        largestNode = CreateNode((*root)->info3, (*root)->center, (*root)->rightCenter);
-        largestNode->info2 = (*root)->info4;
+        promote = info;
+        largestNode->info1 = (*root)->info2;
+        largestNode->left = child;
         largestNode->center = (*root)->right;
-        largestNode->numKeys = 2;
-        (*root)->info2 = info;
-        (*root)->center = child;
+        
+        (*root)->info2 = NULL;
+        (*root)->numKeys = 1;
     }
     else
     {
-        promote = (*root)->info2;
-        largestNode = CreateNode((*root)->info3, (*root)->center, (*root)->rightCenter);
-        largestNode->info2 = (*root)->info4;
-        largestNode->center = (*root)->right;
-        largestNode->numKeys = 2;
-        (*root)->info2 = (*root)->info1;
-        (*root)->center = (*root)->leftCenter;
+        promote = (*root)->info1;
         (*root)->info1 = info;
-        (*root)->leftCenter = child;
+        
+        largestNode->info1 = (*root)->info2;
+        largestNode->left = (*root)->center;
+        largestNode->center = (*root)->right;
+
+        (*root)->info2 = NULL;
+        (*root)->numKeys = 1;
     }
 
-    (*root)->numKeys = 2;
-    (*root)->rightCenter = NULL;
+    (*root)->center = NULL;
     (*root)->right = NULL;
-
-    (*root)->info3 = NULL;
-    (*root)->info4 = NULL;
 
     itBroke.largestNode = largestNode;
     itBroke.promote = promote;
@@ -208,20 +156,20 @@ Split SplitNode(Memory **root, Info *info, Memory *child)
     return (itBroke);
 }
 
-void Insert45(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag)
+void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag)
 {
     if (*root == NULL)
     {
         Info *nova_info = CreateInfo(start, end, status);
         *root = CreateNode(nova_info, NULL, NULL);
-        *flag = 1; 
+        *flag = 1;
     }
     else
     {
         if (IsLeaf(*root))
         {
-            *flag = 1; 
-            if ((*root)->numKeys < 4)
+            *flag = 1;
+            if ((*root)->numKeys < 2)
             {
                 Info *nova_info = CreateInfo(start, end, status);
                 AddInfo(root, nova_info, NULL);
@@ -232,15 +180,12 @@ void Insert45(Memory **root, Memory *parent, Info **promote, int start, int end,
                 Split resultado = SplitNode(root, nova_info, NULL);
 
                 if (!parent)
-                {
                     *root = CreateNode(resultado.promote, *root, resultado.largestNode);
-                }
+                
                 else
                 {
-                    if (parent->numKeys < 4)
-                    {
+                    if (parent->numKeys < 2)
                         AddInfo(&parent, resultado.promote, resultado.largestNode);
-                    }
                     else
                     {
                         resultado = SplitNode(&parent, resultado.promote, resultado.largestNode);
@@ -252,19 +197,16 @@ void Insert45(Memory **root, Memory *parent, Info **promote, int start, int end,
         else
         {
             if (start < (*root)->info1->start)
-                Insert45(&(*root)->left, *root, promote, start, end, status, flag);
-
-            else if ((*root)->numKeys == 1 || ((*root)->numKeys <= 2 && start < (*root)->info2->start))
-                Insert45(&((*root)->leftCenter), *root, promote, start, end, status, flag);
-
-            else if (((*root)->numKeys == 2) || ((*root)->numKeys <= 2 && start < (*root)->info3->start))
-                Insert45(&((*root)->center), *root, promote, start, end, status, flag);
-
+                Insert23(&(*root)->left, *root, promote, start, end, status, flag);
+            else if ((*root)->numKeys == 1 || (start < (*root)->info2->start))
+                Insert23(&(*root)->center, *root, promote, start, end, status, flag);
             else
-                Insert45(&((*root)->right), *root, promote, start, end, status, flag);
+                Insert23(&(*root)->right, *root, promote, start, end, status, flag);
+            
         }
     }
 }
+
 
 Memory *FindSpace(Memory *root, int requiredSpace)
 {
@@ -274,31 +216,27 @@ Memory *FindSpace(Memory *root, int requiredSpace)
         if (IsLeaf(root))
         {
             int espacoDisponivel1 = root->info1->end - root->info1->start;
-            int espacoDisponivel2 = (root->numKeys >= 2) ? root->info2->end - root->info2->start : 0;
-            int espacoDisponivel3 = (root->numKeys >= 3) ? root->info3->end - root->info3->start : 0;
-            int espacoDisponivel4 = (root->numKeys == 4) ? root->info4->end - root->info4->start : 0;
+            int espacoDisponivel2 = (root->numKeys == 2) ? root->info2->end - root->info2->start : 0;
 
             if (root->info1->status == FREE && espacoDisponivel1 >= requiredSpace)
                 found = root;
-            else if (root->numKeys >= 2 && root->info2->status == FREE && espacoDisponivel2 >= requiredSpace)
+            else if (root->numKeys == 2 && root->info2->status == FREE && espacoDisponivel2 >= requiredSpace)
                 found = root;
-            else if (root->numKeys >= 3 && root->info3->status == FREE && espacoDisponivel3 >= requiredSpace)
-                found = root;
-            else if (root->numKeys == 4 && root->info4->status == FREE && espacoDisponivel4 >= requiredSpace)
-                found = root;
-            
         }
         else
         {
             found = FindSpace(root->left, requiredSpace);
-            if (root->left != NULL)
-                FindSpace(root->left, requiredSpace);
+            if (found == NULL)
+                found = FindSpace(root->center, requiredSpace);
+            if (found == NULL && root->numKeys == 2)
+                found = FindSpace(root->right, requiredSpace);
+            
         }
     }
     return (found);
 }
 
-Memory *SourceSpace(Memory *root, int RequiredSpace)
+Memory *SourceSpace(Memory *root, int requiredSpace)
 {
-    return FindSpace(root, RequiredSpace);
+    return FindSpace(root, requiredSpace);
 }

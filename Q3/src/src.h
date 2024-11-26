@@ -15,13 +15,9 @@ typedef struct Memory
 {
     Info *info1;
     Info *info2;
-    Info *info3;
-    Info *info4;
 
     struct Memory *left;
-    struct Memory *leftCenter;
     struct Memory *center;
-    struct Memory *rightCenter;
     struct Memory *right;
 
     int numKeys;
@@ -34,13 +30,12 @@ typedef struct Split
     Info *promote;
 } Split;
 
-
 Info *CreateInfo(int start, int end, int status);
-Memory *CreateNode(Info *info, Memory *leftNode, Memory *leftCenterNode);
-int IsLeaf(Memory *node);
+Memory *createNode(const Info *information, Memory *leftChild, Memory *centerChild);
+int isLeaf(Memory *node);
 void AddInfo(Memory **node, Info *info, Memory *child);
 Split SplitNode(Memory **root, Info *info, Memory *child);
-void Insert45(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag);
+void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag);
 Memory *FindSpace(Memory *root, int requiredSpace);
 Memory *SourceSpace(Memory *root, int RequiredSpace);
 
