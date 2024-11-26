@@ -9,6 +9,6 @@ src_dir = 'src'
 
 executable(
   'my_program',
-  [src_dir + '/main.c',  + '/src.c'],
-  include_directories: src_dir
+  [src_dir + '/main.c', src_dir + '/src.c'],
+  include_directories: include_directories(src_dir)
 )

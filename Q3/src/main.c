@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h> 
 #include "src.h"
+
 #define BLOCO 100
 
 int main()
@@ -43,7 +44,7 @@ int main()
 	} 
 	while (status != FREE && status != OCCUPIED);
 
-	Insert45(&tree, NULL,NULL, start, end, status, &flag);
+	Insert23(&tree, NULL,NULL, start, end, status, &flag);
 	start = end + 1;
 
 	while (end != BLOCO)
@@ -56,7 +57,7 @@ int main()
 			status = rand() % 2;
 
 			flag = 0;
-			Insert45(&tree, NULL, NULL, start, end, status, &flag);
+			Insert23(&tree, NULL, NULL, start, end, status, &flag);
 			start = end + 1;
 		}
 		else
