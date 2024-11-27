@@ -39,7 +39,6 @@ int isLeaf(Memory *node)
     return (node->left == NULL);
 }
 
-
 void AddInfo(Memory **node, Info *info, Memory *child)
 {
     if ((*node)->numKeys == 1)
@@ -95,10 +94,8 @@ void AddInfo(Memory **node, Info *info, Memory *child)
         // Split splitResult;
         // splitResult.largestNode = newNode;
         // splitResult.promote = (*node)->info2;
-
     }
 }
-
 
 Split SplitNode(Memory **root, Info *info, Memory *child)
 {
@@ -130,7 +127,7 @@ Split SplitNode(Memory **root, Info *info, Memory *child)
         largestNode->info1 = (*root)->info2;
         largestNode->left = child;
         largestNode->center = (*root)->right;
-        
+
         (*root)->info2 = NULL;
         (*root)->numKeys = 1;
     }
@@ -138,7 +135,7 @@ Split SplitNode(Memory **root, Info *info, Memory *child)
     {
         promote = (*root)->info1;
         (*root)->info1 = info;
-        
+
         largestNode->info1 = (*root)->info2;
         largestNode->left = (*root)->center;
         largestNode->center = (*root)->right;
@@ -181,7 +178,7 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
 
                 if (!parent)
                     *root = createNode(resultado.promote, *root, resultado.largestNode);
-                
+
                 else
                 {
                     if (parent->numKeys < 2)
@@ -202,11 +199,9 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
                 Insert23(&(*root)->center, *root, promote, start, end, status, flag);
             else
                 Insert23(&(*root)->right, *root, promote, start, end, status, flag);
-            
         }
     }
 }
-
 
 Memory *FindSpace(Memory *root, int requiredSpace)
 {
@@ -230,7 +225,6 @@ Memory *FindSpace(Memory *root, int requiredSpace)
                 found = FindSpace(root->center, requiredSpace);
             if (found == NULL && root->numKeys == 2)
                 found = FindSpace(root->right, requiredSpace);
-            
         }
     }
     return (found);
@@ -241,14 +235,17 @@ Memory *SourceSpace(Memory *root, int requiredSpace)
     return FindSpace(root, requiredSpace);
 }
 
-void DisplayInfos(Memory *root) {
-    if (root) {
+void DisplayInfos(Memory *root)
+{
+    if (root)
+    {
         DisplayInfos(root->left);
         printf("Começo: %d | Fim %d | Status: %d\n", root->info1->start, root->info1->end, root->info1->status);
         DisplayInfos(root->center);
 
-        if (root->numKeys == 2) {
-            printf("Começo: %d | Fim %d | Status: %d\n", root->info1->start, root->info1->end, root->info1->status);
+        if (root->numKeys == 2)
+        {
+            printf("Começo: %d | Fim %d | Status: %d\n", root->info2->start, root->info2->end, root->info2->status);
             DisplayInfos(root->right);
         }
     }
