@@ -16,7 +16,7 @@ Info *CreateInfo(int start, int end, int status)
     return (info);
 }
 
-Memory *createNode(const Info *information, Memory *leftChild, Memory *centerChild)
+Memory *createNode(Info *information, Memory *leftChild, Memory *centerChild)
 {
     Memory *node = (Memory *)malloc(sizeof(Memory));
 
@@ -92,9 +92,9 @@ void AddInfo(Memory **node, Info *info, Memory *child)
             (*node)->numKeys = 1;
         }
 
-        Split splitResult;
-        splitResult.largestNode = newNode;
-        splitResult.promote = (*node)->info2;
+        // Split splitResult;
+        // splitResult.largestNode = newNode;
+        // splitResult.promote = (*node)->info2;
 
     }
 }
@@ -161,12 +161,12 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
     if (*root == NULL)
     {
         Info *nova_info = CreateInfo(start, end, status);
-        *root = CreateNode(nova_info, NULL, NULL);
+        *root = createNode(nova_info, NULL, NULL);
         *flag = 1;
     }
     else
     {
-        if (IsLeaf(*root))
+        if (isLeaf(*root))
         {
             *flag = 1;
             if ((*root)->numKeys < 2)
@@ -180,7 +180,7 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
                 Split resultado = SplitNode(root, nova_info, NULL);
 
                 if (!parent)
-                    *root = CreateNode(resultado.promote, *root, resultado.largestNode);
+                    *root = createNode(resultado.promote, *root, resultado.largestNode);
                 
                 else
                 {
@@ -189,7 +189,7 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
                     else
                     {
                         resultado = SplitNode(&parent, resultado.promote, resultado.largestNode);
-                        parent = CreateNode(resultado.promote, parent, resultado.largestNode);
+                        parent = createNode(resultado.promote, parent, resultado.largestNode);
                     }
                 }
             }
@@ -213,7 +213,7 @@ Memory *FindSpace(Memory *root, int requiredSpace)
     Memory *found = NULL;
     if (root != NULL)
     {
-        if (IsLeaf(root))
+        if (isLeaf(root))
         {
             int espacoDisponivel1 = root->info1->end - root->info1->start;
             int espacoDisponivel2 = (root->numKeys == 2) ? root->info2->end - root->info2->start : 0;
@@ -240,3 +240,17 @@ Memory *SourceSpace(Memory *root, int requiredSpace)
 {
     return FindSpace(root, requiredSpace);
 }
+
+void DisplayInfos(Memory *root) {
+    if (root) {
+        DisplayInfos(root->left);
+        printf("Começo: %d | Fim %d | Status: %d\n", root->info1->start, root->info1->end, root->info1->status);
+        DisplayInfos(root->center);
+
+        if (root->numKeys == 2) {
+            printf("Começo: %d | Fim %d | Status: %d\n", root->info1->start, root->info1->end, root->info1->status);
+            DisplayInfos(root->right);
+        }
+    }
+}
+

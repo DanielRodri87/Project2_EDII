@@ -19,7 +19,7 @@ int main()
 		printf("Inicio: ");
 		scanf("%d", &start);
 
-		printf("Fim:");
+		printf("Fim: ");
 		scanf("%d", &end);
 
 	} while (start < 1 || end > BLOCO);
@@ -54,7 +54,10 @@ int main()
 
 		if (end >= start && end <= BLOCO)
 		{
-			status = rand() % 2;
+			if (status == FREE)
+				status = OCCUPIED;
+			else
+				status = FREE;
 
 			flag = 0;
 			Insert23(&tree, NULL, NULL, start, end, status, &flag);
@@ -63,6 +66,8 @@ int main()
 		else
 			printf("Valor de fim inválido. Informe um valor entre 1 e %d: \n", BLOCO);
 	}
+
+	DisplayInfos(tree);
 
 	return 0;
 }
