@@ -31,12 +31,13 @@ typedef struct Split
 } Split;
 
 Info *CreateInfo(int start, int end, int status);
-Memory *createNode(const Info *information, Memory *leftChild, Memory *centerChild);
+Memory *createNode(Info *information, Memory *leftChild, Memory *centerChild);
 int isLeaf(Memory *node);
 void AddInfo(Memory **node, Info *info, Memory *child);
 Split SplitNode(Memory **root, Info *info, Memory *child);
 void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag);
 Memory *FindSpace(Memory *root, int requiredSpace);
 Memory *SourceSpace(Memory *root, int RequiredSpace);
+void DisplayInfos(Memory *root);
 
 #endif
