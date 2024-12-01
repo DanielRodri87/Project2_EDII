@@ -1,10 +1,10 @@
-#include "dict.h"
+#include "dict.c"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-int main()
-{
-    printf("Oi mundo\n");
+int main(){
+
+    printf("Irei testar mais tarde. ou você pode testar e eu testo depois.");
+
     return 0;
 }
