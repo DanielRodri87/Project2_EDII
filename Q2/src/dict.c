@@ -3,21 +3,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-void InsertTreeBin(BinaryTreeNode *node, TreeNodeInfo info)
+void InsertTreeBin(BinaryTreeNode **node, TreeNodeInfo info)
 {
   if (node == NULL)
   {
-    node = (BinaryTreeNode *)malloc(sizeof(BinaryTreeNode));
-    node->info = info;
-    node->left = NULL;
-    node->right = NULL;
+    *node = (BinaryTreeNode *)malloc(sizeof(BinaryTreeNode));
+    (*node)->info = info;
+    (*node)->left = NULL;
+    (*node)->right = NULL;
   }
   else
   {
-    if (strcmp(info.englishWord, node->info.englishWord) < 0)
-      InsertTreeBin(node->left, info);
+      if (strcmp((*node)->info.englishWord, info.englishWord) > 0)
+      InsertTreeBin(&(*node)->left, info);
     else
-      InsertTreeBin(node->right, info);
+      InsertTreeBin(&(*node)->right, info);
   }
 }
 
@@ -70,11 +70,11 @@ int getColor(RedBlackTreeNode *node)
 
 void TreeBalance(RedBlackTreeNode **node)
 {
-  if (getgetColor((*node)->left) == BLACK && getColor((*node)->right) == RED)
-    rotacaoleft(node);
+  if (getColor((*node)->left) == BLACK && getColor((*node)->right) == RED)
+    leftRotate(node);
   if ((*node)->left != NULL && (*node)->left->color == RED && (*node)->left->left != NULL && (*node)->left->left->color == RED)
-    rotacaoright(node);
-  if (getgetColor((*node)->left) == RED && getColor((*node)->right) == RED)
+    rightRotate(node);
+  if (getColor((*node)->left) == RED && getColor((*node)->right) == RED)
     replacementColor(node);
 }
 
@@ -90,7 +90,7 @@ int insertRedBlackTreeNode(RedBlackTreeNode **node, RBTreeNodeInfo info)
   {
     if (strcmp((*node)->info.portugueseWord, info.portugueseWord) == 0)
     {
-      inserirArvBin(&(*node)->info.binaryTreeEnglish, info.binaryTreeEnglish->info);
+      InsertTreeBin(&(*node)->info.binaryTreeEnglish, info.binaryTreeEnglish->info);
       insert = 1;
     }
     else if (strcmp((*node)->info.portugueseWord, info.portugueseWord) > 0)
