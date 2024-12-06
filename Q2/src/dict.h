@@ -36,16 +36,13 @@ typedef struct redBlackTreeNode
   struct redBlackTreeNode *right;
 } RedBlackTreeNode;
 
-/*
-=====================================================================================================
-*/
-
 int insertRedBlackTreeNode(RedBlackTreeNode **root, RBTreeNodeInfo info);
-
 void displayBinaryTree(BinaryTreeNode *root);
-
 void removeRBTreeNodeByEN(RedBlackTreeNode **root, const char *englishWord, int unit);
-
 void removeRBTreeNodeByPT(RedBlackTreeNode **root, char *portugueseWord, int unit);
+
+// 1nd Question
+void printWordsByUnit(RedBlackTreeNode *root, int unit);
+void findEnglishByPortuguese(RedBlackTreeNode *root, const char *portugueseWord);
 
 #endif

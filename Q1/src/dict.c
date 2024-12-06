@@ -87,37 +87,40 @@ PortugueseEnglish *splitNode(PortugueseEnglish **node, const Info information, I
 void addEnglishTranslation(EnglishPortuguese **translations, const char *englishWord)
 {
     EnglishPortuguese *current = *translations;
+    EnglishPortuguese *parent = NULL; 
 
     while (current)
     {
         if (strcmp(current->word, englishWord) == 0)
-            return; // Palavra já existe, não adicionar novamente.
-
-        if (strcmp(current->word, englishWord) > 0)
         {
-            if (!current->left)
-                break;
-            current = current->left;
+            current = NULL; 
         }
         else
         {
-            if (!current->right)
-                break;
-            current = current->right;
+            parent = current; 
+
+            if (strcmp(current->word, englishWord) > 0)
+                current = current->left; 
+            else
+                current = current->right; 
         }
     }
 
-    EnglishPortuguese *newTranslation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
-    newTranslation->word = strdup(englishWord);
-    newTranslation->left = newTranslation->right = NULL;
+    if (current == NULL && (!parent || strcmp(parent->word, englishWord) != 0))
+    {
+        EnglishPortuguese *newTranslation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
+        newTranslation->word = strdup(englishWord);
+        newTranslation->left = newTranslation->right = NULL;
 
-    if (!current)
-        *translations = newTranslation;
-    else if (strcmp(current->word, englishWord) > 0)
-        current->left = newTranslation;
-    else
-        current->right = newTranslation;
+        if (!parent)
+            *translations = newTranslation; 
+        else if (strcmp(parent->word, englishWord) > 0)
+            parent->left = newTranslation; 
+        else
+            parent->right = newTranslation; 
+    }
 }
+
 
 int updateExistingTranslation(PortugueseEnglish *node, Info info)
 {
@@ -149,50 +152,50 @@ PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
         *node = createNode(info, NULL, NULL);
     else
     {
-        if (updateExistingTranslation(*node, info))
-            return NULL;
-
-        if (isLeaf(*node))
+        if (!(updateExistingTranslation(*node, info)))
         {
-            if ((*node)->infoCount == 1)
-                *node = addKey(*node, info, NULL);
-            else
+            if (isLeaf(*node))
             {
-                greaterNode = splitNode(node, info, promote, NULL);
-                if (parent != NULL && *parent == NULL)
+                if ((*node)->infoCount == 1)
+                    *node = addKey(*node, info, NULL);
+                else
                 {
-                    *node = createNode(*promote, *node, greaterNode);
-                    greaterNode = NULL;
+                    greaterNode = splitNode(node, info, promote, NULL);
+                    if (parent != NULL && *parent == NULL)
+                    {
+                        *node = createNode(*promote, *node, greaterNode);
+                        greaterNode = NULL;
+                    }
                 }
             }
-        }
-        else
-        {
-            if (strcmp(info.portugueseWord, (*node)->info1.portugueseWord) < 0)
-                greaterNode = insertPortugueseWord(&((*node)->left), info, promote, node);
             else
             {
-                if (((*node)->infoCount == 1) || (strcmp(info.portugueseWord, (*node)->info2.portugueseWord) < 0))
-                    greaterNode = insertPortugueseWord(&((*node)->center), info, promote, node);
+                if (strcmp(info.portugueseWord, (*node)->info1.portugueseWord) < 0)
+                    greaterNode = insertPortugueseWord(&((*node)->left), info, promote, node);
                 else
-                    greaterNode = insertPortugueseWord(&((*node)->right), info, promote, node);
-            }
-        }
-
-        if (greaterNode)
-        {
-            if ((*node)->infoCount == 1)
-            {
-                *node = addKey(*node, *promote, greaterNode);
-                greaterNode = NULL;
-            }
-            else
-            {
-                greaterNode = splitNode(node, *promote, &promote1, &greaterNode);
-                if (*parent)
                 {
-                    *node = createNode(promote1, *node, greaterNode);
+                    if (((*node)->infoCount == 1) || (strcmp(info.portugueseWord, (*node)->info2.portugueseWord) < 0))
+                        greaterNode = insertPortugueseWord(&((*node)->center), info, promote, node);
+                    else
+                        greaterNode = insertPortugueseWord(&((*node)->right), info, promote, node);
+                }
+            }
+
+            if (greaterNode)
+            {
+                if ((*node)->infoCount == 1)
+                {
+                    *node = addKey(*node, *promote, greaterNode);
                     greaterNode = NULL;
+                }
+                else
+                {
+                    greaterNode = splitNode(node, *promote, &promote1, &greaterNode);
+                    if (*parent)
+                    {
+                        *node = createNode(promote1, *node, greaterNode);
+                        greaterNode = NULL;
+                    }
                 }
             }
         }
