@@ -3,59 +3,63 @@
 #include <stdlib.h>
 #include <string.h>
 
-EnglishPortuguese *createEnglishTranslation(const char *word)
-{
-    EnglishPortuguese *translation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
-    translation->word = strdup(word);
-    translation->right = translation->left = NULL;
-    return translation;
-}
+// Função para processar cada linha do arquivo e inserir na estrutura
+void processLine(char *line, PortugueseEnglish **root, int *currentUnit) {
+    if (line[0] == '%' && strstr(line, "Unidade")) {
+        sscanf(line, "%% Unidade %d", currentUnit); // Atualiza a unidade atual
+    } else {
+        char *token = strtok(line, ":"); // Pega a palavra em inglês
+        if (token) {
+            char englishWord[100];
+            strcpy(englishWord, token);
 
-Info createInfo(const char *portugueseWord, const char *englishWord, int unit)
-{
-    Info info;
-    info.portugueseWord = strdup(portugueseWord);
-    info.unit = unit;
-    info.englishTranslation = createEnglishTranslation(englishWord);
-    return info;
-}
+            token = strtok(NULL, ",;"); // Pega as palavras em português
+            while (token) {
+                char portugueseWord[100];
+                sscanf(token, " %99[^\n]", portugueseWord);
 
-int main()
-{
-    PortugueseEnglish *root = NULL;
-    Info promote;
+                // Cria a estrutura para armazenar as palavras
+                Info info;
+                info.unit = *currentUnit;
+                info.englishTranslation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
+                info.englishTranslation->word = strdup(englishWord);
+                info.englishTranslation->left = info.englishTranslation->right = NULL;
+                info.portugueseWord = strdup(portugueseWord);
 
-    insertPortugueseWord(&root, createInfo("casa", "house", 1), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("carro", "car", 1), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("gato", "cat", 2), &promote, NULL);
+                Info promote;
+                insertPortugueseWord(root, info, &promote, NULL);
 
-    insertPortugueseWord(&root, createInfo("cachorro", "dog", 2), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("árvore", "tree", 3), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("computador", "computer", 3), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("livro", "book", 3), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("janela", "window", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("porta", "door", 4), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("mesa", "table", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("cadeira", "chair", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("poltrona", "chair", 4), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("telefone", "phone", 5), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("teclado", "keyboard", 5), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("caderno", "notebook", 5), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("caneta", "pen", 5), &promote, NULL);
-
-    // displayWords(root);
-    int maior = LargestUnit(root);
-
-    for (int i = 1; i <= maior; i++)
-    {
-        printf("%% Unidade %d\n", i);
-        printWordsByUnit(root, i);
-        printf("\n");
+                token = strtok(NULL, ",;"); // Continua com a próxima palavra
+            }
+        }
     }
+}
+
+int main() {
+    PortugueseEnglish *root = NULL;
+    FILE *file = fopen("../../input.txt", "r");
+
+    char line[256];
+    int currentUnit = 0;
+
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        return 1;
+    }
+
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = '\0'; // Remove o caractere de nova linha
+        processLine(line, &root, &currentUnit); // Processa cada linha
+    }
+
+    fclose(file);
+
+    // Imprime palavras separadas por unidade
+    printf("\nPalavras da Unidade 1:\n");
+    printWordsByUnit(root, 1);
+
+    printf("\nPalavras da Unidade 2:\n");
+    printWordsByUnit(root, 2);
 
     return 0;
 }

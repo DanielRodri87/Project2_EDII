@@ -2,5 +2,9 @@
 Bus: onibus, barramento;
 Bug: inseto, problema;
 Bike: bicicleta;
+Brithday: aniversario;
 % Unidade 2
 Bicycle: bicicleta;
+Baby: bebe, querida;
+Ball: bola;
+Big: maior;
