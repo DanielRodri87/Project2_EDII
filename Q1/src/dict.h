@@ -30,5 +30,7 @@ PortugueseEnglish* insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
 void displayWords(PortugueseEnglish *root);
 void printWordsByUnit(PortugueseEnglish *root, int unit);
 void findEnglishByPortuguese(PortugueseEnglish *root, const char *portugueseWord);
+int remover23(PortugueseEnglish **father, PortugueseEnglish **root, char *value);
+void SearchEnglishWord(PortugueseEnglish **root, char *englishWord, int unit, PortugueseEnglish **parent); 
 
 #endif

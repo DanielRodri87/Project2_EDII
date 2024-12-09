@@ -3,13 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void test()
-{
-    int wait;
-    printf("Hello World");
-    scanf("%d", &wait);
-}
 
+// ------------------------------------------ INSERIR ---------------------------------------------------------
 int isLeaf(PortugueseEnglish *node)
 {
     return (node->left == NULL);
@@ -204,6 +199,7 @@ PortugueseEnglish *insertPortugueseWord(PortugueseEnglish **node, Info info, Inf
     return (greaterNode);
 }
 
+// ------------------------------------------ EXIBIR ---------------------------------------------------------
 
 void displayWords(PortugueseEnglish *root)
 {
@@ -250,6 +246,319 @@ int LargestUnit(PortugueseEnglish *root)
         return (bigger);
     }
 }
+
+// ------------------------------------------ REMOÇÃO ---------------------------------------------------------
+void ShortestInfoRight(PortugueseEnglish *root, PortugueseEnglish **node, PortugueseEnglish **father)
+{
+    if (root->left != NULL)
+    {
+        *father = root;
+        ShortestInfoRight(root->left, node, father);
+    }
+    else
+        *node = root;
+}
+
+void GreaterInfoLeft(PortugueseEnglish *root, PortugueseEnglish **node, PortugueseEnglish **father)
+{
+    if (root->right != NULL)
+    {
+        *father = root;
+        GreaterInfoLeft(root->right, node, father);
+    }
+    else
+        *node = root;
+}
+
+int remover23(PortugueseEnglish **father, PortugueseEnglish **root, char *value)
+{
+    int removed = 0;
+    PortugueseEnglish *no = NULL, *no1, *fatherNo = NULL, *fatherNo1 = NULL, **aux;
+    aux = (PortugueseEnglish **)malloc(sizeof(PortugueseEnglish *));
+    no1 = (PortugueseEnglish *)malloc(sizeof(PortugueseEnglish));
+
+    if (*root != NULL)
+    {
+        if (isLeaf(*root) == 1)
+        {
+            if ((*root)->infoCount == 2)
+            {
+                if (strcmp(value, (*root)->info2.portugueseWord) == 0)
+                { 
+                    (*root)->info2.englishTranslation = NULL;
+                    (*root)->info2.portugueseWord = NULL;
+                    (*root)->infoCount = 1;
+                    removed = 1;
+                }
+                else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
+                { 
+                    (*root)->info1 = (*root)->info2;
+                    (*root)->info2.englishTranslation = NULL;
+                    (*root)->info2.portugueseWord = NULL;
+                    (*root)->infoCount = 1;
+                    removed = 1;
+                }
+            }
+            else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
+            {
+                if (*father == NULL)
+                {
+                    free(*root);
+                    *root = NULL;
+                    removed = 1;
+                }
+                else if (*root == (*father)->left)
+                {
+                    (*root)->info1 = (*father)->info1;
+                    fatherNo = *father;
+                    ShortestInfoRight((*father)->center, &no, &fatherNo);
+                    (*father)->info1 = no->info1;
+                    removed = 1;
+
+                    if (no->infoCount == 2)
+                    {
+                        no->info1 = no->info2;
+                        (*root)->info2.englishTranslation = NULL;
+                        (*root)->info2.portugueseWord = NULL;
+                        no->infoCount = 1;
+                    }
+                    else
+                    {
+                        if (fatherNo->infoCount == 1)
+                        {
+                            (*root)->info2 = no->info1;
+                            (*root)->infoCount = 2;
+                            free(no);
+                            *father = *root;
+                        }
+                        else
+                        {
+                            no->info1 = fatherNo->info2;
+                            fatherNo1 = fatherNo;
+                            ShortestInfoRight(fatherNo->right, &no1, &fatherNo1);
+                            fatherNo->info2 = no1->info1;
+
+                            if (no1->infoCount == 2)
+                            {
+                                no1->info1 = no1->info2;
+                                no1->info2.englishTranslation = NULL;
+                                no1->info2.portugueseWord = NULL;
+                                no1->infoCount = 1;
+                            }
+                            else
+                            {
+                                no->info2 = fatherNo->info2;
+                                no->infoCount = 2;
+                                fatherNo->info2.englishTranslation = NULL;
+                                fatherNo->info2.portugueseWord = NULL;
+                                fatherNo->infoCount = 1;
+                                free(no1);
+                                fatherNo1->right = NULL;
+                            }
+                        }
+                    }
+                }
+                else if ((*root) == (*father)->center)
+                {
+                    removed = 1;
+                    if ((*father)->infoCount == 1)
+                    {
+                        if (((*father)->left)->infoCount == 2)
+                        {
+                            (*root)->info1 = (*father)->info1;
+                            (*father)->info1 = ((*father)->left)->info2;
+                            ((*father)->left)->info2.englishTranslation = NULL;
+                            ((*father)->left)->info2.portugueseWord = NULL;
+                            ((*father)->left)->infoCount = 1;
+                        }
+                        else
+                        {
+                            ((*father)->left)->info2 = (*father)->info1;
+                            free(*root);
+                            ((*father)->left)->infoCount = 2;
+                            *aux = (*father)->left;
+                            free(*father);
+                            *father = *aux;
+                        }
+                    }
+                    else
+                    {
+                        (*root)->info1 = (*father)->info2;
+                        fatherNo = *father;
+                        ShortestInfoRight((*father)->right, &no, &fatherNo);
+                        (*father)->info2 = no->info1;
+
+                        if (no->infoCount == 2)
+                        {
+                            no->info1 = no->info2;
+                            no->info2.englishTranslation = NULL;
+                            no->info2.portugueseWord = NULL;
+                            no->infoCount = 1;
+                        }
+                        else
+                        {
+                            (*root)->infoCount = 2;
+                            (*root)->info2 = (*father)->info2;
+                            (*father)->info2.englishTranslation = NULL;
+                            (*father)->info2.portugueseWord = NULL;
+                            (*father)->infoCount = 1;
+                            free(no);
+                            (*father)->right = NULL;
+                        }
+                    }
+                }
+                else
+                {
+                    removed = 1;
+                    fatherNo = *father;
+                    GreaterInfoLeft((*father)->center, &no, &fatherNo);
+
+                    if (no->infoCount == 1)
+                    {
+                        no->info2 = (*father)->info2;
+                        (*father)->info2.englishTranslation = NULL;
+                        (*father)->info2.portugueseWord = NULL;
+                        (*father)->infoCount = 1;
+                        no->infoCount = 2;
+                        free(*root);
+                        *root = NULL;
+                    }
+                    else
+                    {
+                        (*root)->info1 = (*father)->info2;
+                        (*father)->info2 = no->info2;
+                        no->info2.englishTranslation = NULL;
+                        no->info2.portugueseWord = NULL;
+                        no->infoCount = 1;
+                    }
+                }
+            }
+        }
+        else
+        { 
+            if (strcmp(value, (*root)->info1.portugueseWord) < 0)
+                removed = remover23(root, &(*root)->left, value);
+            else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
+            {
+                fatherNo = *root;
+                ShortestInfoRight((*root)->center, &no, &fatherNo);
+                (*root)->info1 = no->info1;
+                remover23(root, &(*root)->center, (*root)->info1.portugueseWord);
+                removed = 1;
+            }
+            else if (((*root)->infoCount == 1) || (strcmp(value, (*root)->info1.portugueseWord) < 0))
+                removed = remover23(root, &(*root)->center, value);
+        
+            else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
+            {
+                fatherNo = *father;
+                ShortestInfoRight((*father)->right, &no, &fatherNo);
+                (*root)->info2 = no->info1;
+                remover23(root, &(*root)->right, (*root)->info2.portugueseWord);
+                removed = 1;
+            }
+            else
+                removed = remover23(root, &(*root)->right, value);
+        }
+    }
+    return (removed);
+}
+
+int isLeafBin(EnglishPortuguese *root) {
+    return (root->left == NULL && root->right == NULL);
+}
+
+EnglishPortuguese *singleChild(EnglishPortuguese *root) {
+    EnglishPortuguese *aux = NULL;
+
+    if (root->right == NULL) {
+        aux = root->left;
+    } else if (root->left == NULL) {
+        aux = root->right;
+    }
+
+    return aux;
+}
+
+EnglishPortuguese *smallestChild(EnglishPortuguese *root) {
+    EnglishPortuguese *aux = root;
+
+    if (root) {
+        if (root->left)
+            aux = smallestChild(root->left);
+    }
+
+    return aux;
+}
+
+int removeEnglishWord(EnglishPortuguese **root, char *word) {
+    EnglishPortuguese *childNode;
+    int exists = 0;
+
+    if (*root) {
+        if (strcmp(word, (*root)->word) == 0) {
+            exists = 1;
+            printf("Removing word: %s\n", word);
+            EnglishPortuguese *aux = *root;
+            if (isLeafBin(*root)) {
+                free(aux);
+                *root = NULL;
+            } else if ((childNode = singleChild(*root)) != NULL) {
+                free(aux);
+                *root = childNode;
+            } else {
+                childNode = smallestChild((*root)->right);
+                strcpy((*root)->word, childNode->word);
+
+                removeEnglishWord(&(*root)->right, childNode->word);
+            }
+        } else if (strcmp(word, (*root)->word) < 0) {
+            exists = removeEnglishWord(&(*root)->left, word);
+        } else {
+            exists = removeEnglishWord(&(*root)->right, word);
+        }
+    }
+
+    return exists;
+}
+
+
+
+void SearchEnglishWord(PortugueseEnglish **root, char *englishWord, int unit, PortugueseEnglish **parent) {
+    int removed;
+    if (*root != NULL) {
+        SearchEnglishWord(&(*root)->left, englishWord, unit, parent);
+
+        if ((*root)->info1.englishTranslation != NULL && (*root)->info1.unit == unit) {
+            removed = removeEnglishWord(&(*root)->info1.englishTranslation, englishWord);
+            if (removed) 
+                printf("The word %s was successfully removed!\n\n", englishWord);
+            if ((*root)->info1.englishTranslation == NULL) {
+                removed = remover23(parent, root, (*root)->info1.portugueseWord);
+                if (removed) 
+                    printf("Node removed\n\n");
+            }
+        }
+
+        SearchEnglishWord(&(*root)->center, englishWord, unit, root);
+
+        if ((*root)->infoCount == 2 && (*root)->info2.englishTranslation != NULL && (*root)->info2.unit == unit) {
+            removed = removeEnglishWord(&(*root)->info2.englishTranslation, englishWord);
+            if (removed) 
+                printf("The word %s was successfully removed!\n\n", englishWord);
+            if ((*root)->info2.englishTranslation == NULL) {
+                removed = remover23(parent, root, (*root)->info2.portugueseWord);
+                if (removed) 
+                    printf("Node removed\n\n");
+            }
+        }
+        if ((*root)->infoCount == 2 && (*root)->info2.englishTranslation != NULL) {
+            SearchEnglishWord(&(*root)->right, englishWord, unit, root);
+        }
+    }
+}
+
+
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // I - informar uma unidade e então imprima todas as palavras da unidade em português seguida das

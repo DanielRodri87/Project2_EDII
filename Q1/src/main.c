@@ -1,65 +1,142 @@
 #include "dict.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
-// Função para processar cada linha do arquivo e inserir na estrutura
-void processLine(char *line, PortugueseEnglish **root, int *currentUnit) {
-    if (line[0] == '%' && strstr(line, "Unidade")) {
-        sscanf(line, "%% Unidade %d", currentUnit); // Atualiza a unidade atual
-    } else {
-        char *token = strtok(line, ":"); // Pega a palavra em inglês
-        if (token) {
-            char englishWord[100];
-            strcpy(englishWord, token);
+void InittialMenu()
+{
+    printf("\n------------------------------------------------------------------------------------------------- \n");
+    printf("\nMenu de opções:\n");
+    printf("1 - Informar uma unidade e imprimir todas as palavras em português e as equivalentes em inglês.\n");
+    printf("2 - Informar uma palavra em português e imprimir todas as palavras em inglês equivalentes.\n");
+    printf("3 - Informar uma palavra em inglês e a unidade, removê-la da árvore binária e da árvore 2-3.\n");
+    printf("4 - Informar uma palavra em português e a unidade, removê-la da árvore binária e da árvore 2-3.\n");
+    printf("5 - Imprimir a árvore completa\n");
+    printf("6 - Sair\n");
+    printf("Escolha uma opção: \n");
+    printf("\n------------------------------------------------------------------------------------------------- \n");
+}
 
-            token = strtok(NULL, ",;"); // Pega as palavras em português
-            while (token) {
-                char portugueseWord[100];
-                sscanf(token, " %99[^\n]", portugueseWord);
+void LoadingFile(const char *nomeArquivo, PortugueseEnglish **arvore) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
 
-                // Cria a estrutura para armazenar as palavras
-                Info info;
-                info.unit = *currentUnit;
-                info.englishTranslation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
-                info.englishTranslation->word = strdup(englishWord);
-                info.englishTranslation->left = info.englishTranslation->right = NULL;
-                info.portugueseWord = strdup(portugueseWord);
+    char linha[256];
+    int unidadeAtual = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        linha[strcspn(linha, "\n")] = 0; 
+
+        if (linha[0] == '%') {
+            sscanf(linha, "%% Unidade %d", &unidadeAtual);
+        } else {
+            char palavraIngles[50], traducoesPortugues[200];
+            sscanf(linha, "%[^:]: %[^;]", palavraIngles, traducoesPortugues);
+
+            char *traducaoPortugues = strtok(traducoesPortugues, ",;");
+            while (traducaoPortugues != NULL) {
+                while (*traducaoPortugues == ' ')
+                    traducaoPortugues++; 
+
+                Info novoInfo;
+                novoInfo.portugueseWord = traducaoPortugues;
+                novoInfo.unit = unidadeAtual;
+
+                EnglishPortuguese *novaTraducao = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
+                if (novaTraducao == NULL) {
+                    printf("Erro de alocação de memória para tradução em inglês.\n");
+                    return;
+                }
+                novaTraducao->word = palavraIngles; 
+                novaTraducao->left = novaTraducao->right = NULL; 
+
+                novoInfo.englishTranslation = novaTraducao; 
 
                 Info promote;
-                insertPortugueseWord(root, info, &promote, NULL);
+                PortugueseEnglish *pai = NULL;
 
-                token = strtok(NULL, ",;"); // Continua com a próxima palavra
+                insertPortugueseWord(arvore, novoInfo, &promote, &pai);
+
+                traducaoPortugues = strtok(NULL, ",;");
             }
         }
     }
+
+    fclose(arquivo);
+    printf("Arquivo '%s' carregado com sucesso!\n", nomeArquivo);
 }
 
-int main() {
+
+
+int main()
+{
+    printf("oi\n\n");
     PortugueseEnglish *root = NULL;
-    FILE *file = fopen("../../input.txt", "r");
+    PortugueseEnglish *father = NULL;
+    int unit, removed, option, result;
+    char word[100];
+    printf("oi\n\n");
 
-    char line[256];
-    int currentUnit = 0;
 
-    if (!file) {
-        perror("Erro ao abrir o arquivo");
-        return 1;
-    }
+    LoadingFile("../../input.txt", &root);
+    printf("oi\n\n");
 
-    while (fgets(line, sizeof(line), file)) {
-        line[strcspn(line, "\n")] = '\0'; // Remove o caractere de nova linha
-        processLine(line, &root, &currentUnit); // Processa cada linha
-    }
+    do
+    {
+        InittialMenu();
+        scanf("%d", &option);
 
-    fclose(file);
+        switch (option)
+        {
+        case 1:
+            printf("Informe a unidade das palavras que deseja exibir: ");
+            scanf("%d", &unit);
+            printWordsByUnit(root, unit);
+            break;
 
-    // Imprime palavras separadas por unidade
-    printf("\nPalavras da Unidade 1:\n");
-    printWordsByUnit(root, 1);
+        case 2:
+            printf("Insira a palavra em português que deseja imprimir as palavras em inglês: ");
+            scanf("%s", word);
+            findEnglishByPortuguese(root, word);
+            break;
 
-    printf("\nPalavras da Unidade 2:\n");
-    printWordsByUnit(root, 2);
+        case 3:
+            printf("Insira a palavra em inglês que deseja remover: ");
+            scanf("%s", word);
+            printf("Insira a unidade que deseja remover: ");
+            scanf("%d", &unit);
+            SearchEnglishWord(&root, word, unit, &father);
+            break;
+
+        case 4:
+            printf("Insira a palavra em português que deseja remover: ");
+            scanf("%s", word);
+            removed = remover23(&father, &root, word);
+            if (removed)
+                printf("Palavra '%s' removida com sucesso.\n", word);
+            
+            break;
+
+        case 5:
+            printf("Imprimindo a árvore completa:\n");
+            displayWords(root);
+            break;
+
+        case 6:
+            printf("Saindo do programa.\n");
+            break;
+
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            break;
+        }
+
+    } while (option != 6);
 
     return 0;
 }
