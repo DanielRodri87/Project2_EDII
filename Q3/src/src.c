@@ -173,32 +173,45 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
         else
             Insert23(&(*root)->right, *root, promote, start, end, status, flag);
     }
+
 }
 
 Memory *FindSpace(Memory *root, int requiredSpace)
 {
+    Memory *result = NULL; 
+
     if (root != NULL)
     {
-        if (isLeaf(root))
+        for (int i = 0; i < root->numKeys; i++)
         {
-            int espacoDisponivel1 = root->info1->end - root->info1->start;
-            int espacoDisponivel2 = (root->numKeys == 2) ? root->info2->end - root->info2->start : 0;
+            Info *currentInfo = (i == 0) ? root->info1 : root->info2;
 
-            if (root->info1->status == FREE && espacoDisponivel1 >= requiredSpace)
-                return root;
-            if (root->numKeys == 2 && root->info2->status == FREE && espacoDisponivel2 >= requiredSpace)
-                return root;
+            if (currentInfo->status == FREE)
+            {
+                int availableSpace = currentInfo->end - currentInfo->start + 1;
+
+                if (availableSpace >= requiredSpace)
+                {
+                    result = root; 
+                }
+            }
         }
-        else
+
+        if (result == NULL)
         {
-            Memory *found = FindSpace(root->left, requiredSpace);
-            if (!found) found = FindSpace(root->center, requiredSpace);
-            if (!found && root->numKeys == 2) found = FindSpace(root->right, requiredSpace);
-            return found;
+            result = FindSpace(root->left, requiredSpace);
+
+            if (result == NULL)
+                result = FindSpace(root->center, requiredSpace);
+
+            if (result == NULL && root->numKeys == 2)
+                result = FindSpace(root->right, requiredSpace);
         }
     }
-    return NULL;
+
+    return result; 
 }
+
 
 Memory *SourceSpace(Memory *root, int requiredSpace)
 {
@@ -220,3 +233,49 @@ void DisplayInfos(Memory *root)
         }
     }
 }
+
+// ----------------------------------------------------------------
+void AllocateSpace(Memory **root, int requiredSpace)
+{
+    Memory *node = FindSpace(*root, requiredSpace);
+
+    if (node)
+    {
+        int availableSpace = node->info1->end - node->info1->start + 1;
+
+        if (availableSpace >= requiredSpace)
+        {
+            int newEndOccupied = node->info1->start + requiredSpace - 1;
+
+            Info *newOccupiedInfo = CreateInfo(node->info1->start, newEndOccupied, OCCUPIED);
+
+            node->info1 = newOccupiedInfo;
+
+            if (availableSpace > requiredSpace)
+            {
+                int remainingStart = newEndOccupied + 1;
+                int remainingEnd = node->info1->end;
+                Info *remainingInfo = CreateInfo(remainingStart, remainingEnd, FREE);
+
+                int flag = 0;
+                Insert23(root, NULL, NULL, remainingInfo->start, remainingInfo->end, FREE, &flag);
+
+            }
+
+            printf("Espaço alocado com sucesso.\n");
+        }
+        else
+        {
+            printf("Espaço insuficiente na memória\n");
+        }
+    }
+    else
+    {
+        printf("Espaço insuficiente na memória\n");
+    }
+}
+
+// void MergeAdjacentBlocks(Memory *root)
+// {
+
+// }

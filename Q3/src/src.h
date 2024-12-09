@@ -40,4 +40,7 @@ Memory *FindSpace(Memory *root, int requiredSpace);
 Memory *SourceSpace(Memory *root, int RequiredSpace);
 void DisplayInfos(Memory *root);
 
+void AllocateSpace(Memory **root, int requiredSpace);
+// void MergeAdjacentBlocks(Memory *root);
+
 #endif

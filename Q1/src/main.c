@@ -3,59 +3,124 @@
 #include <stdlib.h>
 #include <string.h>
 
-EnglishPortuguese *createEnglishTranslation(const char *word)
-{
-    EnglishPortuguese *translation = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
-    translation->word = strdup(word);
-    translation->right = translation->left = NULL;
-    return translation;
+void exibirMenu() {
+    printf("\n===============================================================\n");
+    printf("                          MENU PRINCIPAL                      \n");
+    printf("===============================================================\n");
+    printf("  [1] Exibir palavras em português e inglês de uma unidade\n");
+    printf("  [2] Traduzir uma palavra em português para inglês\n");
+    printf("  [3] Remover uma palavra em inglês de uma unidade\n");
+    printf("  [4] Remover uma palavra em português de uma unidade\n");
+    printf("  [5] Exibir toda a árvore 2-3\n");
+    printf("  [0] Sair\n");
+    printf("===============================================================\n");
+    printf("Escolha uma opção: ");
 }
 
-Info createInfo(const char *portugueseWord, const char *englishWord, int unit)
-{
-    Info info;
-    info.portugueseWord = strdup(portugueseWord);
-    info.unit = unit;
-    info.englishTranslation = createEnglishTranslation(englishWord);
-    return info;
-}
-
-int main()
-{
-    PortugueseEnglish *root = NULL;
-    Info promote;
-
-    insertPortugueseWord(&root, createInfo("casa", "house", 1), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("carro", "car", 1), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("gato", "cat", 2), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("cachorro", "dog", 2), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("árvore", "tree", 3), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("computador", "computer", 3), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("livro", "book", 3), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("janela", "window", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("porta", "door", 4), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("mesa", "table", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("cadeira", "chair", 4), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("poltrona", "chair", 4), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("telefone", "phone", 5), &promote, NULL);
-
-    insertPortugueseWord(&root, createInfo("teclado", "keyboard", 5), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("caderno", "notebook", 5), &promote, NULL);
-    insertPortugueseWord(&root, createInfo("caneta", "pen", 5), &promote, NULL);
-
-    // displayWords(root);
-    int maior = LargestUnit(root);
-
-    for (int i = 1; i <= maior; i++)
-    {
-        printf("%% Unidade %d\n", i);
-        printWordsByUnit(root, i);
-        printf("\n");
+void carregarArquivo(const char *nomeArquivo, Portuguese23 **arvore) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
     }
+
+    char linha[256];
+    int unidadeAtual = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        linha[strcspn(linha, "\n")] = 0;
+
+        if (linha[0] == '%') {
+            sscanf(linha, "%% Unidade %d", &unidadeAtual);
+        } else {
+            char palavraIngles[50], traducoesPortugues[200];
+            sscanf(linha, "%[^:]: %[^;]", palavraIngles, traducoesPortugues);
+
+            char *traducaoPortugues = strtok(traducoesPortugues, ",;");
+            while (traducaoPortugues != NULL) {
+                while (*traducaoPortugues == ' ')
+                    traducaoPortugues++;
+
+                insertPortugueseWord(arvore, traducaoPortugues, palavraIngles, unidadeAtual);
+                traducaoPortugues = strtok(NULL, ",;");
+            }
+        }
+    }
+
+    fclose(arquivo);
+    printf("Arquivo '%s' carregado com sucesso!\n", nomeArquivo);
+}
+
+int main() {
+    Portuguese23 *raiz = NULL;
+    Portuguese23 *pai = NULL;
+
+    char palavra[50];
+    int unidade;
+    int removido;
+    carregarArquivo("../input.txt", &raiz);
+    int op;
+
+    do {
+        exibirMenu();
+        scanf("%d", &op);
+
+        switch (op) {
+            case 1:
+                printf("\n---------------- EXIBIR PALAVRAS DE UMA UNIDADE ----------------\n");
+                printf("Digite o número da unidade: ");
+                scanf("%d", &unidade);
+                printWordsByUnit(raiz, unidade);
+                printf("\n---------------------------------------------------------------\n");
+                break;
+
+            case 2:
+                printf("\n----------- TRADUZIR PALAVRA EM PORTUGUÊS PARA INGLÊS -----------\n");
+                printf("Digite a palavra em português: ");
+                scanf("%s", palavra);
+                displayPortugueseTranslation(&raiz, palavra);
+                printf("\n---------------------------------------------------------------\n");
+                break;
+
+            case 3:
+                printf("\n------------------- REMOVER PALAVRA EM INGLÊS ------------------\n");
+                printf("Digite a palavra em inglês: ");
+                scanf("%s", palavra);
+                printf("Digite a unidade: ");
+                scanf("%d", &unidade);
+                searchEnglishWord(&raiz, palavra, unidade, &pai);
+                printf("\n---------------------------------------------------------------\n");
+                break;
+
+            case 4:
+                printf("\n---------------- REMOVER PALAVRA EM PORTUGUÊS ----------------\n");
+                printf("Digite a palavra em português: ");
+                scanf("%s", palavra);
+                removido = remove23(&pai, &raiz, palavra);
+                if (removido)
+                    printf("A palavra '%s' foi removida com sucesso!\n\n", palavra);
+                else
+                    printf("A palavra '%s' não foi encontrada.\n\n", palavra);
+                printf("\n---------------------------------------------------------------\n");
+                break;
+
+            case 5:
+                printf("\n------------------- EXIBIR TODA A ÁRVORE 2-3 ------------------\n");
+                displayTree23(raiz);
+                printf("\n---------------------------------------------------------------\n");
+                break;
+
+            case 0:
+                printf("\n======================= SAINDO DO PROGRAMA =====================\n");
+                break;
+
+            default:
+                printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
+                break;
+        }
+    } while (op != 0);
+
+    freeTree(raiz);
 
     return 0;
 }
