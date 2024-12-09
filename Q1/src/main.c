@@ -1,25 +1,23 @@
 #include "dict.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-void InittialMenu()
-{
-    printf("\n------------------------------------------------------------------------------------------------- \n");
-    printf("\nMenu de opções:\n");
-    printf("1 - Informar uma unidade e imprimir todas as palavras em português e as equivalentes em inglês.\n");
-    printf("2 - Informar uma palavra em português e imprimir todas as palavras em inglês equivalentes.\n");
-    printf("3 - Informar uma palavra em inglês e a unidade, removê-la da árvore binária e da árvore 2-3.\n");
-    printf("4 - Informar uma palavra em português e a unidade, removê-la da árvore binária e da árvore 2-3.\n");
-    printf("5 - Imprimir a árvore completa\n");
-    printf("6 - Sair\n");
-    printf("Escolha uma opção: \n");
-    printf("\n------------------------------------------------------------------------------------------------- \n");
+void exibirMenu() {
+    printf("\n===============================================================\n");
+    printf("                          MENU PRINCIPAL                      \n");
+    printf("===============================================================\n");
+    printf("  [1] Exibir palavras em português e inglês de uma unidade\n");
+    printf("  [2] Traduzir uma palavra em português para inglês\n");
+    printf("  [3] Remover uma palavra em inglês de uma unidade\n");
+    printf("  [4] Remover uma palavra em português de uma unidade\n");
+    printf("  [5] Exibir toda a árvore 2-3\n");
+    printf("  [0] Sair\n");
+    printf("===============================================================\n");
+    printf("Escolha uma opção: ");
 }
 
-void LoadingFile(const char *nomeArquivo, PortugueseEnglish **arvore) {
+void carregarArquivo(const char *nomeArquivo, Portuguese23 **arvore) {
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
@@ -30,7 +28,7 @@ void LoadingFile(const char *nomeArquivo, PortugueseEnglish **arvore) {
     int unidadeAtual = 0;
 
     while (fgets(linha, sizeof(linha), arquivo)) {
-        linha[strcspn(linha, "\n")] = 0; 
+        linha[strcspn(linha, "\n")] = 0;
 
         if (linha[0] == '%') {
             sscanf(linha, "%% Unidade %d", &unidadeAtual);
@@ -41,27 +39,9 @@ void LoadingFile(const char *nomeArquivo, PortugueseEnglish **arvore) {
             char *traducaoPortugues = strtok(traducoesPortugues, ",;");
             while (traducaoPortugues != NULL) {
                 while (*traducaoPortugues == ' ')
-                    traducaoPortugues++; 
+                    traducaoPortugues++;
 
-                Info novoInfo;
-                novoInfo.portugueseWord = traducaoPortugues;
-                novoInfo.unit = unidadeAtual;
-
-                EnglishPortuguese *novaTraducao = (EnglishPortuguese *)malloc(sizeof(EnglishPortuguese));
-                if (novaTraducao == NULL) {
-                    printf("Erro de alocação de memória para tradução em inglês.\n");
-                    return;
-                }
-                novaTraducao->word = palavraIngles; 
-                novaTraducao->left = novaTraducao->right = NULL; 
-
-                novoInfo.englishTranslation = novaTraducao; 
-
-                Info promote;
-                PortugueseEnglish *pai = NULL;
-
-                insertPortugueseWord(arvore, novoInfo, &promote, &pai);
-
+                insertPortugueseWord(arvore, traducaoPortugues, palavraIngles, unidadeAtual);
                 traducaoPortugues = strtok(NULL, ",;");
             }
         }
@@ -71,72 +51,76 @@ void LoadingFile(const char *nomeArquivo, PortugueseEnglish **arvore) {
     printf("Arquivo '%s' carregado com sucesso!\n", nomeArquivo);
 }
 
+int main() {
+    Portuguese23 *raiz = NULL;
+    Portuguese23 *pai = NULL;
 
+    char palavra[50];
+    int unidade;
+    int removido;
+    carregarArquivo("../input.txt", &raiz);
+    int op;
 
-int main()
-{
-    printf("oi\n\n");
-    PortugueseEnglish *root = NULL;
-    PortugueseEnglish *father = NULL;
-    int unit, removed, option, result;
-    char word[100];
-    printf("oi\n\n");
+    do {
+        exibirMenu();
+        scanf("%d", &op);
 
+        switch (op) {
+            case 1:
+                printf("\n---------------- EXIBIR PALAVRAS DE UMA UNIDADE ----------------\n");
+                printf("Digite o número da unidade: ");
+                scanf("%d", &unidade);
+                printWordsByUnit(raiz, unidade);
+                printf("\n---------------------------------------------------------------\n");
+                break;
 
-    LoadingFile("../../input.txt", &root);
-    printf("oi\n\n");
+            case 2:
+                printf("\n----------- TRADUZIR PALAVRA EM PORTUGUÊS PARA INGLÊS -----------\n");
+                printf("Digite a palavra em português: ");
+                scanf("%s", palavra);
+                displayPortugueseTranslation(&raiz, palavra);
+                printf("\n---------------------------------------------------------------\n");
+                break;
 
-    do
-    {
-        InittialMenu();
-        scanf("%d", &option);
+            case 3:
+                printf("\n------------------- REMOVER PALAVRA EM INGLÊS ------------------\n");
+                printf("Digite a palavra em inglês: ");
+                scanf("%s", palavra);
+                printf("Digite a unidade: ");
+                scanf("%d", &unidade);
+                searchEnglishWord(&raiz, palavra, unidade, &pai);
+                printf("\n---------------------------------------------------------------\n");
+                break;
 
-        switch (option)
-        {
-        case 1:
-            printf("Informe a unidade das palavras que deseja exibir: ");
-            scanf("%d", &unit);
-            printWordsByUnit(root, unit);
-            break;
+            case 4:
+                printf("\n---------------- REMOVER PALAVRA EM PORTUGUÊS ----------------\n");
+                printf("Digite a palavra em português: ");
+                scanf("%s", palavra);
+                removido = remove23(&pai, &raiz, palavra);
+                if (removido)
+                    printf("A palavra '%s' foi removida com sucesso!\n\n", palavra);
+                else
+                    printf("A palavra '%s' não foi encontrada.\n\n", palavra);
+                printf("\n---------------------------------------------------------------\n");
+                break;
 
-        case 2:
-            printf("Insira a palavra em português que deseja imprimir as palavras em inglês: ");
-            scanf("%s", word);
-            findEnglishByPortuguese(root, word);
-            break;
+            case 5:
+                printf("\n------------------- EXIBIR TODA A ÁRVORE 2-3 ------------------\n");
+                displayTree23(raiz);
+                printf("\n---------------------------------------------------------------\n");
+                break;
 
-        case 3:
-            printf("Insira a palavra em inglês que deseja remover: ");
-            scanf("%s", word);
-            printf("Insira a unidade que deseja remover: ");
-            scanf("%d", &unit);
-            SearchEnglishWord(&root, word, unit, &father);
-            break;
+            case 0:
+                printf("\n======================= SAINDO DO PROGRAMA =====================\n");
+                break;
 
-        case 4:
-            printf("Insira a palavra em português que deseja remover: ");
-            scanf("%s", word);
-            removed = remover23(&father, &root, word);
-            if (removed)
-                printf("Palavra '%s' removida com sucesso.\n", word);
-            
-            break;
-
-        case 5:
-            printf("Imprimindo a árvore completa:\n");
-            displayWords(root);
-            break;
-
-        case 6:
-            printf("Saindo do programa.\n");
-            break;
-
-        default:
-            printf("Opção inválida! Tente novamente.\n");
-            break;
+            default:
+                printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
+                break;
         }
+    } while (op != 0);
 
-    } while (option != 6);
+    freeTree(raiz);
 
     return 0;
 }
