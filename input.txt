@@ -5,6 +5,6 @@ Bike: bicicleta;
 Brithday: aniversario;
 % Unidade 2
 Bicycle: bicicleta;
-Baby: bebe, querida;
+Baby: bebe, querida, amor;
 Ball: bola;
 Big: maior;
