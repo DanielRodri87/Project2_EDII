@@ -17,6 +17,7 @@ void exibirMenu()
     printf("Escolha uma opção: ");
 }
 
+
 void carregarArquivo(const char *nomeArquivo, RedBlackTreeNode **arvore)
 {
     FILE *arquivo = fopen(nomeArquivo, "r");
