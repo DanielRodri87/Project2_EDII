@@ -61,7 +61,7 @@ int main()
     char palavra[50];
     int unidade;
     int removido;
-    carregarArquivo("../input.txt", &raiz);
+    carregarArquivo("../../input.txt", &raiz);
     int op;
 
     do
@@ -117,7 +117,7 @@ int main()
             printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
             break;
         }
-    } while (op != 0);
+    } while (op != 5);
 
     freeTree(raiz);
 
