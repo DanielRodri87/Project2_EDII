@@ -175,10 +175,11 @@ int main()
         switch (op)
         {
         case 1:
-            printf("\n---------------- EXIBIR PALAVRAS DE UMA UNIDADE ----------------\n");
+            printf("\n---------------- EXIBIR PALAVRAS DE UMA UNIDADE -----------------\n");
             printf("Digite o número da unidade: ");
             scanf("%d", &unidade);
             printWordsByUnit(raiz, unidade);
+            printf("\n-----------------------------------------------------------------\n");
             break;
 
         case 2:
@@ -186,6 +187,7 @@ int main()
             printf("Digite a palavra em português: ");
             scanf("%s", palavra);
             findEnglishByPortuguese(raiz, palavra);
+            printf("\n-----------------------------------------------------------------\n");
             break;
 
         case 3:
@@ -214,6 +216,7 @@ int main()
                 }
                 node = (strcmp(node->info.portugueseWord, palavra) > 0) ? node->left : node->right;
             }
+            printf("\n-----------------------------------------------------------------\n");
             break;
 
         case 4:
@@ -240,6 +243,7 @@ int main()
                 }
                 nodeToRemove = (strcmp(nodeToRemove->info.portugueseWord, palavra) > 0) ? nodeToRemove->left : nodeToRemove->right;
             }
+            printf("\n-----------------------------------------------------------------\n");
             break;
 
         case 5:

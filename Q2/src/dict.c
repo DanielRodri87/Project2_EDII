@@ -107,17 +107,22 @@ int insertRedBlackTreeNode(RedBlackTreeNode **node, RBTreeNodeInfo info)
 // I - informar uma unidade e então imprima todas as palavras da unidade em português seguida das
 // equivalentes em inglês
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
+
 void printWordsByUnit(RedBlackTreeNode *node, int unit)
 {
-  if (node != NULL)
-  {
-    if (node->info.binaryTreeEnglish->info.unit == unit)
-      printf("%s:%s\n", node->info.binaryTreeEnglish->info.englishWord, node->info.portugueseWord);
+    if (node != NULL)
+    {
+        if (node->info.binaryTreeEnglish->info.unit == unit)
+        {
+            printf("PT: %s\n", node->info.portugueseWord);
+            printf("ENG: %s\n", node->info.binaryTreeEnglish->info.englishWord);
+        }
 
-    printWordsByUnit(node->left, unit);
-    printWordsByUnit(node->right, unit);
-  }
+        printWordsByUnit(node->left, unit);
+        printWordsByUnit(node->right, unit);
+    }
 }
+
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // II - informar uma palavra em português e então imprima todas as palavras em inglês equivalente à palavra em
