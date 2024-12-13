@@ -186,6 +186,7 @@ int main()
             printf("\n----------- TRADUZIR PALAVRA EM PORTUGUÊS PARA INGLÊS -----------\n");
             printf("Digite a palavra em português: ");
             scanf("%s", palavra);
+            printf("Traduções em inglês para a palavra '%s':\n", palavra);
             findEnglishByPortuguese(raiz, palavra);
             printf("\n-----------------------------------------------------------------\n");
             break;

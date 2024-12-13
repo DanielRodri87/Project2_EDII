@@ -140,6 +140,7 @@ void findEnglishByPortuguese(RedBlackTreeNode *node, const char *portugueseWord)
   }
 }
 
+
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // III - informar uma palavra em inglês e a unidade a qual a mesma pertence removê-la das árvores binárias
 // das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da
