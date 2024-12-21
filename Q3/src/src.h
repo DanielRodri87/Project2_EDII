@@ -41,6 +41,6 @@ Memory *SourceSpace(Memory *root, int RequiredSpace);
 void DisplayInfos(Memory *root);
 
 void AllocateSpace(Memory **root, int requiredSpace);
-// void MergeAdjacentBlocks(Memory *root);
+int removeFromMemory(Memory **parent, Memory **node, Info *key);
 
 #endif
