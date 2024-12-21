@@ -173,12 +173,11 @@ void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end,
         else
             Insert23(&(*root)->right, *root, promote, start, end, status, flag);
     }
-
 }
 
 Memory *FindSpace(Memory *root, int requiredSpace)
 {
-    Memory *result = NULL; 
+    Memory *result = NULL;
 
     if (root != NULL)
     {
@@ -192,7 +191,7 @@ Memory *FindSpace(Memory *root, int requiredSpace)
 
                 if (availableSpace >= requiredSpace)
                 {
-                    result = root; 
+                    result = root;
                 }
             }
         }
@@ -209,9 +208,8 @@ Memory *FindSpace(Memory *root, int requiredSpace)
         }
     }
 
-    return result; 
+    return result;
 }
-
 
 Memory *SourceSpace(Memory *root, int requiredSpace)
 {
@@ -259,7 +257,6 @@ void AllocateSpace(Memory **root, int requiredSpace)
 
                 int flag = 0;
                 Insert23(root, NULL, NULL, remainingInfo->start, remainingInfo->end, FREE, &flag);
-
             }
 
             printf("Espaço alocado com sucesso.\n");
@@ -275,7 +272,189 @@ void AllocateSpace(Memory **root, int requiredSpace)
     }
 }
 
-// void MergeAdjacentBlocks(Memory *root)
-// {
+// ------------------------------------- REMOVER -------------------------------------
+void freeInfo(Info *info)
+{
+    if (info)
+    {
+        free(info);
+    }
+}
 
-// }
+void freeMemory(Memory *node)
+{
+    if (node)
+    {
+        freeMemory(node->left);
+        freeMemory(node->center);
+        freeMemory(node->right);
+
+        if (node->info1)
+        {
+            freeInfo(node->info1);
+        }
+        if (node->numKeys == 2 && node->info2)
+        {
+            freeInfo(node->info2);
+        }
+
+        free(node);
+    }
+}
+
+Memory *findSmallestRight(Memory *node, Memory **parent)
+{
+    while (node && node->left)
+    {
+        *parent = node;
+        node = node->left;
+    }
+    return node;
+}
+
+Memory *findLargestLeft(Memory *node, Memory **parent)
+{
+    while (node && node->right)
+    {
+        *parent = node;
+        node = node->right;
+    }
+    return node;
+}
+
+void mergeNodes(Memory *parent, Memory *child, int isLeftChild)
+{
+    if (isLeftChild)
+    {
+        child->info2 = parent->info1;
+        child->numKeys = 2;
+        child->center = child->right;
+        child->right = parent->center;
+
+        parent->info1 = parent->info2;
+        parent->center = parent->right;
+        parent->right = NULL;
+        parent->numKeys--;
+    }
+    else
+    {
+        child->info2 = parent->info1;
+        child->numKeys = 2;
+        child->center = child->left;
+        child->left = parent->left;
+
+        parent->info1 = parent->info2;
+        parent->left = parent->center;
+        parent->center = NULL;
+        parent->numKeys--;
+    }
+}
+
+int removeFromMemory(Memory **parent, Memory **node, Info *key)
+{
+    int removed = 0;
+
+    if (*node)
+    {
+        Memory *target = NULL, *parentTarget = NULL;
+
+        // Check if key matches info1 or info2
+        if ((*node)->info1 && memcmp((*node)->info1, key, sizeof(Info)) == 0)
+        {
+            printf("Caso 1\n");
+            target = *node;
+            parentTarget = *parent;
+        }
+        else if ((*node)->numKeys == 2 && (*node)->info2 && memcmp((*node)->info2, key, sizeof(Info)) == 0)
+        {
+            printf("Caso 2\n");
+            target = *node;
+            parentTarget = *parent;
+        }
+        else
+        {
+            // Recursively traverse to find the key
+            if (key->start < (*node)->info1->start)
+            {
+                printf("Caso 3\n");
+                removed = removeFromMemory(node, &(*node)->left, key);
+            }
+            else if ((*node)->numKeys == 2 && key->start > (*node)->info2->start)
+            {
+                printf("Caso 4\n");
+                removed = removeFromMemory(node, &(*node)->right, key);
+            }
+            else
+            {
+                printf("Caso 5\n");
+                removed = removeFromMemory(node, &(*node)->center, key);
+            }
+        }
+
+        if (target)
+        {
+            if (!target->left && !target->center)
+            {
+                // Leaf node
+                if (target->numKeys == 2)
+                {
+                    if (memcmp(target->info1, key, sizeof(Info)) == 0)
+                    {
+                        printf("Caso 6\n");
+                        target->info1 = target->info2;
+                        target->info2 = NULL;
+                    }
+                    else
+                    {
+                        printf("Caso 7\n");
+                        target->info2 = NULL;
+                    }
+                    target->numKeys--;
+                }
+                else
+                {
+                    printf("Caso 8\n");
+                    freeMemory(target);
+                    *node = NULL;
+                }
+            }
+            else
+            {
+                // Internal node
+                Memory *replacement = NULL, *replacementParent = target;
+
+                if (!target->center)
+                {
+                    // Find smallest in right subtree
+                    printf("Caso 9\n");
+                    replacement = findSmallestRight(target->center, &replacementParent);
+                }
+                else
+                {
+                    // Find largest in left subtree
+                    printf("Caso 10\n");
+                    replacement = findLargestLeft(target->left, &replacementParent);
+                }
+
+                if (replacement)
+                {
+                    if (target->info1 && memcmp(target->info1, key, sizeof(Info)) == 0)
+                    {
+                        printf("Caso 11\n");
+                        target->info1 = replacement->info1;
+                    }
+                    else
+                    {
+                        printf("Caso 12\n");
+                        target->info2 = replacement->info1;
+                    }
+
+                    removeFromMemory(&replacementParent, &replacement, replacement->info1);
+                }
+            }
+            removed = 1;
+        }
+    }
+
+    return removed;
+}
