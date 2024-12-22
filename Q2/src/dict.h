@@ -45,4 +45,8 @@ void removeRBTreeNodeByPT(RedBlackTreeNode **root, char *portugueseWord, int uni
 void printWordsByUnit(RedBlackTreeNode *root, int unit);
 void findEnglishByPortuguese(RedBlackTreeNode *root, const char *portugueseWord);
 
+int isLeaf(RedBlackTreeNode *node);
+RedBlackTreeNode *soumfilho(RedBlackTreeNode *node);
+RedBlackTreeNode *SmallChild(RedBlackTreeNode *raiz);
+
 #endif
