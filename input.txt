@@ -1,10 +1,35 @@
-% Unidade 1
-Bus: onibus, barramento;
-Bug: inseto, problema;
-Bike: bicicleta;
-Brithday: aniversario;
-% Unidade 2
-Bicycle: bicicleta;
-Baby: bebe, querida, amor;
-Ball: bola;
-Big: maior;
+% Unidade 1 
+Bus: ônibus, barramento; 
+Bug: inseto, problema; 
+Bike: bicicleta;  
+Coller: ventilador; 
+Network: rede de computadores; 
+System: sistema;  
+% Unidade 2 
+Bug: inseto;  
+Bicycle: bicicleta; 
+Fan: ventilador; 
+Network: rede de relacionamento;
+% Unidade 3
+Bus: ônibus, barramento;
+Computer: computador, máquina;
+Drive: conduzir, unidade de disco;
+Table: mesa, tabela;
+Key: chave, tecla;
+Monitor: monitor;
+Program: programa, programar;
+% Unidade 4
+File: arquivo, ficha;
+Router: roteador, guia;
+Server: servidor, atendente;
+Port: porta, porto;
+Cable: cabo, corda;
+Byte: byte, pedaço;
+Disk: disco, prato;
+% Unidade 5
+Window: janela, janela de sistema;
+Pointer: apontador, ponteiro;
+Storage: armazenamento, guarda;
+Protocol: protocolo, regra;
+Device: dispositivo, aparelho;
+Circuit: circuito, laço;

@@ -75,47 +75,23 @@ int main()
 	printf("Antes: \n");
 	DisplayInfos(tree);
 
-	/*
-		Faça uma função que o usuário informe a quantidade de nós que ele precisa alocar e retorne as
-		informações do nó que atenda as necessidades do usuário e então modifique a situação do referido nó de
-		Livre para Ocupado.
-			(i) Lembre-se que a árvore deve manter nós intercalados de acordo com a situação do nó, ou
-			seja, se a situação de um nó muda então os nós adjacentes a ele deve ser concatenados.
-			Consequentemente os nós da árvore serão modificados.
-
-			(ii)Lembre-se  também se o nó escolhido possui uma quantidade maior de blocos do que o
-			solicitado pelo usuário os nós árvore devem ser atualizados de forma que mantenha blocos
-			adjacentes livres ou ocupados em um mesmo nó.
-	*/
-
 	printf("Informe quanto espaço é necessário: ");
 	scanf("%d", &requiridSpace);
 	AllocateSpace(&tree, requiridSpace);
 
-	printf("Depois: \n");
+	printf("Depois: Sem Merge \n");
 	DisplayInfos(tree);
 
-    printf("Deseja remover um bloco? (S/N): ");
-    scanf(" %c", &opc);
+	int remover_inicio, remover_fim;
+	remover_fim = mergeNodes(&tree, &remover_inicio);
+	Info key;
+	key.start = remover_inicio;
+	key.end = remover_fim;
+	removeFromMemory(NULL, &tree, &key);
 
-    if (opc == 'S' || opc == 's')
-    {
-        Info key;
-        printf("Informe o endereço inicial do bloco a ser removido: ");
-        scanf("%d", &key.start);
+	printf("Depois: Com Merge \n");
+	DisplayInfos(tree);
 
-        printf("Informe o endereço final do bloco a ser removido: ");
-        scanf("%d", &key.end);
-
-        int removed = removeFromMemory(NULL, &tree, &key);
-        if (removed)
-            printf("Bloco removido com sucesso.\n");
-        else
-            printf("Bloco não encontrado.\n");
-
-        printf("Depois da remocao: \n");
-        DisplayInfos(tree);
-    }
-
+  
 	return 0;
 }

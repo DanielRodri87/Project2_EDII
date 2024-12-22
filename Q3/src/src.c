@@ -324,34 +324,6 @@ void findLargestLeft(Memory *root, Memory **no, Memory **paiNo)
         *no = root;
 }
 
-void mergeNodes(Memory *parent, Memory *child, int isLeftChild)
-{
-    if (isLeftChild)
-    {
-        child->info2 = parent->info1;
-        child->numKeys = 2;
-        child->center = child->right;
-        child->right = parent->center;
-
-        parent->info1 = parent->info2;
-        parent->center = parent->right;
-        parent->right = NULL;
-        parent->numKeys--;
-    }
-    else
-    {
-        child->info2 = parent->info1;
-        child->numKeys = 2;
-        child->center = child->left;
-        child->left = parent->left;
-
-        parent->info1 = parent->info2;
-        parent->left = parent->center;
-        parent->center = NULL;
-        parent->numKeys--;
-    }
-}
-
 int removeFromMemory(Memory **parent, Memory **node, Info *key)
 {
     int removeu = 0;
@@ -376,7 +348,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
                     (*node)->info1 = NULL;
                     (*node)->numKeys = 1;
                     removeu = 1;
-                }
+                } 
             }
             else if (key->start == (*node)->info1->start)
             {
@@ -505,7 +477,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
                         no->numKeys = 1;
                     }
                 }
-            }
+            } 
         }
         else
         { // se nao é folha
@@ -538,4 +510,77 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
         }
     }
     return removeu;
+}
+
+int mergeNodes(Memory **root, int *return_start)
+{
+    int return_end = -1;
+    if (root != NULL)
+    {
+        Memory *current = *root;
+
+        // Verifica se o nó possui ambas as informações
+        if (current->info1 && current->info2)
+        {
+            // Verifica se as informações possuem o mesmo status e são contíguas
+            if (current->info1->status == current->info2->status &&
+                current->info1->end + 1 == current->info2->start)
+            {
+                // Atualiza o final da primeira informação
+                current->info1->end = current->info2->end;
+                current->numKeys--;
+
+                *return_start = current->info2->start;
+                return_end = current->info2->end;
+                printf("%d\n", return_end);
+            }
+        }
+
+        // Verifica e mescla com o nó à esquerda
+        if (current->left && current->info1 &&
+            current->left->info2 &&
+            current->left->info2->status == current->info1->status &&
+            current->left->info2->end + 1 == current->info1->start)
+        {
+            current->left->info2->end = current->info1->end;
+            current->numKeys--;
+
+            *return_start = current->info1->start;
+            return_end = current->info1->end;
+        }
+
+        // Verifica e mescla com o nó à direita
+        if (current->right && current->info2 &&
+            current->right->info1 &&
+            current->info2->status == current->right->info1->status &&
+            current->info2->end + 1 == current->right->info1->start)
+        {
+            current->info2->end = current->right->info1->end;
+            current->right->numKeys--;
+
+            *return_start = current->info2->start;
+            return_end = current->info2->end;
+        }
+
+        // Chamada recursiva para os filhos
+        if (current->left)
+        {
+            int left_end = mergeNodes(&current->left, return_start);
+            if (left_end > return_end)
+                return_end = left_end;
+        }
+        if (current->center)
+        {
+            int center_end = mergeNodes(&current->center, return_start);
+            if (center_end > return_end)
+                return_end = center_end;
+        }
+        if (current->right)
+        {
+            int right_end = mergeNodes(&current->right, return_start);
+            if (right_end > return_end)
+                return_end = right_end;
+        }
+    }
+    return return_end;
 }

@@ -150,7 +150,7 @@ Portuguese23 *insertTree23(Portuguese23 **no, Info *info, Info *promote, Portugu
     Portuguese23 *biggerNo = NULL;
     if (*no == NULL)
         *no = createNode(info, NULL, NULL);
-    
+
     else
     {
         if (isLeaf(*no))
@@ -176,7 +176,6 @@ Portuguese23 *insertTree23(Portuguese23 **no, Info *info, Info *promote, Portugu
             else
                 biggerNo = insertTree23(&((*no)->right), info, promote, no);
 
-
             if (biggerNo)
             {
                 if ((*no)->infoCount == 1)
@@ -199,7 +198,6 @@ Portuguese23 *insertTree23(Portuguese23 **no, Info *info, Info *promote, Portugu
 
     return (biggerNo);
 }
-
 
 void displayTree23(const Portuguese23 *root)
 {
@@ -299,14 +297,14 @@ int remove23(Portuguese23 **father, Portuguese23 **root, char *value)
             if ((*root)->infoCount == 2)
             {
                 if (strcmp(value, (*root)->info2.portugueseWord) == 0)
-                { 
+                {
                     (*root)->info2.englishWord = NULL;
                     (*root)->info2.portugueseWord = NULL;
                     (*root)->infoCount = 1;
                     removeu = 1;
                 }
                 else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
-                { 
+                {
                     (*root)->info1 = (*root)->info2;
                     (*root)->info2.englishWord = NULL;
                     (*root)->info2.portugueseWord = NULL;
@@ -450,7 +448,7 @@ int remove23(Portuguese23 **father, Portuguese23 **root, char *value)
             }
         }
         else
-        { 
+        {
             if (strcmp(value, (*root)->info1.portugueseWord) < 0)
                 removeu = remove23(root, &(*root)->left, value);
             else if (strcmp(value, (*root)->info1.portugueseWord) == 0)
@@ -545,18 +543,6 @@ EnglishBin *insertEnglishWord(EnglishBin *root, const char *englishWord, int uni
 void addEnglishTranslation(Info *info, const char *wordIng, int unit)
 {
     info->englishWord = insertEnglishWord(info->englishWord, wordIng, unit);
-}
-
-void printBinaryTree(EnglishBin *root)
-{
-    if (root != NULL)
-    {
-        printBinaryTree(root->left); // Percorre a árvore à leftuerda
-        printf("\n");
-        // Imprime a tradução de inglês associada à word em português
-        printf("word em Inglês: %s = unit: %d\n", root->englishWord, root->unit);
-        printBinaryTree(root->right); // Percorre a árvore à righteita
-    }
 }
 
 int isBinaryLeaf(EnglishBin *root)
@@ -690,6 +676,46 @@ void FreeTreeBinary(EnglishBin *root)
         free(root);
     }
 }
+
+void exibirInfo(Info info)
+{
+    printf("Português: %s | Inglês: %s\n", info.portugueseWord, info.englishWord->englishWord);
+}
+
+void exibirEmOrdem23(Portuguese23 *raiz)
+{
+    if (raiz != NULL)
+    {
+        printf("\n-----------ARVORE-2-3------------\n");
+        if (raiz->infoCount == 1)
+        {
+            exibirEmOrdem23(raiz->left);
+            exibirInfo(raiz->info1);
+            exibirEmOrdem23(raiz->right);
+        }
+        else if (raiz->infoCount == 2)
+        {
+            exibirEmOrdem23(raiz->left);
+            exibirInfo(raiz->info1);
+            exibirEmOrdem23(raiz->center);
+            exibirInfo(raiz->info2);
+            exibirEmOrdem23(raiz->right);
+        }
+    }
+}
+
+void printBinaryTree(EnglishBin *root)
+{
+    if (root != NULL)
+    {
+        printBinaryTree(root->left); // Percorre a árvore à leftuerda
+        printf("\n");
+        // Imprime a tradução de inglês associada à word em português
+        printf("word em Inglês: %s = unit: %d\n", root->englishWord, root->unit);
+        printBinaryTree(root->right); // Percorre a árvore à righteita
+    }
+}
+
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // I - informar uma unit e então imprima todas as words da unit em português seguida das
