@@ -21,7 +21,11 @@ typedef struct Portuguese23 {
     int infoCount;
 } Portuguese23;
 
+
+
 // ------------------------------------ 2-3 -------------------------------------------
+void exibirEmOrdem23(Portuguese23 *raiz);
+void printBinaryTree(EnglishBin *root);
 Portuguese23 *searchWord(Portuguese23 **node, const char *portugueseWord);
 int insertPortugueseWord(Portuguese23 **tree, char *portugueseWord, char *englishWord, int unit);
 void addEnglishTranslation(Info *info, const char *englishWord, int unit);

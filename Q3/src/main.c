@@ -92,7 +92,12 @@ int main()
 	scanf("%d", &requiridSpace);
 	AllocateSpace(&tree, requiridSpace);
 
-	printf("Depois: \n");
+	printf("Depois: Sem Merge \n");
+	DisplayInfos(tree);
+
+	mergeNodes(&tree);
+
+	printf("Depois: Com Merge \n");
 	DisplayInfos(tree);
 
     printf("Deseja remover um bloco? (S/N): ");
@@ -106,6 +111,8 @@ int main()
 
         printf("Informe o endereço final do bloco a ser removido: ");
         scanf("%d", &key.end);
+
+        printf("Manual: %d | %d\n", key.start, key.end);
 
         int removed = removeFromMemory(NULL, &tree, &key);
         if (removed)

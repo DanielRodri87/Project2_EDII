@@ -12,7 +12,8 @@ void exibirMenu()
     printf("  [2] Mostrar traduções a partir de uma palavra em português\n");
     printf("  [3] Remover uma palavra em inglês de uma unidade\n");
     printf("  [4] Remover uma palavra em português de uma unidade\n");
-    printf("  [5] Sair\n");
+    printf("  [5] Exibir Todas as palavras\n");
+    printf("  [6] Sair\n");
     printf("===============================================================\n");
     printf("Escolha uma opção: ");
 }
@@ -61,7 +62,7 @@ int main()
     char palavra[50];
     int unidade;
     int removido;
-    carregarArquivo("../../input.txt", &raiz);
+    carregarArquivo("../input.txt", &raiz);
     int op;
 
     do
@@ -110,14 +111,15 @@ int main()
             break;
 
         case 5:
-            printf("\n======================= SAINDO DO PROGRAMA =====================\n");
+            printf("\n-----------Palavras na Info 1: -----------------\n");
+            exibirEmOrdem23(raiz);
             break;
 
         default:
             printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
             break;
         }
-    } while (op != 5);
+    } while (op != 6);
 
     freeTree(raiz);
 
