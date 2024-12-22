@@ -335,8 +335,6 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
     {
         if (isLeaf(*node) == 1)
         {
-            printf("Tentando remover: Start = %d, End = %d\n", key->start, key->end);
-
             if ((*node)->numKeys == 2)
             {
                 if (key->start == (*node)->info2->start)
@@ -479,7 +477,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
                         no->numKeys = 1;
                     }
                 }
-            } else printf("Erro aqui dois\n");
+            } 
         }
         else
         { // se nao é folha
@@ -514,9 +512,10 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
     return removeu;
 }
 
-void mergeNodes(Memory **root)
+int mergeNodes(Memory **root, int *return_start)
 {
-    if (root != NULL && *root != NULL)
+    int return_end = -1;
+    if (root != NULL)
     {
         Memory *current = *root;
 
@@ -530,6 +529,10 @@ void mergeNodes(Memory **root)
                 // Atualiza o final da primeira informação
                 current->info1->end = current->info2->end;
                 current->numKeys--;
+
+                *return_start = current->info2->start;
+                return_end = current->info2->end;
+                printf("%d\n", return_end);
             }
         }
 
@@ -541,6 +544,9 @@ void mergeNodes(Memory **root)
         {
             current->left->info2->end = current->info1->end;
             current->numKeys--;
+
+            *return_start = current->info1->start;
+            return_end = current->info1->end;
         }
 
         // Verifica e mescla com o nó à direita
@@ -551,15 +557,30 @@ void mergeNodes(Memory **root)
         {
             current->info2->end = current->right->info1->end;
             current->right->numKeys--;
+
+            *return_start = current->info2->start;
+            return_end = current->info2->end;
         }
 
         // Chamada recursiva para os filhos
         if (current->left)
-            mergeNodes(&current->left);
+        {
+            int left_end = mergeNodes(&current->left, return_start);
+            if (left_end > return_end)
+                return_end = left_end;
+        }
         if (current->center)
-            mergeNodes(&current->center);
+        {
+            int center_end = mergeNodes(&current->center, return_start);
+            if (center_end > return_end)
+                return_end = center_end;
+        }
         if (current->right)
-            mergeNodes(&current->right);
-        
+        {
+            int right_end = mergeNodes(&current->right, return_start);
+            if (right_end > return_end)
+                return_end = right_end;
+        }
     }
+    return return_end;
 }

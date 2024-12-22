@@ -42,5 +42,6 @@ void DisplayInfos(Memory *root);
 
 void AllocateSpace(Memory **root, int requiredSpace);
 int removeFromMemory(Memory **parent, Memory **node, Info *key);
-void mergeNodes(Memory **root);
+int mergeNodes(Memory **root, int *return_start);
+
 #endif
