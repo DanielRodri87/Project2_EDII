@@ -302,24 +302,26 @@ void freeMemory(Memory *node)
     }
 }
 
-Memory *findSmallestRight(Memory *node, Memory **parent)
+void findSmallestRight(Memory *root, Memory **no, Memory **paiNo)
 {
-    while (node && node->left)
+    if (root->left != NULL)
     {
-        *parent = node;
-        node = node->left;
+        *paiNo = root;
+        findSmallestRight(root->left, no, paiNo);
     }
-    return node;
+    else
+        *no = root;
 }
 
-Memory *findLargestLeft(Memory *node, Memory **parent)
+void findLargestLeft(Memory *root, Memory **no, Memory **paiNo)
 {
-    while (node && node->right)
+    if (root->right != NULL)
     {
-        *parent = node;
-        node = node->right;
+        *paiNo = root;
+        findLargestLeft(root->right, no, paiNo);
     }
-    return node;
+    else
+        *no = root;
 }
 
 void mergeNodes(Memory *parent, Memory *child, int isLeftChild)
@@ -352,109 +354,188 @@ void mergeNodes(Memory *parent, Memory *child, int isLeftChild)
 
 int removeFromMemory(Memory **parent, Memory **node, Info *key)
 {
-    int removed = 0;
+    int removeu = 0;
+    Memory *no = NULL, *no1, *parentNo = NULL, *parentNo1 = NULL, **aux;
+    aux = (Memory **)malloc(sizeof(Memory *));
+    no1 = (Memory *)malloc(sizeof(Memory));
 
-    if (*node)
+    if (*node != NULL)
     {
-        Memory *target = NULL, *parentTarget = NULL;
+        if (isLeaf(*node) == 1)
+        {
+            if ((*node)->numKeys == 2)
+            {
+                if (key->start == (*node)->info2->start)
+                { // quando é folha, tem duas informações e o numero ta na segunda posição
+                    (*node)->info2 = NULL;
+                    (*node)->numKeys = 1;
+                    removeu = 1;
+                }
+                else if (key->start == (*node)->info1->start)
+                { // quando é folha, tem duas informações e o numero ta na primeira posição do nó
+                    (*node)->info1 = NULL;
+                    (*node)->numKeys = 1;
+                    removeu = 1;
+                }
+            }
+            else if (key->start == (*node)->info1->start)
+            {
+                if (*parent == NULL)
+                {
+                    free(*node);
+                    *node = NULL;
+                    removeu = 1;
+                }
+                else if (*node == (*parent)->left)
+                {
+                    (*node)->info1 = (*parent)->info1;
+                    parentNo = *parent;
+                    findSmallestRight((*parent)->center, &no, &parentNo);
+                    (*parent)->info1 = no->info1;
+                    removeu = 1;
 
-        // Check if key matches info1 or info2
-        if ((*node)->info1 && memcmp((*node)->info1, key, sizeof(Info)) == 0)
-        {
-            printf("Caso 1\n");
-            target = *node;
-            parentTarget = *parent;
-        }
-        else if ((*node)->numKeys == 2 && (*node)->info2 && memcmp((*node)->info2, key, sizeof(Info)) == 0)
-        {
-            printf("Caso 2\n");
-            target = *node;
-            parentTarget = *parent;
+                    if (no->numKeys == 2)
+                    {
+                        no->info1 = no->info2;
+                        (*node)->info1 = NULL;
+                        (*node)->numKeys = 1;
+                        removeu = 1;
+                    }
+                    else
+                    {
+                        if (parentNo->numKeys == 1)
+                        {
+                            (*node)->info2 = no->info1;
+                            (*node)->numKeys = 2;
+                            free(no);
+                            *parent = *node;
+                        }
+                        else
+                        {
+                            no->info1 = parentNo->info2;
+                            parentNo1 = parentNo;
+                            findSmallestRight(parentNo->right, &no1, &parentNo1);
+                            parentNo->info2 = no1->info1;
+
+                            if (no1->numKeys == 2)
+                            {
+                                no1->info1 = no1->info2;
+                                no1->info2 = NULL;
+                                no1->numKeys = 1;
+                            }
+                            else
+                            {
+                                // entrou aqui
+                                no->info2 = parentNo->info2;
+                                no->numKeys = 2;
+                                parentNo->info2 = NULL;
+                                parentNo->numKeys = 1;
+                                free(no1);
+                                parentNo1->right = NULL;
+                            }
+                        }
+                    }
+                }
+                else if ((*node) == (*parent)->center)
+                {
+                    removeu = 1;
+                    if ((*parent)->numKeys == 1)
+                    {
+                        if (((*parent)->left)->numKeys == 2)
+                        {
+                            (*node)->info1 = (*parent)->info1;
+                            (*parent)->info1 = ((*parent)->left)->info2;
+                            ((*parent)->left)->info2 = NULL;
+                            ((*parent)->left)->numKeys = 1;
+                        }
+                        else
+                        {
+                            ((*parent)->left)->info2 = (*parent)->info1;
+                            free(*node);
+                            ((*parent)->left)->numKeys = 2;
+                            *aux = (*parent)->left;
+                            free(*parent);
+                            *parent = *aux;
+                        }
+                    }
+                    else
+                    {
+                        (*node)->info1 = (*parent)->info2;
+                        parentNo = *parent;
+                        findSmallestRight((*parent)->right, &no, &parentNo);
+                        (*parent)->info2 = no->info1;
+
+                        if (no->numKeys == 2)
+                        {
+                            no->info1 = no->info2;
+                            no->info2 = NULL;
+                            no->numKeys = 1;
+                        }
+                        else
+                        {
+                            (*node)->numKeys = 2;
+                            (*node)->info2 = (*parent)->info2;
+                            (*parent)->info2 = NULL;
+                            (*parent)->numKeys = 1;
+                            free(no);
+                            (*parent)->right = NULL;
+                        }
+                    }
+                }
+                else
+                {
+                    removeu = 1;
+                    parentNo = *parent;
+                    findLargestLeft((*parent)->center, &no, &parentNo);
+
+                    if (no->numKeys == 1)
+                    {
+                        no->info2 = (*parent)->info2;
+                        (*parent)->info2 = NULL;
+                        (*parent)->numKeys = 1;
+                        no->numKeys = 2;
+                        free(*node);
+                        *node = NULL;
+                    }
+                    else
+                    {
+                        (*node)->info1 = (*parent)->info2;
+                        (*parent)->info2 = no->info2;
+                        no->info2 = NULL;
+                        no->numKeys = 1;
+                    }
+                }
+            }
         }
         else
-        {
-            // Recursively traverse to find the key
+        { // se nao é folha
             if (key->start < (*node)->info1->start)
+                removeu = removeFromMemory(node, &(*node)->left, key);
+            else if (key->start == (*node)->info1->start)
             {
-                printf("Caso 3\n");
-                removed = removeFromMemory(node, &(*node)->left, key);
+                parentNo = *node;
+                findSmallestRight((*node)->center, &no, &parentNo);
+                (*node)->info1 = no->info1;
+                removeFromMemory(node, &(*node)->center, (*node)->info1);
+                removeu = 1;
             }
-            else if ((*node)->numKeys == 2 && key->start > (*node)->info2->start)
+            else if (((*node)->numKeys == 1) || key->start < (*node)->info1->start)
             {
-                printf("Caso 4\n");
-                removed = removeFromMemory(node, &(*node)->right, key);
+                removeu = removeFromMemory(node, &(*node)->center, key);
             }
-            else
+            else if (key->start == (*node)->info1->start)
             {
-                printf("Caso 5\n");
-                removed = removeFromMemory(node, &(*node)->center, key);
-            }
-        }
-
-        if (target)
-        {
-            if (!target->left && !target->center)
-            {
-                // Leaf node
-                if (target->numKeys == 2)
-                {
-                    if (memcmp(target->info1, key, sizeof(Info)) == 0)
-                    {
-                        printf("Caso 6\n");
-                        target->info1 = target->info2;
-                        target->info2 = NULL;
-                    }
-                    else
-                    {
-                        printf("Caso 7\n");
-                        target->info2 = NULL;
-                    }
-                    target->numKeys--;
-                }
-                else
-                {
-                    printf("Caso 8\n");
-                    freeMemory(target);
-                    *node = NULL;
-                }
+                parentNo = *parent;
+                findSmallestRight((*parent)->right, &no, &parentNo);
+                (*node)->info2 = no->info1;
+                removeFromMemory(node, &(*node)->right, (*node)->info2);
+                removeu = 1;
             }
             else
             {
-                // Internal node
-                Memory *replacement = NULL, *replacementParent = target;
-
-                if (!target->center)
-                {
-                    // Find smallest in right subtree
-                    printf("Caso 9\n");
-                    replacement = findSmallestRight(target->center, &replacementParent);
-                }
-                else
-                {
-                    // Find largest in left subtree
-                    printf("Caso 10\n");
-                    replacement = findLargestLeft(target->left, &replacementParent);
-                }
-
-                if (replacement)
-                {
-                    if (target->info1 && memcmp(target->info1, key, sizeof(Info)) == 0)
-                    {
-                        printf("Caso 11\n");
-                        target->info1 = replacement->info1;
-                    }
-                    else
-                    {
-                        printf("Caso 12\n");
-                        target->info2 = replacement->info1;
-                    }
-
-                    removeFromMemory(&replacementParent, &replacement, replacement->info1);
-                }
+                removeu = removeFromMemory(node, &(*node)->right, key);
             }
-            removed = 1;
         }
     }
-
-    return removed;
+    return removeu;
 }
