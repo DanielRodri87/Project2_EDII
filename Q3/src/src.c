@@ -532,7 +532,6 @@ int mergeNodes(Memory **root, int *return_start)
 
                 *return_start = current->info2->start;
                 return_end = current->info2->end;
-                printf("%d\n", return_end);
             }
         }
 
