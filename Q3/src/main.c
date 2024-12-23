@@ -5,19 +5,28 @@
 
 #define BLOCO 100
 
+void DisplayMenu()
+{
+	printf("\n===============================================================\n");
+	printf("                          MENU PRINCIPAL                      \n");
+	printf("===============================================================\n");
+	printf("  [1] Ocupar Nós Livres\n");
+	printf("  [2] Compactar Memória\n");
+	printf("  [3] Remover bloco de Memória\n");
+	printf("  [4] Exibir alocação e memória\n");
+	printf("  [5] Sair\n");
+	printf("===============================================================\n");
+	printf("Escolha uma opção: ");
+}
+
 int main()
 {
 	Memory *tree = NULL;
-	int start = 0, end = 0, status = 2, flag = 0, requiridSpace;
+	Info key;
+
+	int start = 0, end = 0, status = 2, flag = 0, requiridSpace, control_menu = 0;
 	char opc;
 	srand(time(NULL));
-
-	/*
-		Faça um programa em C que cadastra os nós da árvore, onde o usuário deve informar se o primeiro nó é
-		livre ou ocupado, o endereço inicial e final do nó. Os demais nós serão contabilizados pelo sistema se
-		são livres ou ocupados e o usuário deve apenas informar o endereço final de cada um. O cadastro
-		termina quando o usuário informar como endereço final de um nó o último endereço da memória.
-	*/
 
 	do
 	{
@@ -72,26 +81,43 @@ int main()
 			printf("Valor de fim inválido. Informe um valor entre 1 e %d: \n", BLOCO);
 	}
 
-	printf("Antes: \n");
-	DisplayInfos(tree);
+	do
+	{
+		DisplayMenu();
+		scanf("%d", &control_menu);
 
-	printf("Informe quanto espaço é necessário: ");
-	scanf("%d", &requiridSpace);
-	AllocateSpace(&tree, requiridSpace);
+		switch (control_menu)
+		{
+		case 1:
+			printf("Informe quanto espaço é necessário: ");
+			scanf("%d", &requiridSpace);
+			AllocateSpace(&tree, requiridSpace);
+			break;
+		case 2:
+			int remover_inicio, remover_fim;
+			remover_fim = mergeNodes(&tree, &remover_inicio);
+			key.start = remover_inicio;
+			key.end = remover_fim;
+			removeFromMemory(NULL, &tree, &key);
+			break;
+		case 3:
+			printf("Digite o endereço de início do bloco de memória: ");
+			scanf("%d", &key.start);
 
-	printf("Depois: Sem Merge \n");
-	DisplayInfos(tree);
+			printf("Digite o endereço final do bloco de memória: ");
+			scanf("%d", &key.end);
 
-	int remover_inicio, remover_fim;
-	remover_fim = mergeNodes(&tree, &remover_inicio);
-	Info key;
-	key.start = remover_inicio;
-	key.end = remover_fim;
-	removeFromMemory(NULL, &tree, &key);
-
-	printf("Depois: Com Merge \n");
-	DisplayInfos(tree);
-
-  
-	return 0;
+			removeFromMemory(NULL, &tree, &key);
+			break;
+		case 4:
+			DisplayInfos(tree);
+			break;
+		case 5:
+			printf("Saindo da aplicação...\n");
+			break;
+		default:
+			printf("Opção inválida\n");
+			break;
+		}
+	} while (control_menu != 5);
 }
