@@ -11,10 +11,12 @@ void DisplayMenu()
 	printf("                          MENU PRINCIPAL                      \n");
 	printf("===============================================================\n");
 	printf("  [1] Ocupar Nós Livres\n");
-	printf("  [2] Compactar Memória Ocupada\n");
-	printf("  [3] Remover bloco de Memória\n");
-	printf("  [4] Exibir alocação e memória\n");
-	printf("  [5] Sair\n");
+	printf("  [2] Desocupar Nós\n");
+	printf("  [3] Compactar Memória Ocupada\n");
+	printf("  [4] Compactar Memória Livre\n");
+	printf("  [5] Remover bloco de Memória\n");
+	printf("  [6] Exibir alocação e memória\n");
+	printf("  [7] Sair\n");
 	printf("===============================================================\n");
 	printf("Escolha uma opção: ");
 }
@@ -94,6 +96,13 @@ int main()
 			AllocateSpace(&tree, requiridSpace);
 			break;
 		case 2:
+			printf("Informe o inicio da memória: ");
+			scanf("%d", &start);
+			printf("Informe o fim da memória: ");
+			scanf("%d", &end);
+			FreeSpace(tree, start, end);
+			break;
+		case 3:
 			printf("  [1] Início\n");
 			printf("  [2] Meio\n");
 			printf("  [3] Fim\n");
@@ -135,7 +144,9 @@ int main()
 				break;
 			}
 			break;
-		case 3:
+		case 4:
+			break;
+		case 5:
 			printf("Digite o endereço de início do bloco de memória: ");
 			scanf("%d", &key.start);
 
@@ -144,15 +155,15 @@ int main()
 
 			removeFromMemory(NULL, &tree, &key);
 			break;
-		case 4:
+		case 6:
 			DisplayInfos(tree);
 			break;
-		case 5:
+		case 7:
 			printf("Saindo da aplicação...\n");
 			break;
 		default:
 			printf("Opção inválida\n");
 			break;
 		}
-	} while (control_menu != 5);
+	} while (control_menu != 7);
 }

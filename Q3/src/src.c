@@ -272,6 +272,23 @@ void AllocateSpace(Memory **root, int requiredSpace)
     }
 }
 
+void FreeSpace(Memory *memory, int start, int end)
+{
+    if (memory != NULL)
+    {
+        if (memory->info1 != NULL && memory->info1->start == start && memory->info1->end == end)
+            memory->info1->status = 1; 
+
+        if (memory->info2 != NULL && memory->info2->start == start && memory->info2->end == end)
+            memory->info2->status = 1; 
+        
+
+        FreeSpace(memory->left, start, end);
+        FreeSpace(memory->center, start, end);
+        FreeSpace(memory->right, start, end);
+    }
+}
+
 // ------------------------------------- REMOVER -------------------------------------
 void freeInfo(Info *info)
 {
@@ -348,7 +365,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
                     (*node)->info1 = NULL;
                     (*node)->numKeys = 1;
                     removeu = 1;
-                } 
+                }
             }
             else if (key->start == (*node)->info1->start)
             {
@@ -477,7 +494,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
                         no->numKeys = 1;
                     }
                 }
-            } 
+            }
         }
         else
         { // se nao é folha
