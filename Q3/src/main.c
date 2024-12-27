@@ -11,10 +11,12 @@ void DisplayMenu()
 	printf("                          MENU PRINCIPAL                      \n");
 	printf("===============================================================\n");
 	printf("  [1] Ocupar Nós Livres\n");
-	printf("  [2] Compactar Memória\n");
-	printf("  [3] Remover bloco de Memória\n");
-	printf("  [4] Exibir alocação e memória\n");
-	printf("  [5] Sair\n");
+	printf("  [2] Desocupar Nós\n");
+	printf("  [3] Compactar Memória Ocupada\n");
+	printf("  [4] Compactar Memória Livre\n");
+	printf("  [5] Remover bloco de Memória\n");
+	printf("  [6] Exibir alocação e memória\n");
+	printf("  [7] Sair\n");
 	printf("===============================================================\n");
 	printf("Escolha uma opção: ");
 }
@@ -24,7 +26,7 @@ int main()
 	Memory *tree = NULL;
 	Info key;
 
-	int start = 0, end = 0, status = 2, flag = 0, requiridSpace, control_menu = 0;
+	int start = 0, end = 0, status = 2, flag = 0, requiridSpace, control_menu = 0, sub_menu = 0;
 	char opc;
 	srand(time(NULL));
 
@@ -94,13 +96,57 @@ int main()
 			AllocateSpace(&tree, requiridSpace);
 			break;
 		case 2:
-			int remover_inicio, remover_fim;
-			remover_fim = mergeNodes(&tree, &remover_inicio);
-			key.start = remover_inicio;
-			key.end = remover_fim;
-			removeFromMemory(NULL, &tree, &key);
+			printf("Informe o inicio da memória: ");
+			scanf("%d", &start);
+			printf("Informe o fim da memória: ");
+			scanf("%d", &end);
+			FreeSpace(tree, start, end);
 			break;
 		case 3:
+			printf("  [1] Início\n");
+			printf("  [2] Meio\n");
+			printf("  [3] Fim\n");
+			printf("  [4] Cancelar\n");
+			printf("Digite a opção desejada: ");
+			scanf("%d", &sub_menu);
+
+			switch (sub_menu)
+			{
+			case 1:
+				int remover_inicio, remover_fim;
+				remover_fim = mergeNodesStart(&tree, &remover_inicio);
+				key.start = remover_inicio;
+				key.end = remover_fim;
+				removeFromMemory(NULL, &tree, &key);
+				break;
+
+			case 2: 
+				int remover_inicio_meio, remover_fim_meio;
+				remover_fim_meio = mergeNodesMiddle(&tree, &remover_inicio_meio);
+				key.start = remover_inicio_meio;
+				key.end = remover_fim_meio;
+				removeFromMemory(NULL, &tree, &key);
+				break;
+
+			case 3: 
+				int remover_inicio_fim, remover_fim_fim;
+				remover_fim_fim = mergeNodesEnd(&tree, &remover_inicio_fim);
+				key.start = remover_inicio_fim;
+				key.end = remover_fim_fim;
+				removeFromMemory(NULL, &tree, &key);
+				break;
+
+			case 4:
+				printf("Voltando...\n");
+				break;
+			default:
+				printf("Digite uma opção válida de menu\n");
+				break;
+			}
+			break;
+		case 4:
+			break;
+		case 5:
 			printf("Digite o endereço de início do bloco de memória: ");
 			scanf("%d", &key.start);
 
@@ -109,15 +155,15 @@ int main()
 
 			removeFromMemory(NULL, &tree, &key);
 			break;
-		case 4:
+		case 6:
 			DisplayInfos(tree);
 			break;
-		case 5:
+		case 7:
 			printf("Saindo da aplicação...\n");
 			break;
 		default:
 			printf("Opção inválida\n");
 			break;
 		}
-	} while (control_menu != 5);
+	} while (control_menu != 7);
 }
