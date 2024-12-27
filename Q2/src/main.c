@@ -1,256 +1,153 @@
-#include "dict.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "dict.h"
 
-void exibirMenu()
+/**
+ * @brief insere uma nova informação na árvore rubro-negra.
+ *
+ * @param root Ponteiro duplo para a raiz da árvore.
+ * @param info Informações a serem inseridas na árvore.
+ */
+void insert(RBTree **root, InfoBin info)
+{
+    int result;
+    result = insertIntoRBTree(root, info);
+    (*root)->color = 1;
+}
+
+/**
+ * @brief Exibe o menu principal de opções para o usuário.
+ */
+void ExibirMenu()
 {
     printf("\n===============================================================\n");
-    printf("                          MENU PRINCIPAL                      \n");
-    printf("===============================================================\n");
-    printf("  [1] Exibir palavras em português e inglês por unidade\n");
-    printf("  [2] Mostrar traduções a partir de uma palavra em português\n");
-    printf("  [3] Remover uma palavra em inglês de uma unidade\n");
-    printf("  [4] Remover uma palavra em português de uma unidade\n");
-    printf("  [5] Sair\n");
-    printf("===============================================================\n");
-    printf("Escolha uma opção: ");
+    printf("                          MENU PRINCIPAL                         \n");
+    printf("=================================================================\n");
+    printf("[1] Exibir palavras em português e inglês por unidade\n");
+    printf("[2] Mostrar traduções a partir de uma palavra em português\n");
+    printf("[3] Remover uma palavra em inglês de uma unidade\n");
+    printf("[4] Remover uma palavra em português de uma unidade\n");
+    printf("[5] Metrificar tempo busca\n");
+    printf("[6] Sair\n");
+    printf("=================================================================\n");
+    printf("Opção: ");
 }
 
-
-void carregarArquivo(const char *nomeArquivo, RedBlackTreeNode **arvore)
+void removeSpace(char *str)
 {
-    FILE *arquivo = fopen(nomeArquivo, "r");
-    if (arquivo == NULL)
-    {
-        printf("Erro ao abrir o arquivo '%s'.\n", nomeArquivo);
-        return;
-    }
-
-    char linha[256];
-    int unidadeAtual = 0;
-
-    while (fgets(linha, sizeof(linha), arquivo))
-    {
-        // Remover o caractere de nova linha, se presente
-        linha[strcspn(linha, "\n")] = '\0';
-
-        if (linha[0] == '%')
-        {
-            // Detectar unidade atual
-            if (sscanf(linha, "%% Unidade %d", &unidadeAtual) != 1)
-                printf("Formato de unidade inválido: %s\n", linha);
-        }
-        else
-        {
-            char palavraIngles[50], traducoesPortugues[200];
-
-            // Separar palavra em inglês e traduções em português
-            if (sscanf(linha, "%[^:]: %[^\n]", palavraIngles, traducoesPortugues) == 2)
-            {
-                char *traducaoPortugues = strtok(traducoesPortugues, ",;");
-
-                while (traducaoPortugues != NULL)
-                {
-                    // Remover espaços iniciais
-                    while (*traducaoPortugues == ' ')
-                        traducaoPortugues++;
-
-                    // Criar nova informação para o nó
-                    RBTreeNodeInfo info;
-                    info.portugueseWord = strdup(traducaoPortugues);
-
-                    // Alocar e preencher o nó da árvore binária
-                    BinaryTreeNode *novoNo = malloc(sizeof(BinaryTreeNode));
-                    if (novoNo == NULL)
-                    {
-                        printf("Erro ao alocar memória para o nó binário.\n");
-                        fclose(arquivo);
-                        return;
-                    }
-
-                    novoNo->info.englishWord = strdup(palavraIngles);
-                    novoNo->info.unit = unidadeAtual;
-                    novoNo->left = novoNo->right = NULL;
-
-                    info.binaryTreeEnglish = novoNo;
-
-                    // Inserir na árvore rubro-negra
-                    if (insertRedBlackTreeNode(arvore, info) != 0)
-                    {
-                        printf("Erro ao inserir na árvore rubro-negra.\n");
-                        fclose(arquivo);
-                        return;
-                    }
-
-                    // Próxima tradução
-                    traducaoPortugues = strtok(NULL, ",;");
-                }
-            }
-            else
-            {
-                printf("Linha inválida: %s\n", linha);
-            }
-        }
-    }
-
-    fclose(arquivo);
-    printf("Arquivo '%s' carregado com sucesso!\n", nomeArquivo);
+    if (str != NULL && str[0] == ' ')
+        memmove(str, str + 1, strlen(str));
 }
-
-
-
-/*
-int carregarArquivo(const char *nomeArquivo, RedBlackTreeNode **arvore)
-{
-    FILE *arquivo = fopen(nomeArquivo, "r");
-    int resultado = 1;
-
-    if (arquivo == NULL)
-    {
-        resultado = 0;
-    }
-    else
-    {
-        char linha[256];
-        int unidadeAtual = 0;
-
-        while (fgets(linha, sizeof(linha), arquivo))
-        {
-            linha[strcspn(linha, "\n")] = 0;
-
-            if (linha[0] == '%')
-                sscanf(linha, "%% Unidade %d", &unidadeAtual);
-            else
-            {
-                char palavraIngles[50], traducoesPortugues[200];
-                sscanf(linha, "%[^:]: %[^;]", palavraIngles, traducoesPortugues);
-
-                char *traducaoPortugues = strtok(traducoesPortugues, ",;");
-                while (traducaoPortugues != NULL)
-                {
-                    while (*traducaoPortugues == ' ')
-                        traducaoPortugues++;
-
-                    RBTreeNodeInfo info;
-                    info.portugueseWord = strdup(traducoesPortugues);
-                    info.binaryTreeEnglish->info.englishWord = strdup(palavraIngles);
-                    info.binaryTreeEnglish->info.unit = unidadeAtual;
-
-                    // RBTreeNodeInfo info = {
-                    //     .portugueseWord = strdup(traducoesPortugues),
-                    //     .englishWord = strdup(palavraIngles),
-                    //     .unit = unidadeAtual
-                    // };
-                    insertRedBlackTreeNode(arvore, info);
-                    traducaoPortugues = strtok(NULL, ",;");
-                }
-            }
-        }
-
-        fclose(arquivo);
-    }
-
-    return resultado;
-}
-*/
 
 int main()
 {
+    RBTree *root = NULL;
+    char line[200];
+    int currentUnit = 0, sucess = 1;
 
-    printf("oii entrou\n\n");
-    RedBlackTreeNode *raiz = NULL;
-    char palavra[50];
-    int unidade;
-    int op;
+    FILE *file;
+    file = fopen("../../input.txt", "r");
 
-    carregarArquivo("../../input.txt", &raiz);
-    printf("saiu\n\n");
-
-    do
+    if (file == NULL)
+        sucess = 0;
+    
+    if (sucess = 1)
     {
-        exibirMenu();
-        scanf("%d", &op);
-
-        switch (op)
+        while (fgets(line, sizeof(line), file) != NULL)
         {
-        case 1:
-            printf("\n---------------- EXIBIR PALAVRAS DE UMA UNIDADE ----------------\n");
-            printf("Digite o número da unidade: ");
-            scanf("%d", &unidade);
-            printWordsByUnit(raiz, unidade);
-            break;
+            line[strcspn(line, "\n")] = '\0';
 
-        case 2:
-            printf("\n----------- TRADUZIR PALAVRA EM PORTUGUÊS PARA INGLÊS -----------\n");
-            printf("Digite a palavra em português: ");
-            scanf("%s", palavra);
-            findEnglishByPortuguese(raiz, palavra);
-            break;
-
-        case 3:
-            printf("\n------------------- REMOVER PALAVRA EM INGLÊS ------------------\n");
-            printf("Digite a palavra em inglês: ");
-            scanf("%s", palavra);
-            printf("Digite a unidade: ");
-            scanf("%d", &unidade);
-
-            RedBlackTreeNode *node = raiz;
-            while (node != NULL)
+            if (strncmp(line, "% Unidade", 9) == 0)
+                sscanf(line, "%% Unidade %d", &currentUnit);
+            else if (line[0] != '\0' && line[0] != '%')
             {
-                if (strcmp(node->info.portugueseWord, palavra) == 0)
+                char WordIN[50];
+
+                char *token = strtok(line, ":");
+                if (token != NULL)
                 {
-                    if (isLeaf(node))
-                    {
-                        node = soumfilho(node);
-                        free(node);
-                    }
-                    else
-                    {
-                        RedBlackTreeNode *smallest = SmallChild(node);
-                        free(smallest);
-                    }
-                    break;
+                    strcpy(WordIN, token);
                 }
-                node = (strcmp(node->info.portugueseWord, palavra) > 0) ? node->left : node->right;
-            }
-            break;
+                removeSpace(WordIN);
 
-        case 4:
-            printf("\n---------------- REMOVER PALAVRA EM PORTUGUÊS ----------------\n");
-            printf("Digite a palavra em português: ");
-            scanf("%s", palavra);
-
-            RedBlackTreeNode *nodeToRemove = raiz;
-            while (nodeToRemove != NULL)
-            {
-                if (strcmp(nodeToRemove->info.portugueseWord, palavra) == 0)
+                token = strtok(NULL, ";");
+                if (token != NULL)
                 {
-                    if (isLeaf(nodeToRemove))
+                    char *palavra = strtok(token, ",");
+                    while (palavra != NULL)
                     {
-                        nodeToRemove = soumfilho(nodeToRemove);
-                        free(nodeToRemove);
+                        InfoBin info;
+                        info.portugueseWord = (char *)malloc(50 * sizeof(char));
+                        info.binaryTreeEnglish = (EngPT *)malloc(sizeof(EngPT));
+                        info.binaryTreeEnglish->info.units = (Units *)malloc(sizeof(Units));
+                        info.binaryTreeEnglish->info.units->next = NULL;
+                        info.binaryTreeEnglish->left = NULL;
+                        info.binaryTreeEnglish->right = NULL;
+                        info.binaryTreeEnglish->info.englishWord = (char *)malloc(50 * sizeof(char));
+
+                        removeSpace(palavra);
+                        strcpy(info.portugueseWord, palavra);
+                        strcpy(info.binaryTreeEnglish->info.englishWord, WordIN);
+                        info.binaryTreeEnglish->info.units->unit = currentUnit;
+
+                        insert(&root, info);
+                        palavra = strtok(NULL, ",");
                     }
-                    else
-                    {
-                        RedBlackTreeNode *smallest = SmallChild(nodeToRemove);
-                        free(smallest);
-                    }
-                    break;
                 }
-                nodeToRemove = (strcmp(nodeToRemove->info.portugueseWord, palavra) > 0) ? nodeToRemove->left : nodeToRemove->right;
             }
-            break;
-
-        case 5:
-            printf("\n======================= SAINDO DO PROGRAMA =====================\n");
-            break;
-
-        default:
-            printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
-            break;
         }
-    } while (op != 5);
 
-    return 0;
+        fclose(file);
+        int enc = 0;
+        int op = 0, unit = 0;
+        char palavra[50];
+
+        do
+        {
+            enc = 0;
+            ExibirMenu();
+            scanf("%d", &op);
+            getchar();
+            switch (op)
+            {
+            case 1:
+                printf("Informe a Unidade: ");
+                scanf("%d", &unit);
+                displayUnit(root, unit, &enc);
+                break;
+            case 2:
+                printf("Informe a palavra em portugues: ");
+                scanf("%[^\n]", palavra);
+                getchar();
+                findEnglishByPortuguese(root, palavra);
+                break;
+            case 3:
+                printf("Informe a palavra em ingles: ");
+                scanf("%[^\n]", palavra);
+                getchar();
+                printf("Informe a Unidade: ");
+                scanf("%d", &unit);
+                removeFromRBTreeEN(&root, palavra, unit);
+                break;
+            case 4:
+                printf("Informe a palavra em portugues: ");
+                scanf("%[^\n]", palavra);
+                getchar();
+                printf("Informe a Unidade: ");
+                scanf("%d", &unit);
+                removeFromRBTreePT(&root, palavra, unit);
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opcao invalida!\n");
+                break;
+            }
+        } while (op != 6);
+    }
+
+    return sucess == 1 ? 0 : 1;
 }

@@ -1,5 +1,5 @@
-#ifndef Q2_H
-#define Q2_H
+#ifndef DICT_H
+#define DICT_H
 
 typedef enum color
 {
@@ -7,46 +7,64 @@ typedef enum color
   BLACK = 1
 } Color;
 
-typedef struct treeNodeInfo
+typedef struct units
+{
+  int unit;
+  struct units *next;
+} Units;
+
+typedef struct infoEngPT
 {
   char *englishWord;
-  int unit;
-} TreeNodeInfo;
+  Units *units;
+} InfoEngPT;
 
-typedef struct binaryTreeNode
+typedef struct engPT
 {
-  TreeNodeInfo info;
-  struct binaryTreeNode *left;
-  struct binaryTreeNode *right;
-} BinaryTreeNode;
+  InfoEngPT info;
+  struct engPT *left;
+  struct engPT *right;
+} EngPT;
 
-
-typedef struct rbTreeNodeInfo
+typedef struct infoBin
 {
-  BinaryTreeNode *binaryTreeEnglish;
+  EngPT *binaryTreeEnglish;
   char *portugueseWord;
-} RBTreeNodeInfo;
+} InfoBin;
 
-typedef struct redBlackTreeNode
+typedef struct rbtree
 {
-  RBTreeNodeInfo info;
-
+  InfoBin info;
+  struct rbtree *left;
+  struct rbtree *right;
   Color color;
-  struct redBlackTreeNode *left;
-  struct redBlackTreeNode *right;
-} RedBlackTreeNode;
 
-int insertRedBlackTreeNode(RedBlackTreeNode **root, RBTreeNodeInfo info);
-void displayBinaryTree(BinaryTreeNode *root);
-void removeRBTreeNodeByEN(RedBlackTreeNode **root, const char *englishWord, int unit);
-void removeRBTreeNodeByPT(RedBlackTreeNode **root, char *portugueseWord, int unit);
+} RBTree;
 
-// 1nd Question
-void printWordsByUnit(RedBlackTreeNode *root, int unit);
-void findEnglishByPortuguese(RedBlackTreeNode *root, const char *portugueseWord);
+// Funções chamadas no main
+void displayUnit(RBTree *root, int unit, int *found);
+void findEnglishByPortuguese(RBTree *node, const char *portugueseWord);
+void removeFromRBTreeEN(RBTree **root, const char *englishWord, int unit);
 
-int isLeaf(RedBlackTreeNode *node);
-RedBlackTreeNode *soumfilho(RedBlackTreeNode *node);
-RedBlackTreeNode *SmallChild(RedBlackTreeNode *raiz);
+int insertIntoRBTree(RBTree **root, InfoBin info);
+void removeFromRBTreePT(RBTree **root, char *portugueseWord, int unit);
+
+// Auxiliares
+void insertUnit(Units **units, int unit);
+void insertBinaryTree(EngPT **root, InfoEngPT info);
+void createNode(RBTree **node, InfoBin info);
+
+void flipColors(RBTree **root);
+void rotateLeft(RBTree **root);
+void rotateRight(RBTree **root);
+
+int getColor(RBTree *root);
+void balanceTree(RBTree **root);
+int insertIntoRBTree(RBTree **root, InfoBin info);
+
+int isUnitPresent(Units *units, int unit);
+void displayBinaryTree(EngPT *root, int unit);
+int searchUnit(EngPT *root, int unit);
+void displayUnit(RBTree *root, int unit, int *found);
 
 #endif
