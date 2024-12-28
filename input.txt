@@ -33,3 +33,365 @@ Storage: armazenamento, guarda;
 Protocol: protocolo, regra;
 Device: dispositivo, aparelho;
 Circuit: circuito, laço;
+% Unidade 6
+Chip: chip, fragmento;
+Thread: fio, linha de execução;
+Buffer: buffer, amortecedor;
+Socket: soquete, encaixe;
+Bridge: ponte, interconexão;
+Clock: relógio, temporizador;
+Kernel: núcleo, cerne;
+Platform: plataforma, base;
+% Unidade 7
+Patch: remendo, atualização;
+Cache: cache, esconderijo;
+Shell: casca, interface de comando;
+Stack: pilha, empilhar;
+Heap: monte, pilha de memória;
+Loop: laço, repetição;
+Stream: fluxo, corrente;
+Input: entrada, inserir;
+% Unidade 8
+Output: saída, emitir;
+Queue: fila, enfileirar;
+Switch: interruptor, trocar;
+Backup: cópia de segurança, apoio;
+Firewall: firewall, barreira de proteção;
+Cloud: nuvem, nebulosidade;
+Cluster: aglomerado, conjunto;
+Bandwidth: largura de banda, capacidade de transmissão;
+% Unidade 9
+Topology: topologia, configuração;
+Protocol: protocolo, convenção;
+Address: endereço, discurso;
+Gateway: portal, entrada;
+Access: acesso, entrada;
+Node: nó, ponto;
+Host: anfitrião, hospedar;
+Client: cliente, usuário;
+% Unidade 10
+Session: sessão, encontro;
+Transport: transporte, movimentação;
+Package: pacote, embrulho;
+Data: dados, informações;
+Model: modelo, padrão;
+Virtual: virtual, não real;
+Frame: quadro, moldura;
+Layer: camada, estrato;
+% Unidade 11
+Signal: sinal, comunicar;
+Binary: binário, dual;
+Analog: analógico, contínuo;
+Digital: digital, numérico;
+Frequency: frequência, regularidade;
+Amplitude: amplitude, alcance;
+Bitrate: taxa de bits, velocidade de transmissão;
+Compression: compressão, redução;
+% Unidade 12
+Algorithm: algoritmo, processo;
+Hash: hash, triturar;
+Encryption: criptografia, codificação;
+Decryption: descriptografia, decodificação;
+Keyframe: quadro-chave, marco;
+Latency: latência, atraso;
+Parity: paridade, igualdade;
+Checksum: soma de verificação, controle de erro;
+% Unidade 13
+Bandwidth: largura de banda, capacidade de transmissão;
+Router: roteador, guia;
+Switch: interruptor, troca;
+Ethernet: ethernet, rede local;
+WiFi: wi-fi, conexão sem fio;
+Bluetooth: bluetooth, comunicação curta;
+IP: endereço IP, protocolo;
+DNS: sistema de nomes de domínio;
+% Unidade 14
+USB: USB, barramento universal;
+HDMI: HDMI, interface multimídia;
+VGA: VGA, vídeo analógico;
+SSD: SSD, unidade de estado sólido;
+HDD: HDD, disco rígido;
+RAM: RAM, memória volátil;
+CPU: CPU, processador central;
+GPU: GPU, processador gráfico;
+% Unidade 15
+Ping: ping, sinal de teste;
+Traceroute: rastreamento de rota, caminho;
+Timeout: tempo limite, expiração;
+Hostname: nome do host, identificador;
+Session: sessão, conexão;
+Token: token, marcador;
+Handshake: handshake, saudação;
+Cipher: cifra, código;
+% Unidade 16
+Command: comando, ordem;
+Script: script, roteiro;
+Batch: lote, agrupamento;
+Syntax: sintaxe, estrutura;
+Variable: variável, mutável;
+Function: função, operação;
+Procedure: procedimento, processo;
+Parameter: parâmetro, critério;
+% Unidade 17
+Debugger: depurador, analisador;
+Breakpoint: ponto de interrupção, pausa;
+Compile: compilar, traduzir;
+Execute: executar, realizar;
+Runtime: tempo de execução, período;
+Library: biblioteca, coleção;
+Framework: estrutura, arcabouço;
+Dependency: dependência, vínculo;
+% Unidade 18
+Render: renderizar, representar;
+Shader: sombreador, manipulador gráfico;
+Texture: textura, padrão;
+Pixel: pixel, ponto de imagem;
+Resolution: resolução, definição;
+Aspect: aspecto, proporção;
+Viewport: área de visualização, janela;
+Framebuffer: buffer de quadros, armazenamento gráfico;
+% Unidade 19
+Cluster: cluster, agrupamento;
+Virtualization: virtualização, simulação;
+Hypervisor: hipervisor, monitor de máquinas virtuais;
+Instance: instância, exemplo;
+Snapshot: instantâneo, captura;
+Container: contêiner, recipiente;
+Orchestration: orquestração, coordenação;
+Deployment: implantação, distribuição;
+% Unidade 20
+Query: consulta, pergunta;
+Index: índice, marcador;
+Relation: relação, conexão;
+Tuple: tupla, sequência;
+Constraint: restrição, limite;
+Schema: esquema, estrutura;
+Partition: partição, divisão;
+Replication: replicação, cópia;
+% Unidade 21
+Authentication: autenticação, validação;
+Authorization: autorização, permissão;
+Credential: credencial, identificação;
+Access: acesso, permissão;
+Privilege: privilégio, direito;
+Session: sessão, período;
+Token: token, símbolo;
+Audit: auditoria, inspeção;
+% Unidade 22
+Instance: instância, exemplo;
+Class: classe, categoria;
+Object: objeto, item;
+Property: propriedade, característica;
+Inheritance: herança, sucessão;
+Polymorphism: polimorfismo, multiplicidade;
+Abstraction: abstração, simplificação;
+Encapsulation: encapsulamento, isolamento;
+% Unidade 23
+Thread: thread, linha de execução;
+Mutex: mutex, exclusão mútua;
+Semaphore: semáforo, sinalizador;
+Process: processo, tarefa;
+Fork: bifurcação, divisão;
+Deadlock: deadlock, impasse;
+Priority: prioridade, importância;
+Scheduler: escalonador, organizador;
+% Unidade 24
+Register: registrador, cadastro;
+Opcode: opcode, código de operação;
+Instruction: instrução, comando;
+Assembly: montagem, conjunto;
+Stack: pilha, empilhar;
+Heap: heap, memória alocada;
+Cache: cache, memória rápida;
+Bus: barramento, transporte;
+% Unidade 25
+Map: mapa, correspondência;
+Reduce: reduzir, condensar;
+Pipeline: pipeline, sequência;
+Partition: partição, segmento;
+Shuffle: embaralhar, reorganizar;
+Join: junção, unir;
+Sort: ordenar, classificar;
+Filter: filtrar, peneirar;
+% Unidade 26
+Latency: latência, atraso;
+Throughput: vazão, rendimento;
+Jitter: jitter, variação de atraso;
+Bandwidth: largura de banda, capacidade;
+Congestion: congestionamento, sobrecarga;
+Packet: pacote, unidade de dados;
+Header: cabeçalho, título;
+Payload: carga útil, conteúdo;
+% Unidade 27
+Gesture: gesto, movimento;
+Scroll: rolar, percorrer;
+Click: clique, pressionar;
+Hover: pairar, flutuar;
+Touch: toque, contato;
+Swipe: deslizar, passar;
+Drag: arrastar, puxar;
+Drop: soltar, liberar;
+% Unidade 28
+Threadpool: pool de threads, grupo de execução;
+Async: assíncrono, não simultâneo;
+Promise: promessa, garantia;
+Await: aguardar, esperar;
+Callback: retorno de chamada, função de retorno;
+Future: futuro, projeção;
+Event: evento, ocorrência;
+Signal: sinal, indicação;
+% Unidade 29
+Boot: inicializar, iniciar;
+Kernel: núcleo, base;
+Daemon: daemon, processo em segundo plano;
+Log: log, registro;
+Crash: falha, colapso;
+Recovery: recuperação, restauração;
+Patch: correção, atualização;
+Uptime: tempo de atividade, duração;
+% Unidade 30
+Tokenize: tokenizar, dividir;
+Parse: analisar, interpretar;
+Compile: compilar, traduzir;
+Optimize: otimizar, melhorar;
+Link: linkar, conectar;
+Execute: executar, rodar;
+Debug: depurar, corrigir;
+Profile: perfil, análise de desempenho;
+% Unidade 31
+Latency: latência, atraso;
+Throughput: vazão, capacidade;
+Protocol: protocolo, norma;
+Handshake: handshake, saudação;
+Bandwidth: largura de banda, alcance;
+Frame: quadro, moldura;
+Segment: segmento, seção;
+Bit: bit, unidade binária;
+% Unidade 32
+Queue: fila, sequência;
+Stack: pilha, organizar;
+Heap: monte, alocação;
+Priority: prioridade, hierarquia;
+Scheduler: escalonador, agendador;
+Process: processo, tarefa;
+Semaphore: semáforo, controle;
+Mutex: mutex, exclusão mútua;
+% Unidade 33
+Algorithm: algoritmo, método;
+Sorting: ordenação, classificação;
+Search: busca, procura;
+Traversal: travessia, percurso;
+Recursion: recursão, repetição;
+Iteration: iteração, ciclo;
+Efficiency: eficiência, desempenho;
+Complexity: complexidade, dificuldade;
+% Unidade 34
+Pixel: pixel, unidade de imagem;
+Bitmap: mapa de bits, gráfico;
+Resolution: resolução, definição;
+Palette: paleta, conjunto de cores;
+Vector: vetor, direção;
+Render: renderizar, exibir;
+Viewport: janela de visualização, tela;
+Canvas: tela, área de desenho;
+% Unidade 35
+Encryption: criptografia, codificação;
+Decryption: descriptografia, decodificação;
+Hash: hash, resumo;
+Certificate: certificado, validação;
+Keypair: par de chaves, conjunto criptográfico;
+Symmetric: simétrico, equivalente;
+Asymmetric: assimétrico, desigual;
+Signature: assinatura, marca;
+% Unidade 36
+Data: dados, informações;
+Packet: pacote, unidade;
+Stream: fluxo, corrente;
+Buffer: buffer, amortecedor;
+Sync: sincronizar, ajustar;
+Async: assíncrono, não simultâneo;
+Protocol: protocolo, regra;
+Transmission: transmissão, envio;
+% Unidade 37
+Router: roteador, guia;
+Switch: interruptor, comutador;
+Hub: hub, central;
+Bridge: ponte, conexão;
+Gateway: portal, entrada;
+Modem: modem, modulador-demodulador;
+Access: acesso, entrada;
+LAN: LAN, rede local;
+% Unidade 38
+Function: função, operação;
+Method: método, abordagem;
+Argument: argumento, parâmetro;
+Parameter: parâmetro, especificação;
+Return: retorno, devolução;
+Call: chamada, invocação;
+Scope: escopo, alcance;
+Closure: fechamento, encapsulamento;
+% Unidade 39
+File: arquivo, documento;
+Directory: diretório, pasta;
+Path: caminho, trajeto;
+Extension: extensão, complemento;
+Rename: renomear, alterar;
+Copy: copiar, duplicar;
+Move: mover, transferir;
+Delete: excluir, apagar;
+% Unidade 40
+Disk: disco, unidade;
+Partition: partição, divisão;
+Format: formatar, preparar;
+Cluster: cluster, agrupamento;
+Sector: setor, segmento;
+Volume: volume, capacidade;
+Drive: unidade, conduzir;
+FileSystem: sistema de arquivos, estrutura;
+% Unidade 41
+Cloud: nuvem, ambiente remoto;
+Instance: instância, exemplo;
+Region: região, área;
+Backup: backup, cópia de segurança;
+Restore: restaurar, reverter;
+Snapshot: instantâneo, captura;
+Replication: replicação, duplicação;
+Scaling: escalonamento, dimensionamento;
+% Unidade 42
+AI: inteligência artificial, aprendizado;
+Model: modelo, representação;
+Training: treinamento, prática;
+Dataset: conjunto de dados, base;
+Neural: neural, ligado a redes;
+Layer: camada, nível;
+Inference: inferência, dedução;
+Prediction: predição, previsão;
+% Unidade 43
+Game: jogo, brincadeira;
+Engine: motor, mecanismo;
+Asset: recurso, ativo;
+Animation: animação, movimento;
+Texture: textura, padrão;
+Collider: colisor, detector;
+Scene: cena, ambiente;
+Sprite: sprite, figura;
+% Unidade 44
+Node: nó, ponto;
+Edge: aresta, ligação;
+Graph: grafo, gráfico;
+Traversal: travessia, percurso;
+Weight: peso, valor;
+Cycle: ciclo, repetição;
+Tree: árvore, hierarquia;
+Path: caminho, trajeto;
+% Unidade 45
+Bootloader: carregador, inicializador;
+Kernel: núcleo, base;
+Daemon: daemon, serviço;
+Service: serviço, assistência;
+Log: registro, diário;
+Crash: falha, colapso;
+Recovery: recuperação, restauração;
+Uptime: tempo ativo, duração;
+
+

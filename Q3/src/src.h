@@ -47,7 +47,8 @@ void FreeSpace(Memory *memory, int start, int end);
 int removeFromMemory(Memory **parent, Memory **node, Info *key);
 
 int mergeNodesStart(Memory **root, int *return_start);
-int mergeNodesMiddle(Memory **root, int *return_start);
+void mergeNodesMiddle(Memory **root, int *remover_inicio_meio1, int *remover_fim_meio1, int *remover_inicio_meio2, int *remover_fim_meio2);
 int mergeNodesEnd(Memory **root, int *return_start);
+
 
 #endif

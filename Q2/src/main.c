@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include <ctype.h>
 #include "dict.h"
 
@@ -139,7 +140,22 @@ int main()
                 scanf("%d", &unit);
                 removeFromRBTreePT(&root, palavra, unit);
                 break;
-            case 0:
+            case 5:
+                printf("Informe a palavra em portugues: ");
+                scanf("%[^\n]", palavra);
+                getchar();
+                
+                clock_t start, end;
+                double cpu_time_used;
+
+                start = clock();
+                findEnglishByPortuguese(root, palavra);
+                end = clock();
+                
+                cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+                printf("Tempo gasto para executar a busca: %.6f segundos\n", cpu_time_used);
+                break;
+            case 6:
                 printf("Saindo...\n");
                 break;
             default:

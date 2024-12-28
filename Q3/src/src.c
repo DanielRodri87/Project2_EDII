@@ -603,77 +603,44 @@ int mergeNodesStart(Memory **root, int *return_start)
 
 // ============================
 
-int mergeNodesMiddle(Memory **root, int *return_start)
+void mergeNodesMiddle(Memory **root, int *remover_inicio_meio1, int *remover_fim_meio1, int *remover_inicio_meio2, int *remover_fim_meio2)
 {
-    int return_end = -1;
-    if (root != NULL)
+    if (root != NULL && *root != NULL)
     {
         Memory *current = *root;
 
-        // Verifica se o nó atual possui duas informações que podem ser mescladas
+        // Verifica se existem nós intermediários que podem ser mesclados
         if (current->info1 && current->info2)
         {
+            // Verifica contiguidade entre info1 e info2
             if (current->info1->status == current->info2->status &&
                 current->info1->end + 1 == current->info2->start)
             {
-                current->info1->end = current->info2->end;
-                current->numKeys--;
+                // Salva os endereços do primeiro nó que será removido
+                *remover_inicio_meio1 = current->info1->start;
+                *remover_fim_meio1 = current->info1->end;
 
-                *return_start = current->info2->start;
-                return_end = current->info2->end;
+                // Salva os endereços do segundo nó que será removido
+                *remover_inicio_meio2 = current->info2->start;
+                *remover_fim_meio2 = current->info2->end;
+
+                return; // Para a busca após encontrar a primeira mescla
             }
         }
 
-        // Mescla nós contíguos à direita e à esquerda
-        if (current->left && current->right)
-        {
-            if (current->left->info2 &&
-                current->info1 &&
-                current->left->info2->status == current->info1->status &&
-                current->left->info2->end + 1 == current->info1->start)
-            {
-                current->left->info2->end = current->info1->end;
-                current->numKeys--;
-
-                *return_start = current->info1->start;
-                return_end = current->info1->end;
-            }
-
-            if (current->right->info1 &&
-                current->info2 &&
-                current->info2->status == current->right->info1->status &&
-                current->info2->end + 1 == current->right->info1->start)
-            {
-                current->info2->end = current->right->info1->end;
-                current->right->numKeys--;
-
-                *return_start = current->info2->start;
-                return_end = current->info2->end;
-            }
-        }
-
-        // Chamada recursiva para os filhos
+        // Recursão para encontrar nós intermediários nos filhos
         if (current->left)
-        {
-            int left_end = mergeNodesMiddle(&current->left, return_start);
-            if (left_end > return_end)
-                return_end = left_end;
-        }
+            mergeNodesMiddle(&current->left, remover_inicio_meio1, remover_fim_meio1, remover_inicio_meio2, remover_fim_meio2);
+
         if (current->center)
-        {
-            int center_end = mergeNodesMiddle(&current->center, return_start);
-            if (center_end > return_end)
-                return_end = center_end;
-        }
+            mergeNodesMiddle(&current->center, remover_inicio_meio1, remover_fim_meio1, remover_inicio_meio2, remover_fim_meio2);
+
         if (current->right)
-        {
-            int right_end = mergeNodesMiddle(&current->right, return_start);
-            if (right_end > return_end)
-                return_end = right_end;
-        }
+            mergeNodesMiddle(&current->right, remover_inicio_meio1, remover_fim_meio1, remover_inicio_meio2, remover_fim_meio2);
     }
-    return return_end;
 }
+
+
 
 int mergeNodesEnd(Memory **root, int *return_start)
 {
@@ -732,3 +699,4 @@ int mergeNodesEnd(Memory **root, int *return_start)
     }
     return return_end;
 }
+
