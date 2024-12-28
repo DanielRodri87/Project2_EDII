@@ -3,6 +3,51 @@
 #include <stdlib.h>
 #include <string.h>
 
+// DEBUGANDO
+void printNode(const Memory *node, int depth)
+{
+    if (node == NULL)
+        return;
+
+    // Imprime indentação para representar a profundidade
+    for (int i = 0; i < depth; i++)
+        printf("    ");
+
+    // Imprime as informações do nó
+    printf("[");
+    if (node->info1)
+        printf("(%d, %d, %d)", node->info1->start, node->info1->end, node->info1->status);
+    if (node->numKeys == 2 && node->info2)
+        printf(" | (%d, %d, %d)", node->info2->start, node->info2->end, node->info2->status);
+    printf("]\n");
+}
+
+// Função recursiva para imprimir a árvore
+void printTree(const Memory *root, int depth)
+{
+    if (root == NULL)
+        return;
+
+    // Imprime o nó atual
+    printNode(root, depth);
+
+    // Recursivamente imprime as subárvores
+    printTree(root->left, depth + 1);
+    printTree(root->center, depth + 1);
+    if (root->numKeys == 2) // Só imprime a subárvore direita se houver uma segunda chave
+        printTree(root->right, depth + 1);
+}
+
+// Função principal para desenhar a árvore
+void drawTree(const Memory *root)
+{
+    printf("Árvore 2-3:\n");
+    printTree(root, 0);
+}
+
+// ############################################################################################################
+
+
 Info *CreateInfo(int start, int end, int status)
 {
     Info *info = (Info *)malloc(sizeof(Info));
@@ -16,163 +61,158 @@ Info *CreateInfo(int start, int end, int status)
     return info;
 }
 
-Memory *createNode(Info *information, Memory *leftChild, Memory *centerChild)
+Memory *criaNo(const Info *informacao, Memory *filhoesq, Memory *filhocen)
 {
-    Memory *node = (Memory *)malloc(sizeof(Memory));
+    Memory *no = (Memory *)malloc(sizeof(Memory));
+    if (no == NULL)
+        printf("Erro ao alocar memória para o nó.\n");
 
-    if (node != NULL)
+    no->info1 = (Info *)malloc(sizeof(Info));
+    if (no->info1 == NULL)
     {
-        node->info1 = information;
-        node->left = leftChild;
-        node->center = centerChild;
-        node->numKeys = 1;
+        printf("Erro ao alocar memória para info1.\n");
+        free(no);
+    }
+    *(no->info1) = *informacao;
+
+    no->info2 = NULL;
+    no->left = filhoesq;
+    no->center = filhocen;
+    no->right = NULL;
+    no->numKeys = 1;
+
+    return no;
+}
+
+int ehFolha(const Memory *no)
+{
+    int achou = 0;
+
+    if (no->left == NULL)
+        achou = 1;
+
+    return achou;
+}
+
+Memory *addInfo(Memory *no, const Info *informacao, Memory *filho)
+{
+    if (informacao->start > no->info1->start)
+    {
+        no->info2 = malloc(sizeof(Info));
+        *(no->info2) = *informacao; 
+        no->right = filho;         
     }
     else
     {
-        printf("Falha ao criar o Nó!\n");
+        no->info2 = no->info1;     
+        no->right = no->center;  
+        no->info1 = malloc(sizeof(Info));
+        *(no->info1) = *informacao; 
+        no->center = filho;     
     }
-
-    return node;
+    no->numKeys = 2; 
+    return no;    
 }
 
-int isLeaf(Memory *node)
+Memory *quebraNo(Memory **no, const Info *informacao, Info *promove, Memory **filho)
 {
-    return node->left == NULL;
-}
+    Memory *maior;
 
-void AddInfo(Memory **node, Info *info, Memory *child)
-{
-    if ((*node)->numKeys == 1)
+    if (informacao->start > (*no)->info1->start)
     {
-        if (info->start > (*node)->info1->start)
-        {
-            (*node)->info2 = info;
-            (*node)->right = child;
-        }
+        *promove = *(*no)->info2; 
+        if (filho) 
+            maior = criaNo(informacao, (*no)->right, *filho);  
         else
-        {
-            (*node)->info2 = (*node)->info1;
-            (*node)->info1 = info;
-            (*node)->right = (*node)->center;
-            (*node)->center = child;
-        }
-        (*node)->numKeys = 2;
+            maior = criaNo(informacao, (*no)->right, NULL);  
     }
-    else if ((*node)->numKeys == 2)
+    else if (informacao->start > (*no)->info2->start)
     {
-        Memory *newNode = (Memory *)malloc(sizeof(Memory));
-        newNode->numKeys = 1;
-
-        if (info->start > (*node)->info2->start)
-        {
-            newNode->info1 = info;
-            newNode->left = (*node)->right;
-            newNode->center = child;
-        }
-        else if (info->start > (*node)->info1->start)
-        {
-            newNode->info1 = (*node)->info2;
-            newNode->left = child;
-            newNode->center = (*node)->right;
-        }
+        *promove = *informacao; 
+        if (filho)
+            maior = criaNo((*no)->info2, *filho, (*no)->right);  
         else
-        {
-            newNode->info1 = (*node)->info2;
-            (*node)->info2 = (*node)->info1;
-            (*node)->info1 = info;
-            newNode->left = (*node)->center;
-            newNode->center = (*node)->right;
-            (*node)->center = child;
-        }
-        (*node)->numKeys = 1;
-    }
-}
-
-Split SplitNode(Memory **root, Info *info, Memory *child)
-{
-    Memory *largestNode = (Memory *)malloc(sizeof(Memory));
-    Info *promote = NULL;
-    Split itBroke;
-
-    largestNode->numKeys = 1;
-
-    if (info->start > (*root)->info2->start)
-    {
-        promote = (*root)->info2;
-        (*root)->numKeys = 1;
-
-        largestNode->info1 = info;
-        largestNode->left = (*root)->center;
-        largestNode->center = child;
-    }
-    else if (info->start > (*root)->info1->start)
-    {
-        promote = info;
-        largestNode->info1 = (*root)->info2;
-        largestNode->left = child;
-        largestNode->center = (*root)->right;
-
-        (*root)->numKeys = 1;
+            maior = criaNo((*no)->info2, NULL, (*no)->right); 
     }
     else
     {
-        promote = (*root)->info1;
-        (*root)->info1 = info;
+        *promove = *(*no)->info1; 
 
-        largestNode->info1 = (*root)->info2;
-        largestNode->left = (*root)->center;
-        largestNode->center = (*root)->right;
+        maior = criaNo((*no)->info2, (*no)->center, (*no)->right);
 
-        (*root)->numKeys = 1;
+        if ((*no)->info1 == NULL)
+        {
+            (*no)->info1 = (Info *)malloc(sizeof(Info));
+            if ((*no)->info1 == NULL)
+                printf("Erro ao alocar memória para info1.\n");
+        }
+
+        *(*no)->info1 = *informacao;
+
+        if (filho)
+            (*no)->center = *filho;
+        else
+            (*no)->center = NULL;
     }
 
-    itBroke.largestNode = largestNode;
-    itBroke.promote = promote;
-
-    return itBroke;
+    (*no)->numKeys = 1; 
+    return maior;
 }
 
-void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag)
-{
-    if (*root == NULL)
-    {
-        Info *nova_info = CreateInfo(start, end, status);
-        *root = createNode(nova_info, NULL, NULL);
-        *flag = 1;
-    }
-    else if (isLeaf(*root))
-    {
-        *flag = 1;
-        if ((*root)->numKeys < 2)
-        {
-            Info *nova_info = CreateInfo(start, end, status);
-            AddInfo(root, nova_info, NULL);
-        }
-        else
-        {
-            Info *nova_info = CreateInfo(start, end, status);
-            Split resultado = SplitNode(root, nova_info, NULL);
 
-            if (!parent)
-                *root = createNode(resultado.promote, *root, resultado.largestNode);
-            else if (parent->numKeys < 2)
-                AddInfo(&parent, resultado.promote, resultado.largestNode);
+Memory *inserirArv23(Memory **no, Info *informacao, Info *promove, Memory **pai)
+{
+    Info promove1;
+    Memory *maiorNo = NULL;
+    if (*no == NULL)
+        *no = criaNo(informacao, NULL, NULL);
+
+    else
+    {
+        if (ehFolha(*no))
+        { // Caso seja folha
+            if ((*no)->numKeys == 1)
+                *no = addInfo(*no, informacao, NULL);
             else
             {
-                resultado = SplitNode(&parent, resultado.promote, resultado.largestNode);
-                parent = createNode(resultado.promote, parent, resultado.largestNode);
+                maiorNo = quebraNo(no, informacao, promove, NULL);
+                if (pai == NULL)
+                { // Se não há pai, criar nova raiz
+                    *no = criaNo(promove, *no, maiorNo);
+                    maiorNo = NULL;
+                }
+            }
+        }
+        else
+        { // Nó não e folha
+          // Navega para o filho apropriado
+            if (informacao->start < (*no)->info1->start)
+                maiorNo = inserirArv23(&((*no)->left), informacao, promove, no);
+            else if ((*no)->numKeys == 1 || informacao->start < (*no)->info2->start)
+                maiorNo = inserirArv23(&((*no)->center), informacao, promove, no);
+            else
+                maiorNo = inserirArv23(&((*no)->right), informacao, promove, no);
+            if (maiorNo)
+            {
+                if ((*no)->numKeys == 1)
+                {
+                    *no = addInfo(*no, promove, maiorNo);
+                    maiorNo = NULL;
+                }
+                else
+                {
+                    maiorNo = quebraNo(no, promove, &promove1, &maiorNo);
+                    if (pai == NULL)
+                    {
+                        *no = criaNo(&promove1, *no, maiorNo);
+                        maiorNo = NULL;
+                    }
+                }
             }
         }
     }
-    else
-    {
-        if (start < (*root)->info1->start)
-            Insert23(&(*root)->left, *root, promote, start, end, status, flag);
-        else if ((*root)->numKeys == 1 || start < (*root)->info2->start)
-            Insert23(&(*root)->center, *root, promote, start, end, status, flag);
-        else
-            Insert23(&(*root)->right, *root, promote, start, end, status, flag);
-    }
+
+    return maiorNo;
 }
 
 Memory *FindSpace(Memory *root, int requiredSpace)
@@ -232,6 +272,7 @@ void DisplayInfos(Memory *root)
     }
 }
 
+
 // ----------------------------------------------------------------
 void AllocateSpace(Memory **root, int requiredSpace)
 {
@@ -245,18 +286,22 @@ void AllocateSpace(Memory **root, int requiredSpace)
         {
             int newEndOccupied = node->info1->start + requiredSpace - 1;
 
+            // Cria um novo Info para o espaço ocupado
             Info *newOccupiedInfo = CreateInfo(node->info1->start, newEndOccupied, OCCUPIED);
 
+            // Atualiza a informação no nó
             node->info1 = newOccupiedInfo;
 
+            // Caso reste espaço, cria um novo nó para o espaço restante
             if (availableSpace > requiredSpace)
             {
                 int remainingStart = newEndOccupied + 1;
                 int remainingEnd = node->info1->end;
                 Info *remainingInfo = CreateInfo(remainingStart, remainingEnd, FREE);
 
-                int flag = 0;
-                Insert23(root, NULL, NULL, remainingInfo->start, remainingInfo->end, FREE, &flag);
+                // Utiliza a nova função inserirArv23 para adicionar o espaço restante
+                Info promove;
+                inserirArv23(root, remainingInfo, &promove, NULL);
             }
 
             printf("Espaço alocado com sucesso.\n");
@@ -277,11 +322,10 @@ void FreeSpace(Memory *memory, int start, int end)
     if (memory != NULL)
     {
         if (memory->info1 != NULL && memory->info1->start == start && memory->info1->end == end)
-            memory->info1->status = 1; 
+            memory->info1->status = 1;
 
         if (memory->info2 != NULL && memory->info2->start == start && memory->info2->end == end)
-            memory->info2->status = 1; 
-        
+            memory->info2->status = 1;
 
         FreeSpace(memory->left, start, end);
         FreeSpace(memory->center, start, end);
@@ -350,7 +394,7 @@ int removeFromMemory(Memory **parent, Memory **node, Info *key)
 
     if (*node != NULL)
     {
-        if (isLeaf(*node) == 1)
+        if (ehFolha(*node) == 1)
         {
             if ((*node)->numKeys == 2)
             {
@@ -640,8 +684,6 @@ void mergeNodesMiddle(Memory **root, int *remover_inicio_meio1, int *remover_fim
     }
 }
 
-
-
 int mergeNodesEnd(Memory **root, int *return_start)
 {
     int return_end = -1;
@@ -699,4 +741,3 @@ int mergeNodesEnd(Memory **root, int *return_start)
     }
     return return_end;
 }
-
