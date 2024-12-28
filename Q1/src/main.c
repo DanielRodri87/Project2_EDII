@@ -1,6 +1,7 @@
 #include "dict.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
 void exibirMenu()
@@ -13,7 +14,8 @@ void exibirMenu()
     printf("  [3] Remover uma palavra em inglês de uma unidade\n");
     printf("  [4] Remover uma palavra em português de uma unidade\n");
     printf("  [5] Exibir Todas as palavras\n");
-    printf("  [6] Sair\n");
+    printf("  [6] Metrificar\n");
+    printf("  [7] Sair\n");
     printf("===============================================================\n");
     printf("Escolha uma opção: ");
 }
@@ -114,12 +116,32 @@ int main()
             printf("\n-----------Palavras na Info 1: -----------------\n");
             exibirEmOrdem23(raiz);
             break;
+        case 6:
+            printf("Informe a palavra em portugues: ");
+            getchar();
+            scanf("%[^\n]", palavra);
+            getchar();
+
+            clock_t start, end;
+            double cpu_time_used;
+
+            start = clock();
+            displayPortugueseTranslation(&raiz, palavra);
+            end = clock();
+
+            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+            printf("Tempo gasto para executar a busca: %.6f segundos\n", cpu_time_used);
+            break;
+
+        case 7:
+            printf("Saindo...\n");
+            break;
 
         default:
             printf("\nOpção inválida! Por favor, escolha uma opção válida.\n\n");
             break;
         }
-    } while (op != 6);
+    } while (op != 7);
 
     freeTree(raiz);
 

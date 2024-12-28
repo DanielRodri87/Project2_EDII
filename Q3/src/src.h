@@ -24,19 +24,12 @@ typedef struct Memory
 
 } Memory;
 
-typedef struct Split
-{
-    Memory *largestNode;
-    Info *promote;
-} Split;
+
+void drawTree(const Memory *root);
 
 Info *CreateInfo(int start, int end, int status);
 Memory *createNode(Info *information, Memory *leftChild, Memory *centerChild);
-int isLeaf(Memory *node);
-
-void AddInfo(Memory **node, Info *info, Memory *child);
-Split SplitNode(Memory **root, Info *info, Memory *child);
-void Insert23(Memory **root, Memory *parent, Info **promote, int start, int end, int status, int *flag);
+Memory *inserirArv23(Memory **no, Info *informacao, Info *promove, Memory **Pai);
 
 Memory *FindSpace(Memory *root, int requiredSpace);
 Memory *SourceSpace(Memory *root, int RequiredSpace);
