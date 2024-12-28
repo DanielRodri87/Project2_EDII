@@ -12,11 +12,10 @@ void DisplayMenu()
 	printf("===============================================================\n");
 	printf("  [1] Ocupar Nós Livres\n");
 	printf("  [2] Desocupar Nós\n");
-	printf("  [3] Compactar Memória Ocupada\n");
-	printf("  [4] Compactar Memória Livre\n");
-	printf("  [5] Remover bloco de Memória\n");
-	printf("  [6] Exibir alocação e memória\n");
-	printf("  [7] Sair\n");
+	printf("  [3] Compactar Memória\n");
+	printf("  [4] Remover bloco de Memória\n");
+	printf("  [5] Exibir alocação e memória\n");
+	printf("  [6] Sair\n");
 	printf("===============================================================\n");
 	printf("Escolha uma opção: ");
 }
@@ -117,18 +116,29 @@ int main()
 				remover_fim = mergeNodesStart(&tree, &remover_inicio);
 				key.start = remover_inicio;
 				key.end = remover_fim;
+				printf("Inicio: %d Fim %d\n\n", key.start, key.end);
+
 				removeFromMemory(NULL, &tree, &key);
 				break;
 
-			case 2: 
-				int remover_inicio_meio, remover_fim_meio;
-				remover_fim_meio = mergeNodesMiddle(&tree, &remover_inicio_meio);
-				key.start = remover_inicio_meio;
-				key.end = remover_fim_meio;
-				removeFromMemory(NULL, &tree, &key);
+			case 2:
+				int remover_inicio_meio1, remover_fim_meio1;
+				int remover_inicio_meio2, remover_fim_meio2;
+				mergeNodesMiddle(&tree, &remover_inicio_meio1, &remover_fim_meio1, &remover_inicio_meio2, &remover_fim_meio2);
+
+				key.start = remover_inicio_meio1;
+				key.end = remover_fim_meio1; 
+				printf("Inicio: %d Fim %d\n\n", key.start, key.end);
+				removeFromMemory(&tree, &tree, &key);
+
+				key.start = remover_inicio_meio2;
+				key.end = remover_fim_meio2; 
+				removeFromMemory(&tree, &tree, &key);
+				printf("Inicio: %d Fim %d\n\n", key.start, key.end);
+
 				break;
 
-			case 3: 
+			case 3:
 				int remover_inicio_fim, remover_fim_fim;
 				remover_fim_fim = mergeNodesEnd(&tree, &remover_inicio_fim);
 				key.start = remover_inicio_fim;
@@ -144,9 +154,8 @@ int main()
 				break;
 			}
 			break;
+
 		case 4:
-			break;
-		case 5:
 			printf("Digite o endereço de início do bloco de memória: ");
 			scanf("%d", &key.start);
 
@@ -155,15 +164,15 @@ int main()
 
 			removeFromMemory(NULL, &tree, &key);
 			break;
-		case 6:
+		case 5:
 			DisplayInfos(tree);
 			break;
-		case 7:
+		case 6:
 			printf("Saindo da aplicação...\n");
 			break;
 		default:
 			printf("Opção inválida\n");
 			break;
 		}
-	} while (control_menu != 7);
+	} while (control_menu != 6);
 }
