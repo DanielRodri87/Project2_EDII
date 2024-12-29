@@ -16,7 +16,7 @@ int findFirstStart(Memory *root)
         result = current->info1->start;
     }
 
-    return result;
+    return (result);
 }
 
 int findLastStart(Memory *root)
@@ -35,7 +35,7 @@ int findLastStart(Memory *root)
             result = current->info1->start;
     }
 
-    return result;
+    return (result);
 }
 
 void DisplayMenu()
@@ -45,12 +45,10 @@ void DisplayMenu()
     printf("===============================================================\n");
     printf("  [1] Ocupar Nós Livres\n");
     printf("  [2] Desocupar Nós\n");
-    printf("  [3] Compactar Memória\n");
-    printf("  [4] Remover Bloco de Memória\n");
-    printf("  [5] Exibir Alocação de Memória\n");
-    printf("  [6] Sair\n");
+    printf("  [3] Exibir Alocação de Memória\n");
+    printf("  [4] Sair\n");
     printf("===============================================================\n");
-    printf("Escolha uma opção (1-6): ");
+    printf("Escolha uma opção (1-4): ");
 }
 
 void DisplaySubMenu()
@@ -71,12 +69,11 @@ int main()
     Memory *tree = NULL;
     Info *newInfo;
     Info promove;
-    int start = 0, end = 0, status = 2, requiredSpace, control_menu = 0, sub_menu = 0, bloco, space, start2 = 0;
+    int start = 0, end = 0, status = 2, requiredSpace, control_menu = 0, bloco, space, start2 = 0;
     char opc;
 
     srand(time(NULL));
 
-    // Solicitar o tamanho da memória
     printf("===============================================================\n");
     printf("          Bem-vindo ao Gerenciador de Memória Dinâmica          \n");
     printf("===============================================================\n");
@@ -110,12 +107,10 @@ int main()
 
     } while (status != FREE && status != OCCUPIED);
 
-    // Primeira inserção de memória
     newInfo = CreateInfo(start, end, status);
     inserirArv23(&tree, newInfo, &promove, NULL);
     start = end + 1;
 
-    // Loop para alocar mais memória até atingir o total
     while (end != bloco)
     {
         printf("\nInforme o valor final da memória (entre %d e %d): ", start, bloco);
@@ -135,8 +130,6 @@ int main()
         else
             printf("\nValor de fim inválido. Informe um valor entre %d e %d.\n", start, bloco);
     }
-
-    // Menu principal
     do
     {
         DisplayMenu();
@@ -152,22 +145,26 @@ int main()
             {
                 if (findFirstStart(tree) == start2)
                 {
-                    int remover_inicio, remover_fim;
-                    remover_fim = mergeNodesStart(&tree, &remover_inicio);
-                    newInfo = CreateInfo(remover_inicio, remover_fim, 0);
-                    removeFromMemory(NULL, &tree, newInfo);
+                    int remover_inicio;
+                    mergeNodesStart(&tree, &remover_inicio);
+                    Memory_remover(&tree, remover_inicio);
                     printf("Compactação realizada no início da memória.\n");
                 }
                 else if (findLastStart(tree) == start2)
                 {
-                    int remover_inicio_fim, remover_fim_fim;
-                    remover_fim_fim = mergeNodesEnd(&tree, &remover_inicio_fim);
-                    newInfo = CreateInfo(remover_inicio_fim, remover_fim_fim, 0);
-                    removeFromMemory(NULL, &tree, newInfo);
+                    int remover_inicio_fim;
+                    mergeNodesEnd(&tree, &remover_inicio_fim);
+                    Memory_remover(&tree, remover_inicio_fim);
                     printf("Compactação realizada no fim da memória.\n");
                 }
                 else
-                    printf("Aqui é a compactação do centro que não funciona\n");
+                {
+                    int aux1, aux2;
+                    mergeNodesMiddle(&tree, &aux1, &aux2);
+                    Memory_remover(&tree, aux1);
+                    Memory_remover(&tree, aux2);
+                    printf("Compactação realizada no meio da memória.\n");
+                }
             }
             break;
 
@@ -177,77 +174,36 @@ int main()
             printf("Informe o fim da memória a ser desocupada: ");
             scanf("%d", &end);
             FreeSpace(tree, start, end);
-            break;
-
-        case 3:
-            DisplaySubMenu();
-            scanf("%d", &sub_menu);
-
-            switch (sub_menu)
+            if (findFirstStart(tree) == start)
             {
-            case 1:
-            {
-                int remover_inicio, remover_fim;
-                remover_fim = mergeNodesStart(&tree, &remover_inicio);
-                newInfo = CreateInfo(remover_inicio, remover_fim, 0);
-                removeFromMemory(NULL, &tree, newInfo);
+                int remover_inicio;
+                mergeNodesStart(&tree, &remover_inicio);
+                Memory_remover(&tree, remover_inicio);
                 printf("Compactação realizada no início da memória.\n");
             }
-            break;
-
-            case 2:
+            else if (findLastStart(tree) == start)
             {
-                int remover_inicio_meio1, remover_fim_meio1;
-                int remover_inicio_meio2, remover_fim_meio2;
-                mergeNodesMiddle(&tree, &remover_inicio_meio1, &remover_fim_meio1, &remover_inicio_meio2, &remover_fim_meio2);
-
-                newInfo = CreateInfo(remover_inicio_meio1, remover_fim_meio1, 0);
-                removeFromMemory(&tree, &tree, newInfo);
-
-                newInfo = CreateInfo(remover_inicio_meio2, remover_fim_meio2, 0);
-                removeFromMemory(&tree, &tree, newInfo);
-
+                int remover_inicio_fim;
+                mergeNodesEnd(&tree, &remover_inicio_fim);
+                Memory_remover(&tree, remover_inicio_fim);
+                printf("Compactação realizada no fim da memória.\n");
+            }
+            else
+            {
+                int aux1, aux2;
+                mergeNodesMiddle(&tree, &aux1, &aux2);
+                Memory_remover(&tree, aux1);
+                Memory_remover(&tree, aux2);
                 printf("Compactação realizada no meio da memória.\n");
             }
             break;
 
-            case 3:
-            {
-                int remover_inicio_fim, remover_fim_fim;
-                remover_fim_fim = mergeNodesEnd(&tree, &remover_inicio_fim);
-                newInfo = CreateInfo(remover_inicio_fim, remover_fim_fim, 0);
-                removeFromMemory(NULL, &tree, newInfo);
-                printf("Compactação realizada no fim da memória.\n");
-            }
-            break;
-
-            case 4:
-                printf("\nVoltando ao menu principal...\n");
-                break;
-
-            default:
-                printf("\nOpção inválida! Escolha uma opção entre 1 e 4.\n");
-                break;
-            }
-            break;
-
-        case 4:
-            printf("\nDigite o endereço de início do bloco de memória a ser removido: ");
-            scanf("%d", &start);
-
-            printf("Digite o endereço final do bloco de memória a ser removido: ");
-            scanf("%d", &end);
-
-            newInfo = CreateInfo(start, end, 0);
-            removeFromMemory(NULL, &tree, newInfo);
-            break;
-
-        case 5:
+        case 3:
             printf("\nExibindo alocação de memória...\n");
             DisplayInfos(tree);
             break;
 
-        case 6:
+        case 4:
             printf("\nSaindo da aplicação...\n");
             break;
 
@@ -255,7 +211,7 @@ int main()
             printf("\nOpção inválida! Por favor, escolha uma opção entre 1 e 6.\n");
             break;
         }
-    } while (control_menu != 6);
+    } while (control_menu != 4);
 
     return 0;
 }
