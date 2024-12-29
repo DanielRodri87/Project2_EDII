@@ -28,14 +28,13 @@ typedef struct Memory
 void drawTree(const Memory *root);
 
 Info *CreateInfo(int start, int end, int status);
-Memory *createNode(Info *information, Memory *leftChild, Memory *centerChild);
 Memory *inserirArv23(Memory **no, Info *informacao, Info *promove, Memory **Pai);
 
 Memory *FindSpace(Memory *root, int requiredSpace);
 Memory *SourceSpace(Memory *root, int RequiredSpace);
 void DisplayInfos(Memory *root);
 
-void AllocateSpace(Memory **root, int requiredSpace);
+int AllocateSpace(Memory **root, int requiredSpace, int *return_start);
 void FreeSpace(Memory *memory, int start, int end);
 int removeFromMemory(Memory **parent, Memory **node, Info *key);
 

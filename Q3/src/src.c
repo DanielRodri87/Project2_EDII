@@ -274,10 +274,10 @@ void DisplayInfos(Memory *root)
 
 
 // ----------------------------------------------------------------
-void AllocateSpace(Memory **root, int requiredSpace)
+int AllocateSpace(Memory **root, int requiredSpace, int *return_start)
 {
     Memory *node = FindSpace(*root, requiredSpace);
-
+    int lenspace = 0;
     if (node)
     {
         int availableSpace = node->info1->end - node->info1->start + 1;
@@ -286,20 +286,17 @@ void AllocateSpace(Memory **root, int requiredSpace)
         {
             int newEndOccupied = node->info1->start + requiredSpace - 1;
 
-            // Cria um novo Info para o espaço ocupado
             Info *newOccupiedInfo = CreateInfo(node->info1->start, newEndOccupied, OCCUPIED);
 
-            // Atualiza a informação no nó
             node->info1 = newOccupiedInfo;
+            *return_start = node->info1->start;
+            lenspace = availableSpace;
 
-            // Caso reste espaço, cria um novo nó para o espaço restante
             if (availableSpace > requiredSpace)
             {
                 int remainingStart = newEndOccupied + 1;
                 int remainingEnd = node->info1->end;
                 Info *remainingInfo = CreateInfo(remainingStart, remainingEnd, FREE);
-
-                // Utiliza a nova função inserirArv23 para adicionar o espaço restante
                 Info promove;
                 inserirArv23(root, remainingInfo, &promove, NULL);
             }
@@ -315,6 +312,7 @@ void AllocateSpace(Memory **root, int requiredSpace)
     {
         printf("Espaço insuficiente na memória\n");
     }
+    return lenspace;
 }
 
 void FreeSpace(Memory *memory, int start, int end)
