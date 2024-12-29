@@ -274,44 +274,60 @@ void DisplayInfos(Memory *root)
 
 
 // ----------------------------------------------------------------
-int AllocateSpace(Memory **root, int requiredSpace, int *return_start)
-{
+int AllocateSpace(Memory **root, int requiredSpace, int *return_start) {
     Memory *node = FindSpace(*root, requiredSpace);
     int lenspace = 0;
-    if (node)
-    {
-        int availableSpace = node->info1->end - node->info1->start + 1;
 
-        if (availableSpace >= requiredSpace)
-        {
-            int newEndOccupied = node->info1->start + requiredSpace - 1;
+    if (node) {
+        Info *targetInfo = NULL;
+        int availableSpace = 0;
 
-            Info *newOccupiedInfo = CreateInfo(node->info1->start, newEndOccupied, OCCUPIED);
+        // Verifica info1
+        if (node->info1 && node->info1->status == FREE) {
+            availableSpace = node->info1->end - node->info1->start + 1;
+            if (availableSpace >= requiredSpace) {
+                targetInfo = node->info1;
+            }
+        }
 
-            node->info1 = newOccupiedInfo;
-            *return_start = node->info1->start;
+        // Verifica info2 se info1 não for suficiente
+        if (!targetInfo && node->info2 && node->info2->status == FREE) {
+            availableSpace = node->info2->end - node->info2->start + 1;
+            if (availableSpace >= requiredSpace) {
+                targetInfo = node->info2;
+            }
+        }
+
+        if (targetInfo) {
+            int newEndOccupied = targetInfo->start + requiredSpace - 1;
+
+            Info *newOccupiedInfo = CreateInfo(targetInfo->start, newEndOccupied, OCCUPIED);
+            *return_start = targetInfo->start;
             lenspace = availableSpace;
 
-            if (availableSpace > requiredSpace)
-            {
+            // Atualiza o espaço ocupado e insere o restante como livre
+            if (targetInfo == node->info1) {
+                node->info1 = newOccupiedInfo;
+            } else if (targetInfo == node->info2) {
+                node->info2 = newOccupiedInfo;
+            }
+
+            if (availableSpace > requiredSpace) {
                 int remainingStart = newEndOccupied + 1;
-                int remainingEnd = node->info1->end;
+                int remainingEnd = targetInfo->end;
                 Info *remainingInfo = CreateInfo(remainingStart, remainingEnd, FREE);
                 Info promove;
                 inserirArv23(root, remainingInfo, &promove, NULL);
             }
 
             printf("Espaço alocado com sucesso.\n");
-        }
-        else
-        {
+        } else {
             printf("Espaço insuficiente na memória\n");
         }
-    }
-    else
-    {
+    } else {
         printf("Espaço insuficiente na memória\n");
     }
+
     return lenspace;
 }
 
