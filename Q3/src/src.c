@@ -5,6 +5,14 @@
 
 // ############################################################################################################
 
+/**
+ * @brief Cria uma estrutura do tipo Info com os valores fornecidos.
+ *
+ * @param start Valor inicial da estrutura Info.
+ * @param end Valor final da estrutura Info.
+ * @param status Status da estrutura Info.
+ * @return Ponteiro para a estrutura Info criada.
+ */
 Info *CreateInfo(int start, int end, int status)
 {
     Info *info = (Info *)malloc(sizeof(Info));
@@ -15,163 +23,211 @@ Info *CreateInfo(int start, int end, int status)
         info->end = end;
         info->status = status;
     }
-    return info;
+    return (info);
 }
 
-Memory *criaNo(const Info *informacao, Memory *filhoesq, Memory *filhocen)
+/**
+ * @brief Cria um novo nó para a estrutura de árvore 2-3.
+ *
+ * @param info Ponteiro para a estrutura Info a ser armazenada no nó.
+ * @param leftChild Ponteiro para o filho esquerdo do nó.
+ * @param centerChild Ponteiro para o filho central do nó.
+ * @return Ponteiro para o nó criado.
+ */
+Memory *createNode(const Info *info, Memory *leftChild, Memory *centerChild)
 {
-    Memory *no = (Memory *)malloc(sizeof(Memory));
-    if (no == NULL)
+    Memory *node = (Memory *)malloc(sizeof(Memory));
+    if (node == NULL)
         printf("Erro ao alocar memória para o nó.\n");
 
-    no->info1 = (Info *)malloc(sizeof(Info));
-    if (no->info1 == NULL)
+    node->info1 = (Info *)malloc(sizeof(Info));
+    if (node->info1 == NULL)
     {
         printf("Erro ao alocar memória para info1.\n");
-        free(no);
+        free(node);
     }
-    *(no->info1) = *informacao;
+    *(node->info1) = *info;
 
-    no->info2 = NULL;
-    no->left = filhoesq;
-    no->center = filhocen;
-    no->right = NULL;
-    no->numKeys = 1;
+    node->info2 = NULL;
+    node->left = leftChild;
+    node->center = centerChild;
+    node->right = NULL;
+    node->numKeys = 1;
 
-    return no;
+    return (node);
 }
 
-int ehFolha(const Memory *no)
+/**
+ * @brief Verifica se o nó é uma folha na árvore 2-3.
+ *
+ * @param node Ponteiro para o nó a ser verificado.
+ * @return 1 se o nó é uma folha, caso contrário, 0.
+ */
+int isLeaf(const Memory *node)
 {
-    int achou = 0;
+    int thought = 0;
 
-    if (no->left == NULL)
-        achou = 1;
+    if (node->left == NULL)
+        thought = 1;
 
-    return achou;
+    return (thought);
 }
 
-Memory *addInfo(Memory *no, const Info *informacao, Memory *filho)
+/**
+ * @brief Adiciona uma nova chave a um nó da árvore 2-3.
+ *
+ * @param node Ponteiro para o nó onde a chave será adicionada.
+ * @param info Ponteiro para a nova chave a ser adicionada.
+ * @param child Ponteiro para o nó filho associado à nova chave.
+ * @return Ponteiro atualizado para o nó.
+ */
+Memory *addKey(Memory *node, const Info *info, Memory *child)
 {
-    if (informacao->start > no->info1->start)
+    if (info->start > node->info1->start)
     {
-        no->info2 = malloc(sizeof(Info));
-        *(no->info2) = *informacao;
-        no->right = filho;
+        node->info2 = malloc(sizeof(Info));
+        *(node->info2) = *info;
+        node->right = child;
     }
     else
     {
-        no->info2 = no->info1;
-        no->right = no->center;
-        no->info1 = malloc(sizeof(Info));
-        *(no->info1) = *informacao;
-        no->center = filho;
+        node->info2 = node->info1;
+        node->right = node->center;
+        node->info1 = malloc(sizeof(Info));
+        *(node->info1) = *info;
+        node->center = child;
     }
-    no->numKeys = 2;
-    return no;
+    node->numKeys = 2;
+
+    return (node);
 }
 
-Memory *quebraNo(Memory **no, const Info *informacao, Info *promove, Memory **filho)
+/**
+ * @brief Divide um nó da árvore 2-3 e promove uma chave para o nó pai.
+ *
+ * @param node Ponteiro duplo para o nó a ser dividido.
+ * @param info Ponteiro para a chave a ser inserida.
+ * @param promote Ponteiro para armazenar a chave promovida.
+ * @param child Ponteiro duplo para o nó filho associado.
+ * @return Ponteiro para o novo nó criado durante a divisão.
+ */
+Memory *quebraNo(Memory **node, const Info *info, Info *promote, Memory **child)
 {
-    Memory *maior;
+    Memory *bigger;
 
-    if (informacao->start > (*no)->info1->start)
+    if (info->start > (*node)->info1->start)
     {
-        *promove = *(*no)->info2;
-        if (filho)
-            maior = criaNo(informacao, (*no)->right, *filho);
+        *promote = *(*node)->info2;
+        if (child)
+            bigger = createNode(info, (*node)->right, *child);
         else
-            maior = criaNo(informacao, (*no)->right, NULL);
+            bigger = createNode(info, (*node)->right, NULL);
     }
-    else if (informacao->start > (*no)->info2->start)
+    else if (info->start > (*node)->info2->start)
     {
-        *promove = *informacao;
-        if (filho)
-            maior = criaNo((*no)->info2, *filho, (*no)->right);
+        *promote = *info;
+        if (child)
+            bigger = createNode((*node)->info2, *child, (*node)->right);
         else
-            maior = criaNo((*no)->info2, NULL, (*no)->right);
+            bigger = createNode((*node)->info2, NULL, (*node)->right);
     }
     else
     {
-        *promove = *(*no)->info1;
+        *promote = *(*node)->info1;
 
-        maior = criaNo((*no)->info2, (*no)->center, (*no)->right);
+        bigger = createNode((*node)->info2, (*node)->center, (*node)->right);
 
-        if ((*no)->info1 == NULL)
+        if ((*node)->info1 == NULL)
         {
-            (*no)->info1 = (Info *)malloc(sizeof(Info));
-            if ((*no)->info1 == NULL)
+            (*node)->info1 = (Info *)malloc(sizeof(Info));
+            if ((*node)->info1 == NULL)
                 printf("Erro ao alocar memória para info1.\n");
         }
 
-        *(*no)->info1 = *informacao;
+        *(*node)->info1 = *info;
 
-        if (filho)
-            (*no)->center = *filho;
+        if (child)
+            (*node)->center = *child;
         else
-            (*no)->center = NULL;
+            (*node)->center = NULL;
     }
 
-    (*no)->numKeys = 1;
-    return maior;
+    (*node)->numKeys = 1;
+
+    return (bigger);
 }
 
-Memory *inserirArv23(Memory **no, Info *informacao, Info *promove, Memory **pai)
+/**
+ * @brief Insere uma nova chave na árvore 2-3.
+ *
+ * @param node Ponteiro duplo para o nó raiz da árvore.
+ * @param info Ponteiro para a chave a ser inserida.
+ * @param promote Ponteiro para armazenar a chave promovida (se houver).
+ * @param father Ponteiro duplo para o nó pai.
+ * @return Ponteiro para o nó criado ou modificado durante a inserção.
+ */
+Memory *insertTree23(Memory **node, Info *info, Info *promote, Memory **father)
 {
-    Info promove1;
-    Memory *maiorNo = NULL;
-    if (*no == NULL)
-        *no = criaNo(informacao, NULL, NULL);
+    Info promote1;
+    Memory *biggerNode = NULL;
+    if (*node == NULL)
+        *node = createNode(info, NULL, NULL);
 
     else
     {
-        if (ehFolha(*no))
-        { // Caso seja folha
-            if ((*no)->numKeys == 1)
-                *no = addInfo(*no, informacao, NULL);
+        if (isLeaf(*node))
+        { 
+            if ((*node)->numKeys == 1)
+                *node = addKey(*node, info, NULL);
             else
             {
-                maiorNo = quebraNo(no, informacao, promove, NULL);
-                if (pai == NULL)
-                { // Se não há pai, criar nova raiz
-                    *no = criaNo(promove, *no, maiorNo);
-                    maiorNo = NULL;
+                biggerNode = quebraNo(node, info, promote, NULL);
+                if (father == NULL)
+                { 
+                    *node = createNode(promote, *node, biggerNode);
+                    biggerNode = NULL;
                 }
             }
         }
         else
-        { // Nó não e folha
-          // Navega para o filho apropriado
-            if (informacao->start < (*no)->info1->start)
-                maiorNo = inserirArv23(&((*no)->left), informacao, promove, no);
-            else if ((*no)->numKeys == 1 || informacao->start < (*no)->info2->start)
-                maiorNo = inserirArv23(&((*no)->center), informacao, promove, no);
+        { 
+            if (info->start < (*node)->info1->start)
+                biggerNode = insertTree23(&((*node)->left), info, promote, node);
+            else if ((*node)->numKeys == 1 || info->start < (*node)->info2->start)
+                biggerNode = insertTree23(&((*node)->center), info, promote, node);
             else
-                maiorNo = inserirArv23(&((*no)->right), informacao, promove, no);
-            if (maiorNo)
+                biggerNode = insertTree23(&((*node)->right), info, promote, node);
+            if (biggerNode)
             {
-                if ((*no)->numKeys == 1)
+                if ((*node)->numKeys == 1)
                 {
-                    *no = addInfo(*no, promove, maiorNo);
-                    maiorNo = NULL;
+                    *node = addKey(*node, promote, biggerNode);
+                    biggerNode = NULL;
                 }
                 else
                 {
-                    maiorNo = quebraNo(no, promove, &promove1, &maiorNo);
-                    if (pai == NULL)
+                    biggerNode = quebraNo(node, promote, &promote1, &biggerNode);
+                    if (father == NULL)
                     {
-                        *no = criaNo(&promove1, *no, maiorNo);
-                        maiorNo = NULL;
+                        *node = createNode(&promote1, *node, biggerNode);
+                        biggerNode = NULL;
                     }
                 }
             }
         }
     }
 
-    return maiorNo;
+    return (biggerNode);
 }
 
-Memory *FindSpace(Memory *root, int requiredSpace)
+/**
+ * @brief Procura por um espaço livre na árvore que atenda ao tamanho necessário.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ * @param requiredSpace Tamanho do espaço necessário.
+ * @return Ponteiro para o nó que contém o espaço livre encontrado, ou NULL se não houver espaço suficiente.
+ */
+Memory *findSpace(Memory *root, int requiredSpace)
 {
     Memory *result = NULL;
 
@@ -186,52 +242,69 @@ Memory *FindSpace(Memory *root, int requiredSpace)
                 int availableSpace = currentInfo->end - currentInfo->start + 1;
 
                 if (availableSpace >= requiredSpace)
-                {
                     result = root;
-                }
             }
         }
 
         if (result == NULL)
         {
-            result = FindSpace(root->left, requiredSpace);
+            result = findSpace(root->left, requiredSpace);
 
             if (result == NULL)
-                result = FindSpace(root->center, requiredSpace);
+                result = findSpace(root->center, requiredSpace);
 
             if (result == NULL && root->numKeys == 2)
-                result = FindSpace(root->right, requiredSpace);
+                result = findSpace(root->right, requiredSpace);
         }
     }
 
-    return result;
+    return (result);
 }
 
-Memory *SourceSpace(Memory *root, int requiredSpace)
+/**
+ * @brief Encontra espaço disponível na memória.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ * @param requiredSpace Tamanho do espaço necessário.
+ * @return Ponteiro para o nó que contém o espaço livre encontrado.
+ */
+Memory *sourceSpace(Memory *root, int requiredSpace)
 {
-    return FindSpace(root, requiredSpace);
+    return findSpace(root, requiredSpace);
 }
 
-void DisplayInfos(Memory *root)
+/**
+ * @brief Exibe todas as informações armazenadas na árvore.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ */
+void displayInfos(Memory *root)
 {
     if (root)
     {
-        DisplayInfos(root->left);
+        displayInfos(root->left);
         printf("Começo: %d | Fim %d | Status: %d\n", root->info1->start, root->info1->end, root->info1->status);
-        DisplayInfos(root->center);
+        displayInfos(root->center);
 
         if (root->numKeys == 2)
         {
             printf("Começo: %d | Fim %d | Status: %d\n", root->info2->start, root->info2->end, root->info2->status);
-            DisplayInfos(root->right);
+            displayInfos(root->right);
         }
     }
 }
 
-// ----------------------------------------------------------------
-int AllocateSpace(Memory **root, int requiredSpace, int *return_start)
+/**
+ * @brief Aloca espaço na árvore para atender ao tamanho necessário.
+ *
+ * @param root Ponteiro duplo para a raiz da árvore.
+ * @param requiredSpace Tamanho do espaço necessário.
+ * @param return_start Ponteiro para armazenar o início do espaço alocado.
+ * @return Tamanho do espaço alocado.
+ */
+int allocateSpace(Memory **root, int requiredSpace, int *return_start)
 {
-    Memory *node = FindSpace(*root, requiredSpace);
+    Memory *node = findSpace(*root, requiredSpace);
     int lenspace = 0;
 
     if (node)
@@ -239,24 +312,18 @@ int AllocateSpace(Memory **root, int requiredSpace, int *return_start)
         Info *targetInfo = NULL;
         int availableSpace = 0;
 
-        // Verifica info1
         if (node->info1 && node->info1->status == FREE)
         {
             availableSpace = node->info1->end - node->info1->start + 1;
             if (availableSpace >= requiredSpace)
-            {
                 targetInfo = node->info1;
-            }
         }
 
-        // Verifica info2 se info1 não for suficiente
         if (!targetInfo && node->info2 && node->info2->status == FREE)
         {
             availableSpace = node->info2->end - node->info2->start + 1;
             if (availableSpace >= requiredSpace)
-            {
                 targetInfo = node->info2;
-            }
         }
 
         if (targetInfo)
@@ -267,41 +334,39 @@ int AllocateSpace(Memory **root, int requiredSpace, int *return_start)
             *return_start = targetInfo->start;
             lenspace = availableSpace;
 
-            // Atualiza o espaço ocupado e insere o restante como livre
             if (targetInfo == node->info1)
-            {
                 node->info1 = newOccupiedInfo;
-            }
             else if (targetInfo == node->info2)
-            {
                 node->info2 = newOccupiedInfo;
-            }
 
             if (availableSpace > requiredSpace)
             {
                 int remainingStart = newEndOccupied + 1;
                 int remainingEnd = targetInfo->end;
                 Info *remainingInfo = CreateInfo(remainingStart, remainingEnd, FREE);
-                Info promove;
-                inserirArv23(root, remainingInfo, &promove, NULL);
+                Info promote;
+                insertTree23(root, remainingInfo, &promote, NULL);
             }
 
             printf("Espaço alocado com sucesso.\n");
         }
         else
-        {
             printf("Espaço insuficiente na memória\n");
-        }
     }
     else
-    {
         printf("Espaço insuficiente na memória\n");
-    }
 
-    return lenspace;
+    return (lenspace);
 }
 
-void FreeSpace(Memory *memory, int start, int end)
+/**
+ * @brief Libera um espaço específico na memória, marcando-o como livre.
+ *
+ * @param memory Ponteiro para a raiz da árvore.
+ * @param start Início do espaço a ser liberado.
+ * @param end Fim do espaço a ser liberado.
+ */
+void freeSpace(Memory *memory, int start, int end)
 {
     if (memory != NULL)
     {
@@ -311,252 +376,18 @@ void FreeSpace(Memory *memory, int start, int end)
         if (memory->info2 != NULL && memory->info2->start == start && memory->info2->end == end)
             memory->info2->status = 1;
 
-        FreeSpace(memory->left, start, end);
-        FreeSpace(memory->center, start, end);
-        FreeSpace(memory->right, start, end);
+        freeSpace(memory->left, start, end);
+        freeSpace(memory->center, start, end);
+        freeSpace(memory->right, start, end);
     }
 }
 
-// ------------------------------------- REMOVER -------------------------------------
-// void freeInfo(Info *info)
-// {
-//     if (info)
-//     {
-//         free(info);
-//     }
-// }
-
-// void freeMemory(Memory *node)
-// {
-//     if (node)
-//     {
-//         freeMemory(node->left);
-//         freeMemory(node->center);
-//         freeMemory(node->right);
-
-//         if (node->info1)
-//         {
-//             freeInfo(node->info1);
-//         }
-//         if (node->numKeys == 2 && node->info2)
-//         {
-//             freeInfo(node->info2);
-//         }
-
-//         free(node);
-//     }
-// }
-
-// void findSmallestRight(Memory *root, Memory **no, Memory **paiNo)
-// {
-//     if (root->left != NULL)
-//     {
-//         *paiNo = root;
-//         findSmallestRight(root->left, no, paiNo);
-//     }
-//     else
-//         *no = root;
-// }
-
-// void findLargestLeft(Memory *root, Memory **no, Memory **paiNo)
-// {
-//     if (root->right != NULL)
-//     {
-//         *paiNo = root;
-//         findLargestLeft(root->right, no, paiNo);
-//     }
-//     else
-//         *no = root;
-// }
-
-// int removeFromMemory(Memory **parent, Memory **node, Info *key)
-// {
-//     int removeu = 0;
-//     Memory *no = NULL, *no1, *parentNo = NULL, *parentNo1 = NULL, **aux;
-//     aux = (Memory **)malloc(sizeof(Memory *));
-//     no1 = (Memory *)malloc(sizeof(Memory));
-
-//     if (*node != NULL)
-//     {
-//         if (ehFolha(*node) == 1)
-//         {
-//             if ((*node)->numKeys == 2)
-//             {
-//                 if (key->start == (*node)->info2->start)
-//                 { // quando é folha, tem duas informações e o numero ta na segunda posição
-//                     (*node)->info2 = NULL;
-//                     (*node)->numKeys = 1;
-//                     removeu = 1;
-//                 }
-//                 else if (key->start == (*node)->info1->start)
-//                 { // quando é folha, tem duas informações e o numero ta na primeira posição do nó
-//                     (*node)->info1 = NULL;
-//                     (*node)->numKeys = 1;
-//                     removeu = 1;
-//                 }
-//             }
-//             else if (key->start == (*node)->info1->start)
-//             {
-//                 if (*parent == NULL)
-//                 {
-//                     free(*node);
-//                     *node = NULL;
-//                     removeu = 1;
-//                 }
-//                 else if (*node == (*parent)->left)
-//                 {
-//                     (*node)->info1 = (*parent)->info1;
-//                     parentNo = *parent;
-//                     findSmallestRight((*parent)->center, &no, &parentNo);
-//                     (*parent)->info1 = no->info1;
-//                     removeu = 1;
-
-//                     if (no->numKeys == 2)
-//                     {
-//                         no->info1 = no->info2;
-//                         (*node)->info1 = NULL;
-//                         (*node)->numKeys = 1;
-//                         removeu = 1;
-//                     }
-//                     else
-//                     {
-//                         if (parentNo->numKeys == 1)
-//                         {
-//                             (*node)->info2 = no->info1;
-//                             (*node)->numKeys = 2;
-//                             free(no);
-//                             *parent = *node;
-//                         }
-//                         else
-//                         {
-//                             no->info1 = parentNo->info2;
-//                             parentNo1 = parentNo;
-//                             findSmallestRight(parentNo->right, &no1, &parentNo1);
-//                             parentNo->info2 = no1->info1;
-
-//                             if (no1->numKeys == 2)
-//                             {
-//                                 no1->info1 = no1->info2;
-//                                 no1->info2 = NULL;
-//                                 no1->numKeys = 1;
-//                             }
-//                             else
-//                             {
-//                                 // entrou aqui
-//                                 no->info2 = parentNo->info2;
-//                                 no->numKeys = 2;
-//                                 parentNo->info2 = NULL;
-//                                 parentNo->numKeys = 1;
-//                                 free(no1);
-//                                 parentNo1->right = NULL;
-//                             }
-//                         }
-//                     }
-//                 }
-//                 else if ((*node) == (*parent)->center)
-//                 {
-//                     removeu = 1;
-//                     if ((*parent)->numKeys == 1)
-//                     {
-//                         if (((*parent)->left)->numKeys == 2)
-//                         {
-//                             (*node)->info1 = (*parent)->info1;
-//                             (*parent)->info1 = ((*parent)->left)->info2;
-//                             ((*parent)->left)->info2 = NULL;
-//                             ((*parent)->left)->numKeys = 1;
-//                         }
-//                         else
-//                         {
-//                             ((*parent)->left)->info2 = (*parent)->info1;
-//                             free(*node);
-//                             ((*parent)->left)->numKeys = 2;
-//                             *aux = (*parent)->left;
-//                             free(*parent);
-//                             *parent = *aux;
-//                         }
-//                     }
-//                     else
-//                     {
-//                         (*node)->info1 = (*parent)->info2;
-//                         parentNo = *parent;
-//                         findSmallestRight((*parent)->right, &no, &parentNo);
-//                         (*parent)->info2 = no->info1;
-
-//                         if (no->numKeys == 2)
-//                         {
-//                             no->info1 = no->info2;
-//                             no->info2 = NULL;
-//                             no->numKeys = 1;
-//                         }
-//                         else
-//                         {
-//                             (*node)->numKeys = 2;
-//                             (*node)->info2 = (*parent)->info2;
-//                             (*parent)->info2 = NULL;
-//                             (*parent)->numKeys = 1;
-//                             free(no);
-//                             (*parent)->right = NULL;
-//                         }
-//                     }
-//                 }
-//                 else
-//                 {
-//                     removeu = 1;
-//                     parentNo = *parent;
-//                     findLargestLeft((*parent)->center, &no, &parentNo);
-
-//                     if (no->numKeys == 1)
-//                     {
-//                         no->info2 = (*parent)->info2;
-//                         (*parent)->info2 = NULL;
-//                         (*parent)->numKeys = 1;
-//                         no->numKeys = 2;
-//                         free(*node);
-//                         *node = NULL;
-//                     }
-//                     else
-//                     {
-//                         (*node)->info1 = (*parent)->info2;
-//                         (*parent)->info2 = no->info2;
-//                         no->info2 = NULL;
-//                         no->numKeys = 1;
-//                     }
-//                 }
-//             }
-//         }
-//         else
-//         { // se nao é folha
-//             if (key->start < (*node)->info1->start)
-//                 removeu = removeFromMemory(node, &(*node)->left, key);
-//             else if (key->start == (*node)->info1->start)
-//             {
-//                 parentNo = *node;
-//                 findSmallestRight((*node)->center, &no, &parentNo);
-//                 (*node)->info1 = no->info1;
-//                 removeFromMemory(node, &(*node)->center, (*node)->info1);
-//                 removeu = 1;
-//             }
-//             else if (((*node)->numKeys == 1) || key->start < (*node)->info1->start)
-//             {
-//                 removeu = removeFromMemory(node, &(*node)->center, key);
-//             }
-//             else if (key->start == (*node)->info1->start)
-//             {
-//                 parentNo = *parent;
-//                 findSmallestRight((*parent)->right, &no, &parentNo);
-//                 (*node)->info2 = no->info1;
-//                 removeFromMemory(node, &(*node)->right, (*node)->info2);
-//                 removeu = 1;
-//             }
-//             else
-//             {
-//                 removeu = removeFromMemory(node, &(*node)->right, key);
-//             }
-//         }
-//     }
-//     return removeu;
-// }
-
+/**
+ * @brief Une nós consecutivos na árvore 2-3 que possuem status e intervalos contíguos.
+ *
+ * @param root Ponteiro duplo para a raiz da árvore.
+ * @param return_start Ponteiro para armazenar o início do intervalo unificado.
+ */
 void mergeNodesStart(Memory **root, int *return_start)
 {
     if (root != NULL)
@@ -607,21 +438,18 @@ void mergeNodesStart(Memory **root, int *return_start)
 }
 
 // ============================
-// HARD CODING
+// HARD CODING TÁ ERRADO NÃO PEGUEM
 void mergeNodesMiddle(Memory **root, int *aux1, int *aux2)
 {
     if (root != NULL && *root != NULL)
     {
         Memory *current = *root;
 
-        // Verifica se existem nós intermediários que podem ser mesclados
         if (current->info1 && current->info2)
         {
-            // Verifica contiguidade entre info1 e info2
             if (current->info1->status == current->info2->status &&
                 current->info1->end + 1 == current->info2->start)
             {
-                // Salvando os valores start dos dois nós
                 *aux1 = current->info1->start;
                 *aux2 = current->info2->start;
             }
@@ -629,7 +457,6 @@ void mergeNodesMiddle(Memory **root, int *aux1, int *aux2)
                 current->info1->end = current->info2->end;
         }
 
-        // Recursão para encontrar nós intermediários nos filhos
         if (current->left)
             mergeNodesMiddle(&current->left, aux1, aux2);
 
@@ -641,7 +468,12 @@ void mergeNodesMiddle(Memory **root, int *aux1, int *aux2)
     }
 }
 
-
+/**
+ * @brief Une nós consecutivos na árvore 2-3 que possuem status e intervalos contíguos.
+ *
+ * @param root Ponteiro duplo para a raiz da árvore.
+ * @param return_start Ponteiro para armazenar o início do intervalo unificado.
+ */
 void mergeNodesEnd(Memory **root, int *return_start)
 {
     if (root != NULL)
@@ -671,7 +503,6 @@ void mergeNodesEnd(Memory **root, int *return_start)
             }
         }
 
-        // Chamada recursiva para os filhos
         if (current->left)
             mergeNodesEnd(&current->left, return_start);
         else if (current->center)
@@ -681,715 +512,944 @@ void mergeNodesEnd(Memory **root, int *return_start)
     }
 }
 
-// ###################################################################################################################
-// Remover do
-//         Mateus
-// ###################################################################################################################
-static int balanceamento(Memory **raiz, Memory *filho1, Memory **filho2, Info info, Memory **maior)
+/**
+ * @brief Verifica o equilíbrio da árvore 2-3 e ajusta caso necessário.
+ * 
+ * @param root Ponteiro para o nó raiz da árvore.
+ * @param child1 Primeiro nó filho.
+ * @param child2 Segundo nó filho.
+ * @param info Informações a serem usadas no ajuste.
+ * @param bigger Ponteiro para o nó maior após o ajuste.
+ * @return int Retorna 1 se o nó foi equilibrado, caso contrário, 0.
+ */
+static int balancing(Memory **root, Memory *child1, Memory **child2, Info info, Memory **bigger)
 {
-    int balanceou = 0;
-    if (*filho2 == NULL || (*filho2)->numKeys == 0)
+    int balanced = 0;
+    if (*child2 == NULL || (*child2)->numKeys == 0)
     {
-        if (*filho2 != NULL)
-            no23_desalocar(filho2);
+        if (*child2 != NULL)
+            node23Deallocate(child2);
 
-        *maior = no23_juntar(filho1, info, *maior, raiz);
-        balanceou = 1;
+        *bigger = node23Together(child1, info, *bigger, root);
+        balanced = 1;
     }
-    return balanceou;
+    return (balanced);
 }
 
-static int eh_folha(Memory no)
+/**
+ * @brief Verifica se o campo info1 do nó contém a informação passada.
+ * 
+ * @param node Nó da árvore.
+ * @param info Informação a ser comparada.
+ * @return int Retorna 1 se info1 for igual à informação passada, caso contrário, 0.
+ */
+static int isInfo1(Memory node, int info)
 {
-    return no.left == NULL;
+    return (info == node.info1->start);
 }
 
-static int eh_info1(Memory no, int info)
+/**
+ * @brief Verifica se o campo info2 do nó contém a informação passada.
+ * 
+ * @param node Nó da árvore.
+ * @param info Informação a ser comparada.
+ * @return int Retorna 1 se info1 for igual à informação passada, caso contrário, 0.
+ */
+static int isInfo2(Memory node, int info)
 {
-    return info == no.info1->start;
+    return (node.numKeys == 2 && info == node.info2->start);
 }
 
-static int eh_info2(Memory no, int info)
+/**
+ * @brief Aloca memória para um novo nó 2-3.
+ * 
+ * @return Memory* Retorna um ponteiro para o nó alocado.
+ * @note Se a alocação falhar, o programa encerra com erro.
+ */
+Memory *node23Allocate()
 {
-    return no.numKeys == 2 && info == no.info2->start;
-}
+    Memory *node;
+    node = (Memory *)malloc(sizeof(Memory));
 
-Memory *no23_alocar()
-{
-    Memory *no;
-    no = (Memory *)malloc(sizeof(Memory));
-
-    if (!no)
+    if (!node)
     {
         printf("Erro ao alocar nó da árvore");
         exit(EXIT_FAILURE);
     }
 
-    return no;
+    return node;
 }
 
-void no23_desalocar(Memory **no)
+/**
+ * @brief Libera a memória de um nó 2-3 e define o ponteiro como NULL.
+ * 
+ * @param node Ponteiro para o nó a ser desalocado.
+ */
+void node23Deallocate(Memory **node)
 {
-    free(*no);
-    *no = NULL;
+    free(*node);
+    *node = NULL;
 }
 
-Memory *no23_criar(Info info, Memory *filho_left, Memory *filho_center)
+/**
+ * @brief Cria um novo nó 2-3 com uma única chave e filhos esquerdo e central.
+ * 
+ * @param info Informação associada ao novo nó.
+ * @param leftChild Ponteiro para o filho esquerdo.
+ * @param centerChild Ponteiro para o filho central.
+ * @return Memory* Retorna um ponteiro para o novo nó criado.
+ */
+Memory *nodeCreate(Info info, Memory *leftChild, Memory *centerChild)
 {
-    Memory *no;
-    no = no23_alocar();
+    Memory *node;
+    node = node23Allocate();
 
-    no->info1 = (Info *)malloc(sizeof(Info));
-    if (no->info1 == NULL)
+    node->info1 = (Info *)malloc(sizeof(Info));
+    if (node->info1 == NULL)
     {
         fprintf(stderr, "Erro ao alocar memória para info1\n");
         exit(EXIT_FAILURE);
     }
 
-    *(no->info1) = info;
+    *(node->info1) = info;
 
-    no->left = filho_left;
-    no->center = filho_center;
-    no->right = NULL;
-    no->numKeys = 1;
-    return no;
+    node->left = leftChild;
+    node->center = centerChild;
+    node->right = NULL;
+    node->numKeys = 1;
+
+    return (node);
 }
 
-Memory *no23_quebrar(Memory *no, Info info, Info *promove, Memory *filho_maior)
+/**
+ * @brief Realiza a divisão de um nó 2-3, promovendo uma chave e criando um novo nó.
+ * 
+ * @param node Nó a ser dividido.
+ * @param info Informação a ser inserida durante a divisão.
+ * @param promote Ponteiro para armazenar a chave promovida.
+ * @param biggerChild Ponteiro para o filho maior após a divisão.
+ * @return Memory* Retorna um ponteiro para o novo nó criado durante a divisão.
+ */
+Memory *nodeBreak(Memory *node, Info info, Info *promote, Memory *biggerChild)
 {
-    Memory *maior;
+    Memory *bigger;
 
-    if (info.start > no->info2->start)
+    if (info.start > node->info2->start)
     {
-        *promove = *(no->info2);
-        maior = no23_criar(info, no->right, filho_maior);
+        *promote = *(node->info2);
+        bigger = nodeCreate(info, node->right, biggerChild);
     }
-    else if (info.start > no->info1->start)
+    else if (info.start > node->info1->start)
     {
-        *promove = info;
-        maior = no23_criar(*(no->info2), filho_maior, no->right);
+        *promote = info;
+        bigger = nodeCreate(*(node->info2), biggerChild, node->right);
     }
     else
     {
-        *promove = *(no->info1);
-        maior = no23_criar(*(no->info2), no->center, no->right);
+        *promote = *(node->info1);
+        bigger = nodeCreate(*(node->info2), node->center, node->right);
 
-        *(no->info1) = info;
+        *(node->info1) = info;
 
-        no->center = filho_maior;
+        node->center = biggerChild;
     }
 
-    no->numKeys = 1;
+    node->numKeys = 1;
 
-    return maior;
+    return (bigger);
 }
-void no23_adicionar_info(Memory *no, Info info, Memory *filho_maior)
+
+/**
+ * @brief Adiciona uma nova chave a um nó 2-3 existente.
+ * 
+ * @param node Ponteiro para o nó onde a chave será adicionada.
+ * @param info Informação a ser adicionada.
+ * @param biggerChild Ponteiro para o filho maior associado à nova chave.
+ */
+void nodeAddInfo(Memory *node, Info info, Memory *biggerChild)
 {
-    if (info.start > no->info1->start)
+    if (info.start > node->info1->start)
     {
-        if (no->info2 == NULL)
+        if (node->info2 == NULL)
         {
-            no->info2 = (Info *)malloc(sizeof(Info));
-            if (no->info2 == NULL)
+            node->info2 = (Info *)malloc(sizeof(Info));
+            if (node->info2 == NULL)
             {
                 fprintf(stderr, "Erro ao alocar memória para info2\n");
                 exit(EXIT_FAILURE);
             }
         }
-        *(no->info2) = info;
-        no->right = filho_maior;
+        *(node->info2) = info;
+        node->right = biggerChild;
     }
     else
     {
-        if (no->info2 == NULL)
+        if (node->info2 == NULL)
         {
-            no->info2 = (Info *)malloc(sizeof(Info));
-            if (no->info2 == NULL)
+            node->info2 = (Info *)malloc(sizeof(Info));
+            if (node->info2 == NULL)
             {
                 fprintf(stderr, "Erro ao alocar memória para info2\n");
                 exit(EXIT_FAILURE);
             }
         }
-        *(no->info2) = *(no->info1);
+        *(node->info2) = *(node->info1);
 
-        no->right = no->center;
-        no->center = filho_maior;
-        *(no->info1) = info;
+        node->right = node->center;
+        node->center = biggerChild;
+        *(node->info1) = info;
     }
 
-    no->numKeys = 2;
+    node->numKeys = 2;
 }
 
-Memory *no23_juntar(Memory *filho1, Info info, Memory *maior, Memory **raiz)
+/**
+ * @brief Combina informações e nós em uma estrutura 2-3.
+ * 
+ * Essa função adiciona uma informação ao nó `child1`, ajusta a quantidade de chaves no nó raiz e desaloca a raiz caso ela fique vazia após a operação.
+ * 
+ * @param child1 Ponteiro para o nó que será combinado.
+ * @param info Informação que será adicionada ao nó.
+ * @param bigger Ponteiro para o nó maior que será combinado.
+ * @param root Ponteiro duplo para a raiz da árvore.
+ * @return Ponteiro para o nó `child1`, que se torna o nó resultante.
+ */
+Memory *node23Together(Memory *child1, Info info, Memory *bigger, Memory **root)
 {
-    no23_adicionar_info(filho1, info, maior);
+    nodeAddInfo(child1, info, bigger);
 
-    (*raiz)->numKeys--;
+    (*root)->numKeys--;
 
-    if ((*raiz)->numKeys == 0)
-        no23_desalocar(raiz);
+    if ((*root)->numKeys == 0)
+        node23Deallocate(root);
 
-    return filho1;
+    return (child1);
 }
 
-static Info no23_maior_info(Memory *raiz)
+/**
+ * @brief Obtém a maior informação armazenada no nó 2-3.
+ * 
+ * Retorna a maior informação do nó com base no número de chaves presentes.
+ * 
+ * @param root Ponteiro para o nó atual.
+ * @return Maior informação armazenada no nó.
+ */
+static Info node23BiggerInfo(Memory *root)
 {
-    return raiz->numKeys == 2 ? *(raiz->info2) : *(raiz->info1);
+    return (root->numKeys == 2 ? *(root->info2) : *(root->info1));
 }
 
-static Memory *Memory_buscar_menor_filho(Memory *raiz, Memory **pai)
+/**
+ * @brief Localiza o filho menor (à esquerda) de uma subárvore 2-3.
+ * 
+ * Essa função percorre a subárvore à esquerda até encontrar um nó folha e retorna esse nó.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param father Ponteiro para armazenar o pai do nó encontrado.
+ * @return Ponteiro para o menor nó folha encontrado.
+ */
+static Memory *lookMinorChild(Memory *root, Memory **father)
 {
-    Memory *filho;
-    filho = raiz;
+    Memory *child;
+    child = root;
 
-    while (!eh_folha(*filho))
+    while (!isLeaf(child))
     {
-        *pai = filho;
-        filho = filho->left;
+        *father = child;
+        child = child->left;
     }
 
-    return filho;
+    return (child);
 }
 
-static Memory *Memory_buscar_maior_filho(Memory *raiz, Memory **pai, Info *maior_valor)
+/**
+ * @brief Localiza o filho maior (à direita) de uma subárvore 2-3.
+ * 
+ * Essa função percorre a subárvore à direita até encontrar um nó folha e retorna esse nó. 
+ * A maior informação do nó encontrado também é armazenada.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param father Ponteiro para armazenar o pai do nó encontrado.
+ * @param bigger_valor Ponteiro para armazenar a maior informação encontrada.
+ * @return Ponteiro para o maior nó folha encontrado.
+ */
+static Memory *lookBiggerChild(Memory *root, Memory **father, Info *bigger_valor)
 {
-    Memory *filho;
-    filho = raiz;
+    Memory *child;
+    child = root;
 
-    while (!eh_folha(*filho))
+    while (!isLeaf(child))
     {
-        *pai = filho;
-        if (filho->numKeys == 1)
-            filho = filho->center;
+        *father = child;
+        if (child->numKeys == 1)
+            child = child->center;
         else
-            filho = filho->right;
+            child = child->right;
     }
 
-    if (filho != NULL)
-        *maior_valor = no23_maior_info(filho);
+    if (child != NULL)
+        *bigger_valor = node23BiggerInfo(child);
 
-    return filho;
+    return (child);
 }
 
-static Memory *Memory_buscar_pai(Memory *raiz, int info)
+/**
+ * @brief Encontra o pai de um nó contendo uma informação específica.
+ * 
+ * Essa função percorre a árvore para encontrar o pai de um nó que contém a informação especificada. 
+ * Caso o pai não seja encontrado, retorna NULL.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param info Informação a ser localizada.
+ * @return Ponteiro para o nó pai contendo a informação, ou NULL caso não seja encontrado.
+ */
+static Memory *sourceFather(Memory *root, int info)
 {
-    Memory *pai;
-    pai = NULL;
+    Memory *father;
+    father = NULL;
 
-    if (raiz != NULL)
+    if (root != NULL)
     {
-        if (!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
+        if (!isInfo1(*root, info) && !isInfo2(*root, info))
         {
-            if (info < raiz->info1->start)
-                pai = Memory_buscar_pai(raiz->left, info);
-            else if (raiz->numKeys == 1 || info < raiz->info2->start)
-                pai = Memory_buscar_pai(raiz->center, info);
+            if (info < root->info1->start)
+                father = sourceFather(root->left, info);
+            else if (root->numKeys == 1 || info < root->info2->start)
+                father = sourceFather(root->center, info);
             else
-                pai = Memory_buscar_pai(raiz->right, info);
+                father = sourceFather(root->right, info);
 
-            if (pai == NULL)
-                pai = raiz;
+            if (father == NULL)
+                father = root;
         }
     }
 
-    return pai;
+    return (father);
 }
 
-static Memory *Memory_buscar_maior_pai(Memory *raiz, int info)
+/**
+ * @brief Localiza o pai do maior nó que contém uma informação maior que um valor dado.
+ * 
+ * Essa função percorre a árvore para encontrar o pai de um nó cujo valor é maior que a informação especificada. 
+ * Caso o pai não seja encontrado, retorna NULL.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param info Informação a ser localizada.
+ * @return Ponteiro para o nó pai contendo a maior informação maior que o valor especificado, ou NULL caso não seja encontrado.
+ */
+static Memory *sourceBiggerFather(Memory *root, int info)
 {
-    Memory *pai;
-    pai = NULL;
+    Memory *father;
+    father = NULL;
 
-    if (raiz != NULL)
+    if (root != NULL)
     {
-        if (!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
+        if (!isInfo1(*root, info) && !isInfo2(*root, info))
         {
-            if (info < raiz->info1->start)
-                pai = Memory_buscar_maior_pai(raiz->left, info);
-            else if (raiz->numKeys == 1 || info < raiz->info2->start)
-                pai = Memory_buscar_maior_pai(raiz->center, info);
+            if (info < root->info1->start)
+                father = sourceBiggerFather(root->left, info);
+            else if (root->numKeys == 1 || info < root->info2->start)
+                father = sourceBiggerFather(root->center, info);
             else
-                pai = Memory_buscar_maior_pai(raiz->right, info);
+                father = sourceBiggerFather(root->right, info);
 
-            if (pai == NULL && ((raiz->numKeys == 1 && raiz->info1->start > info) || (raiz->numKeys == 2 && raiz->info2->start > info)))
-                pai = raiz;
+            if (father == NULL && ((root->numKeys == 1 && root->info1->start > info) || (root->numKeys == 2 && root->info2->start > info)))
+                father = root;
         }
     }
 
-    return pai;
+    return (father);
 }
 
-// static Memory *Memory_buscar_maior_pai_2_infos(Memory *raiz, int info)
-// {
-//     Memory *pai;
-//     pai = NULL;
-
-//     if (raiz != NULL)
-//     {
-//         if (!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
-//         {
-//             if (info < raiz->info1->start)
-//                 pai = Memory_buscar_maior_pai_2_infos(raiz->left, info);
-//             else if (raiz->numKeys == 1 || info < raiz->info2->start)
-//                 pai = Memory_buscar_maior_pai_2_infos(raiz->center, info);
-//             else
-//                 pai = Memory_buscar_maior_pai_2_infos(raiz->right, info);
-
-//             if (pai == NULL && raiz->numKeys == 2 && raiz->info1->start > info)
-//                 pai = raiz;
-//         }
-//     }
-
-//     return pai;
-// }
-
-static Memory *Memory_buscar_menor_pai(Memory *raiz, int info)
+/**
+ * @brief Localiza o pai do menor nó que contém uma informação menor que um valor dado.
+ * 
+ * Essa função percorre a árvore para encontrar o pai de um nó cujo valor é menor que a informação especificada. 
+ * Caso o pai não seja encontrado, retorna NULL.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param info Informação a ser localizada.
+ * @return Ponteiro para o nó pai contendo a menor informação menor que o valor especificado, ou NULL caso não seja encontrado.
+ */
+static Memory *sourceMinorFather(Memory *root, int info)
 {
-    Memory *pai;
-    pai = NULL;
+    Memory *father;
+    father = NULL;
 
-    if (raiz != NULL)
+    if (root != NULL)
     {
-        if (!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
+        if (!isInfo1(*root, info) && !isInfo2(*root, info))
         {
-            if (info < raiz->info1->start)
-                pai = Memory_buscar_menor_pai(raiz->left, info);
-            else if (raiz->numKeys == 1 || info < raiz->info2->start)
-                pai = Memory_buscar_menor_pai(raiz->center, info);
+            if (info < root->info1->start)
+                father = sourceMinorFather(root->left, info);
+            else if (root->numKeys == 1 || info < root->info2->start)
+                father = sourceMinorFather(root->center, info);
             else
-                pai = Memory_buscar_menor_pai(raiz->right, info);
+                father = sourceMinorFather(root->right, info);
 
-            if (pai == NULL && raiz->info1->start < info)
-                pai = raiz;
+            if (father == NULL && root->info1->start < info)
+                father = root;
         }
     }
 
-    return pai;
+    return (father);
 }
 
-static Memory *Memory_buscar_menor_pai_2_infos(Memory *raiz, int info)
+/**
+ * @brief Localiza o pai do menor nó que contém duas informações e é menor que um valor dado.
+ * 
+ * Essa função percorre a árvore para encontrar o pai de um nó contendo duas informações, cujo valor é menor que a informação especificada. 
+ * Caso o pai não seja encontrado, retorna NULL.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @param info Informação a ser localizada.
+ * @return Ponteiro para o nó pai contendo a menor informação menor que o valor especificado e com duas informações, ou NULL caso não seja encontrado.
+ */
+static Memory *sourceMinorFather2Infos(Memory *root, int info)
 {
-    Memory *pai;
-    pai = NULL;
+    Memory *father;
+    father = NULL;
 
-    if (raiz != NULL)
+    if (root != NULL)
     {
-        if (!eh_info1(*raiz, info) && !eh_info2(*raiz, info))
+        if (!isInfo1(*root, info) && !isInfo2(*root, info))
         {
-            if (info < raiz->info1->start)
-                pai = Memory_buscar_menor_pai_2_infos(raiz->left, info);
-            else if (raiz->numKeys == 1 || info < raiz->info2->start)
-                pai = Memory_buscar_menor_pai_2_infos(raiz->center, info);
+            if (info < root->info1->start)
+                father = sourceMinorFather2Infos(root->left, info);
+            else if (root->numKeys == 1 || info < root->info2->start)
+                father = sourceMinorFather2Infos(root->center, info);
             else
-                pai = Memory_buscar_menor_pai_2_infos(raiz->right, info);
+                father = sourceMinorFather2Infos(root->right, info);
 
-            if (pai == NULL && raiz->numKeys == 2 && raiz->info2->start < info)
-                pai = raiz;
+            if (father == NULL && root->numKeys == 2 && root->info2->start < info)
+                father = root;
         }
     }
 
-    return pai;
+    return (father);
 }
 
-int possivel_remover(Memory *raiz)
-{
-    int possivel = 0;
 
-    if (raiz != NULL)
+/**
+ * @brief Verifica se é possível remover um nó específico da árvore.
+ * 
+ * Essa função verifica se um nó na árvore pode ser removido com base em suas chaves e filhos.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @return Retorna 1 se for possível remover o nó, caso contrário, retorna 0.
+ */
+int possibleRemove(Memory *root)
+{
+    int possible = 0;
+
+    if (root != NULL)
     {
-        possivel = raiz->numKeys == 2;
+        possible = root->numKeys == 2;
 
-        if (!possivel)
+        if (!possible)
         {
-            possivel = possivel_remover(raiz->center);
+            possible = possibleRemove(root->center);
 
-            if (!possivel)
-                possivel = possivel_remover(raiz->left);
+            if (!possible)
+                possible = possibleRemove(root->left);
         }
     }
 
-    return possivel;
+    return (possible);
 }
 
-static int movimento_onda(Info saindo, Info *entrada, Memory *pai, Memory **origem, Memory **raiz, Memory **maior, int (*funcao_remover)(Memory **, int, Memory *, Memory **, Memory **))
+
+/**
+ * @brief Movimenta informações durante a remoção para manter o equilíbrio da árvore.
+ * 
+ * Essa função realiza o movimento de uma informação, transferindo-a entre nós para manter o equilíbrio da árvore 2-3.
+ * 
+ * @param leaving Informação que está saindo.
+ * @param input Ponteiro para a nova informação a ser inserida.
+ * @param father Ponteiro para o pai do nó afetado.
+ * @param origin Ponteiro para a raiz da subárvore de origem.
+ * @param root Ponteiro para a raiz da árvore.
+ * @param bigger Ponteiro para o maior nó afetado.
+ * @param removeFunction Função que será usada para remover a informação.
+ * @return Retorna 1 se a operação foi bem-sucedida, ou 0 caso contrário.
+ */
+static int waveMoviment(Info leaving, Info *input, Memory *father, Memory **origin, Memory **root, Memory **bigger, int (*removeFunction)(Memory **, int, Memory *, Memory **, Memory **))
 {
-    int removeu = funcao_remover(raiz, saindo.start, pai, origem, maior);
-    *entrada = saindo;
-    return removeu;
+    int removed = removeFunction(root, leaving.start, father, origin, bigger);
+    *input = leaving;
+
+    return (removed);
 }
 
-Memory *Memory_criar()
+/**
+ * @brief Cria uma nova árvore de memória, inicialmente vazia.
+ * 
+ * A função simplesmente retorna NULL, indicando que a árvore de memória está vazia.
+ * 
+ * @return Ponteiro NULL, indicando que não há memória alocada.
+ */
+Memory *createMemory()
 {
     return NULL;
 }
 
-void Memory_desalocar(Memory **raiz)
+/**
+ * @brief Desaloca recursivamente todos os nós da árvore de memória.
+ * 
+ * A função realiza a desalocação de todos os nós da árvore binária de 2-3,
+ * liberando a memória de todos os seus filhos e do próprio nó.
+ * 
+ * @param root Ponteiro duplo para o nó raiz da árvore.
+ */
+void deallocateMemory(Memory **root)
 {
-    if (*raiz != NULL)
+    if (*root != NULL)
     {
-        Memory_desalocar(&((*raiz)->left));
-        Memory_desalocar(&((*raiz)->center));
+        deallocateMemory(&((*root)->left));
+        deallocateMemory(&((*root)->center));
 
-        if ((*raiz)->numKeys == 2)
-            Memory_desalocar(&((*raiz)->right));
+        if ((*root)->numKeys == 2)
+            deallocateMemory(&((*root)->right));
 
-        no23_desalocar(raiz);
+        node23Deallocate(root);
     }
 }
 
-Memory *Memory_inserir(Memory **raiz, Info info, Memory *pai, Info *promove)
+/**
+ * @brief Insere um novo valor na árvore de memória, com possível promoção de valor.
+ * 
+ * A função insere recursivamente um valor na árvore binária de 2-3, e, se necessário, realiza a promoção
+ * de um valor para um nó superior, mantendo a árvore balanceada.
+ * 
+ * @param root Ponteiro duplo para o nó raiz da árvore.
+ * @param info O valor (informação) a ser inserido.
+ * @param father Ponteiro para o nó pai do nó atual (usado durante a recursão).
+ * @param promote Ponteiro para o valor que pode ser promovido para o nó pai.
+ * @return Ponteiro para o nó que contém o valor promovido, ou NULL se não houver promoção.
+ */
+Memory *insertMemory(Memory **root, Info info, Memory *father, Info *promote)
 {
-    Memory *maior;
-    maior = NULL;
+    Memory *bigger;
+    bigger = NULL;
 
-    if (*raiz == NULL)
-        *raiz = no23_criar(info, NULL, NULL);
+    if (*root == NULL)
+        *root = nodeCreate(info, NULL, NULL);
     else
     {
-        if (eh_folha(**raiz))
+        if (isLeaf(*root))
         {
-            if ((*raiz)->numKeys == 1)
-                no23_adicionar_info(*raiz, info, NULL);
+            if ((*root)->numKeys == 1)
+                nodeAddInfo(*root, info, NULL);
             else
             {
-                maior = no23_quebrar(*raiz, info, promove, NULL);
-                if (pai == NULL)
+                bigger = nodeBreak(*root, info, promote, NULL);
+                if (father == NULL)
                 {
-                    *raiz = no23_criar(*promove, *raiz, maior);
-                    maior = NULL;
+                    *root = nodeCreate(*promote, *root, bigger);
+                    bigger = NULL;
                 }
             }
         }
         else
         {
-            if (info.start < (*raiz)->info1->start)
-                maior = Memory_inserir(&((*raiz)->left), info, *raiz, promove);
-            else if ((*raiz)->numKeys == 1 || info.start < (*raiz)->info2->start)
-                maior = Memory_inserir(&((*raiz)->center), info, *raiz, promove);
+            if (info.start < (*root)->info1->start)
+                bigger = insertMemory(&((*root)->left), info, *root, promote);
+            else if ((*root)->numKeys == 1 || info.start < (*root)->info2->start)
+                bigger = insertMemory(&((*root)->center), info, *root, promote);
             else
-                maior = Memory_inserir(&((*raiz)->right), info, *raiz, promove);
+                bigger = insertMemory(&((*root)->right), info, *root, promote);
 
-            if (maior != NULL)
+            if (bigger != NULL)
             {
-                if ((*raiz)->numKeys == 1)
+                if ((*root)->numKeys == 1)
                 {
-                    no23_adicionar_info(*raiz, *promove, maior);
-                    maior = NULL;
+                    nodeAddInfo(*root, *promote, bigger);
+                    bigger = NULL;
                 }
                 else
                 {
-                    Info promove_aux;
-                    maior = no23_quebrar(*raiz, *promove, &promove_aux, maior);
-                    *promove = promove_aux;
-                    if (pai == NULL)
+                    Info promote_aux;
+                    bigger = nodeBreak(*root, *promote, &promote_aux, bigger);
+                    *promote = promote_aux;
+                    if (father == NULL)
                     {
-                        *raiz = no23_criar(promove_aux, *raiz, maior);
-                        maior = NULL;
+                        *root = nodeCreate(promote_aux, *root, bigger);
+                        bigger = NULL;
                     }
                 }
             }
         }
     }
 
-    return maior;
+    return (bigger);
 }
 
-int Memory_remover_nao_folha1(Memory **origem, Memory *raiz, Info *info, Memory *filho1, Memory *filho2, Memory **maior)
+/**
+ * @brief Remove um nó de memória em um nó não folha (primeiro caso de remoção).
+ * 
+ * A função remove um nó da árvore binária de 2-3 em uma posição não-folha, fazendo o ajuste de
+ * filhos e promovendo informações de outros nós para preencher o espaço.
+ * 
+ * @param origin Ponteiro duplo para o nó raiz da árvore original.
+ * @param root Nó atual que contém o valor a ser removido.
+ * @param info O valor que será removido.
+ * @param child1 Filho 1 da árvore.
+ * @param child2 Filho 2 da árvore.
+ * @param bigger Ponteiro para o nó de maior valor que será atualizado.
+ * @return Inteiro indicando o sucesso ou falha da remoção.
+ */
+int memoryRemoveNoLeaf1(Memory **origin, Memory *root, Info *info, Memory *child1, Memory *child2, Memory **bigger)
 {
-    int removeu;
-    Memory *filho, *pai;
-    Info info_filho;
+    int removed;
+    Memory *child, *father;
+    Info info_child;
 
-    pai = raiz;
+    father = root;
 
-    filho = Memory_buscar_maior_filho(filho1, &pai, &info_filho);
+    child = lookBiggerChild(child1, &father, &info_child);
 
-    if (filho->numKeys == 2)
+    if (child->numKeys == 2)
     {
-        *info = info_filho;
-        filho->numKeys = 1;
+        *info = info_child;
+        child->numKeys = 1;
     }
     else
     {
-        filho = Memory_buscar_menor_filho(filho2, &pai);
-        removeu = movimento_onda(*(filho->info1), info, pai, origem, &filho, maior, Memory_remover1);
+        child = lookMinorChild(child2, &father);
+        removed = waveMoviment(*(child->info1), info, father, origin, &child, bigger, removeMemory1);
     }
 
-    return removeu;
+    return (removed);
 }
 
-int Memory_remover_nao_folha2(Memory **origem, Memory *raiz, Info *info, Memory *filho1, Memory *filho2, Memory **maior)
+/**
+ * @brief Remove um nó de memória em um nó não folha (segundo caso de remoção).
+ * 
+ * A função remove um nó da árvore binária de 2-3 em uma posição não-folha, ajustando filhos
+ * e promovendo informações para manter a árvore balanceada.
+ * 
+ * @param origin Ponteiro duplo para o nó raiz da árvore original.
+ * @param root Nó atual que contém o valor a ser removido.
+ * @param info O valor que será removido.
+ * @param child1 Filho 1 da árvore.
+ * @param child2 Filho 2 da árvore.
+ * @param bigger Ponteiro para o nó de maior valor que será atualizado.
+ * @return Inteiro indicando o sucesso ou falha da remoção.
+ */
+int memoryRemoveNoLeaf2(Memory **origin, Memory *root, Info *info, Memory *child1, Memory *child2, Memory **bigger)
 {
-    int removeu;
-    Memory *filho, *pai;
-    Info info_filho;
+    int removed;
+    Memory *child, *father;
+    Info info_child;
 
-    pai = raiz;
+    father = root;
 
-    filho = Memory_buscar_menor_filho(filho1, &pai);
+    child = lookMinorChild(child1, &father);
 
-    if (filho->numKeys == 2)
+    if (child->numKeys == 2)
     {
-        *info = *(filho->info1);
-        *(filho->info1) = *(filho->info2);
-        filho->numKeys = 1;
+        *info = *(child->info1);
+        *(child->info1) = *(child->info2);
+        child->numKeys = 1;
     }
     else
     {
-        filho = Memory_buscar_maior_filho(filho2, &pai, &info_filho);
-        removeu = movimento_onda(info_filho, info, pai, origem, &filho, maior, Memory_remover2);
+        child = lookBiggerChild(child2, &father, &info_child);
+        removed = waveMoviment(info_child, info, father, origin, &child, bigger, memoryRemove2);
     }
 
-    return removeu;
+    return removed;
 }
 
-int Memory_remover1(Memory **raiz, int info, Memory *pai, Memory **origem, Memory **maior)
+/**
+ * @brief Remove um nó de memória do nó folha 1.
+ * 
+ * A função realiza a remoção de um nó de memória quando o nó é folha, ajustando
+ * os filhos e promovendo valores para garantir a integridade da árvore.
+ * 
+ * @param root Ponteiro duplo para o nó raiz da árvore.
+ * @param info Valor a ser removido.
+ * @param father Nó pai do nó atual.
+ * @param origin Ponteiro duplo para a árvore original.
+ * @param bigger Ponteiro para o nó maior que será atualizado.
+ * @return Inteiro indicando o sucesso ou falha da remoção.
+ */
+int removeMemory1(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger)
 {
-    int removeu = 0;
+    int removed = 0;
 
-    if (*raiz != NULL)
+    if (*root != NULL)
     {
-        int info1 = eh_info1(**raiz, info);
-        int info2 = eh_info2(**raiz, info);
+        int info1 = isInfo1(**root, info);
+        int info2 = isInfo2(**root, info);
 
         if (info1 || info2)
         {
-            removeu = 1;
-            if (eh_folha(**raiz))
+            removed = 1;
+            if (isLeaf(*root))
             {
-                if ((*raiz)->numKeys == 2)
+                if ((*root)->numKeys == 2)
                 {
                     if (info1)
-                        (*raiz)->info1 = (*raiz)->info2;
+                        (*root)->info1 = (*root)->info2;
 
-                    (*raiz)->numKeys = 1;
+                    (*root)->numKeys = 1;
                 }
                 else
                 {
-                    if (pai == NULL)
-                        no23_desalocar(raiz);
+                    if (father == NULL)
+                        node23Deallocate(root);
                     else
                     {
-                        Memory *pai_aux;
-                        Info info_pai;
-                        if (*raiz == pai->left || (pai->numKeys == 2 && *raiz == pai->center))
+                        Memory *auxFather;
+                        Info info_father;
+                        if (*root == father->left || (father->numKeys == 2 && *root == father->center))
                         {
-                            pai_aux = Memory_buscar_pai(*origem, pai->info1->start);
+                            auxFather = sourceFather(*origin, father->info1->start);
 
-                            if (*raiz == pai->left)
-                                info_pai = *(pai->info1);
+                            if (*root == father->left)
+                                info_father = *(father->info1);
                             else
-                                info_pai = *(pai->info2);
+                                info_father = *(father->info2);
 
-                            removeu = movimento_onda(info_pai, (*raiz)->info1, pai_aux, origem, &pai, maior, Memory_remover1);
+                            removed = waveMoviment(info_father, (*root)->info1, auxFather, origin, &father, bigger, removeMemory1);
                         }
-                        else // Filho do center (com pai de 1 info) ou da direita
+                        else 
                         {
-                            pai_aux = Memory_buscar_maior_pai(*origem, (*raiz)->info1->start);
+                            auxFather = sourceBiggerFather(*origin, (*root)->info1->start);
 
-                            Memory *menor_pai;
-                            menor_pai = Memory_buscar_menor_pai_2_infos(*origem, (*raiz)->info1->start);
+                            Memory *menor_father;
+                            menor_father = sourceMinorFather2Infos(*origin, (*root)->info1->start);
 
-                            if (pai_aux == NULL || (pai_aux != pai && menor_pai != NULL))
+                            if (auxFather == NULL || (auxFather != father && menor_father != NULL))
                             {
-                                *maior = pai;
-                                (*raiz)->numKeys = 0;
-                                removeu = -1;
+                                *bigger = father;
+                                (*root)->numKeys = 0;
+                                removed = -1;
                             }
                             else
                             {
-                                if (pai_aux->info1->start > (*raiz)->info1->start)
-                                    info_pai = *(pai_aux->info1);
+                                if (auxFather->info1->start > (*root)->info1->start)
+                                    info_father = *(auxFather->info1);
                                 else
-                                    info_pai = *(pai_aux->info2);
+                                    info_father = *(auxFather->info2);
 
                                 Memory *avo;
-                                avo = Memory_buscar_pai(*origem, info_pai.start);
-                                removeu = movimento_onda(info_pai, (*raiz)->info1, avo, origem, &pai_aux, maior, Memory_remover1);
+                                avo = sourceFather(*origin, info_father.start);
+                                removed = waveMoviment(info_father, (*root)->info1, avo, origin, &auxFather, bigger, removeMemory1);
                             }
                         }
                     }
                 }
             }
             else if (info2)
-                removeu = Memory_remover_nao_folha1(origem, *raiz, (*raiz)->info2, (*raiz)->center, (*raiz)->right, maior);
+                removed = memoryRemoveNoLeaf1(origin, *root, (*root)->info2, (*root)->center, (*root)->right, bigger);
             else if (info1)
-                removeu = Memory_remover_nao_folha1(origem, *raiz, (*raiz)->info1, (*raiz)->left, (*raiz)->center, maior);
+                removed = memoryRemoveNoLeaf1(origin, *root, (*root)->info1, (*root)->left, (*root)->center, bigger);
         }
         else
         {
-            if (info < (*raiz)->info1->start)
-                removeu = Memory_remover1(&(*raiz)->left, info, *raiz, origem, maior);
-            else if ((*raiz)->numKeys == 1 || info < (*raiz)->info2->start)
-                removeu = Memory_remover1(&(*raiz)->center, info, *raiz, origem, maior);
+            if (info < (*root)->info1->start)
+                removed = removeMemory1(&(*root)->left, info, *root, origin, bigger);
+            else if ((*root)->numKeys == 1 || info < (*root)->info2->start)
+                removed = removeMemory1(&(*root)->center, info, *root, origin, bigger);
             else
-                removeu = Memory_remover1(&(*raiz)->right, info, *raiz, origem, maior);
+                removed = removeMemory1(&(*root)->right, info, *root, origin, bigger);
         }
     }
-    return removeu;
+    return (removed);
 }
 
-int Memory_remover2(Memory **raiz, int info, Memory *pai, Memory **origem, Memory **maior)
+/**
+ * @brief Remove uma informação específica da árvore de memória. A função verifica a presença da informação e a remove caso seja encontrada.
+ * Ela trabalha recursivamente nas subárvores esquerda, central ou direita, dependendo da posição da informação na árvore. Se a remoção
+ * resultar em um desequilíbrio, a árvore é rebalanceada.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ * @param info A informação a ser removida.
+ * @param father O pai do nó atual (usado para balanceamento).
+ * @param origin A raiz original da árvore.
+ * @param bigger Um ponteiro para armazenar o nó de memória maior, caso seja necessário durante o balanceamento.
+ * @return Retorna 1 se a informação foi removida com sucesso, -1 se houve desequilíbrio, e 0 se a informação não foi encontrada.
+ */
+int memoryRemove2(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger)
 {
-    int removeu = 0;
+    int removed = 0;
 
-    if (*raiz != NULL)
+    if (*root != NULL)
     {
-        int info1 = eh_info1(**raiz, info);
-        int info2 = eh_info2(**raiz, info);
+        int info1 = isInfo1(**root, info);
+        int info2 = isInfo2(**root, info);
 
         if (info1 || info2)
         {
-            removeu = 1;
-            if (eh_folha(**raiz))
+            removed = 1;
+            if (isLeaf(*root))
             {
-                if ((*raiz)->numKeys == 2)
+                if ((*root)->numKeys == 2)
                 {
                     if (info1)
-                        (*raiz)->info1 = (*raiz)->info2;
+                        (*root)->info1 = (*root)->info2;
 
-                    (*raiz)->numKeys = 1;
+                    (*root)->numKeys = 1;
                 }
                 else
                 {
-                    if (pai == NULL)
-                        no23_desalocar(raiz);
+                    if (father == NULL)
+                        node23Deallocate(root);
                     else
                     {
-                        Memory *pai_aux;
-                        Info info_pai;
-                        if (*raiz == pai->center || (pai->numKeys == 2 && *raiz == pai->right))
+                        Memory *auxFather;
+                        Info info_father;
+                        if (*root == father->center || (father->numKeys == 2 && *root == father->right))
                         {
-                            pai_aux = Memory_buscar_pai(*origem, pai->info1->start);
+                            auxFather = sourceFather(*origin, father->info1->start);
 
-                            if (*raiz == pai->center)
-                                info_pai = *(pai->info1);
+                            if (*root == father->center)
+                                info_father = *(father->info1);
                             else
-                                info_pai = *(pai->info2);
+                                info_father = *(father->info2);
 
-                            removeu = movimento_onda(info_pai, (*raiz)->info1, pai_aux, origem, &pai, maior, Memory_remover2);
+                            removed = waveMoviment(info_father, (*root)->info1, auxFather, origin, &father, bigger, memoryRemove2);
                         }
-                        else // Filho da esquerda
+                        else 
                         {
-                            pai_aux = Memory_buscar_menor_pai(*origem, (*raiz)->info1->start);
+                            auxFather = sourceMinorFather(*origin, (*root)->info1->start);
 
-                            Memory *menor_pai;
-                            menor_pai = Memory_buscar_menor_pai_2_infos(*origem, (*raiz)->info1->start);
+                            Memory *menor_father;
+                            menor_father = sourceMinorFather2Infos(*origin, (*root)->info1->start);
 
                             Memory *avo;
-                            if (pai_aux == NULL || (pai_aux != pai && menor_pai != NULL))
+                            if (auxFather == NULL || (auxFather != father && menor_father != NULL))
                             {
-                                removeu = -1;
-                                *maior = pai;
+                                removed = -1;
+                                *bigger = father;
                             }
                             else
                             {
-                                if (pai_aux->numKeys == 2 && pai_aux->info2->start < (*raiz)->info1->start)
-                                    info_pai = *(pai_aux->info2);
+                                if (auxFather->numKeys == 2 && auxFather->info2->start < (*root)->info1->start)
+                                    info_father = *(auxFather->info2);
                                 else
-                                    info_pai = *(pai_aux->info1);
+                                    info_father = *(auxFather->info1);
 
-                                avo = Memory_buscar_pai(*origem, info_pai.start);
-                                removeu = movimento_onda(info_pai, (*raiz)->info1, avo, origem, &pai_aux, maior, Memory_remover2);
+                                avo = sourceFather(*origin, info_father.start);
+                                removed = waveMoviment(info_father, (*root)->info1, avo, origin, &auxFather, bigger, memoryRemove2);
                             }
                         }
                     }
                 }
             }
             else if (info2)
-                removeu = Memory_remover_nao_folha2(origem, *raiz, (*raiz)->info2, (*raiz)->right, (*raiz)->center, maior);
+                removed = memoryRemoveNoLeaf2(origin, *root, (*root)->info2, (*root)->right, (*root)->center, bigger);
             else if (info1)
-                removeu = Memory_remover_nao_folha2(origem, *raiz, (*raiz)->info1, (*raiz)->center, (*raiz)->left, maior);
+                removed = memoryRemoveNoLeaf2(origin, *root, (*root)->info1, (*root)->center, (*root)->left, bigger);
         }
         else
         {
-            if (info < (*raiz)->info1->start)
-                removeu = Memory_remover2(&(*raiz)->left, info, *raiz, origem, maior);
-            else if ((*raiz)->numKeys == 1 || info < (*raiz)->info2->start)
-                removeu = Memory_remover2(&(*raiz)->center, info, *raiz, origem, maior);
+            if (info < (*root)->info1->start)
+                removed = memoryRemove2(&(*root)->left, info, *root, origin, bigger);
+            else if ((*root)->numKeys == 1 || info < (*root)->info2->start)
+                removed = memoryRemove2(&(*root)->center, info, *root, origin, bigger);
             else
-                removeu = Memory_remover2(&(*raiz)->right, info, *raiz, origem, maior);
+                removed = memoryRemove2(&(*root)->right, info, *root, origin, bigger);
         }
     }
-    return removeu;
+    return (removed);
 }
 
-int Memory_remover(Memory **raiz, int info)
+/**
+ * @brief Função principal para remover uma informação da árvore de memória. Se a informação não for encontrada, tenta-se rebalancear
+ * a árvore e remover a informação novamente. Esta função lida com o rebalanceamento e casos onde a remoção não é trivial.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ * @param info A informação a ser removida.
+ * @return Retorna 1 se a informação foi removida, -1 se houve um desequilíbrio e foi necessário rebalanceamento, ou 0 se a informação não foi encontrada.
+ */
+int removeMemory(Memory **root, int info)
 {
-    Memory *maior, *posicao_juncao;
-    int removeu = Memory_remover1(raiz, info, NULL, raiz, &posicao_juncao);
+    Memory *bigger, *junctionPosition;
+    int removed = removeMemory1(root, info, NULL, root, &junctionPosition);
 
-    if (removeu == -1)
+    if (removed == -1)
     {
-        Info valor_juncao = no23_maior_info(posicao_juncao);
-        maior = NULL;
-        removeu = Memory_rebalancear(raiz, valor_juncao.start, &maior);
+        Info junctionValue = node23BiggerInfo(junctionPosition);
+        bigger = NULL;
+        removed = memoryRebalance(root, junctionValue.start, &bigger);
 
-        if (removeu == -1)
+        if (removed == -1)
         {
-            Memory *pai, *posicao_juncao2;
-            Info *entrada;
-            pai = Memory_buscar_pai(*raiz, valor_juncao.start);
+            Memory *father, *junctionPosition2;
+            Info *input;
+            father = sourceFather(*root, junctionValue.start);
 
-            if (eh_info1(*posicao_juncao, valor_juncao.start))
-                entrada = posicao_juncao->center->info1;
+            if (isInfo1(*junctionPosition, junctionValue.start))
+                input = junctionPosition->center->info1;
             else
-                entrada = posicao_juncao->right->info1;
+                input = junctionPosition->right->info1;
 
-            removeu = movimento_onda(valor_juncao, entrada, pai, raiz, &posicao_juncao, &posicao_juncao2, Memory_remover2);
+            removed = waveMoviment(junctionValue, input, father, root, &junctionPosition, &junctionPosition2, memoryRemove2);
 
-            if (removeu == -1)
+            if (removed == -1)
             {
-                valor_juncao = *(posicao_juncao2->info1);
-                pai = Memory_buscar_pai(*raiz, valor_juncao.start);
-                removeu = movimento_onda(valor_juncao, posicao_juncao2->left->info1, pai, raiz, &posicao_juncao2, &posicao_juncao, Memory_remover1);
+                junctionValue = *(junctionPosition2->info1);
+                father = sourceFather(*root, junctionValue.start);
+                removed = waveMoviment(junctionValue, junctionPosition2->left->info1, father, root, &junctionPosition2, &junctionPosition, removeMemory1);
 
-                valor_juncao = no23_maior_info(posicao_juncao);
-                maior = NULL;
-                removeu = Memory_rebalancear(raiz, valor_juncao.start, &maior);
+                junctionValue = node23BiggerInfo(junctionPosition);
+                bigger = NULL;
+                removed = memoryRebalance(root, junctionValue.start, &bigger);
             }
         }
 
-        if (*raiz == NULL)
-            *raiz = maior;
+        if (*root == NULL)
+            *root = bigger;
     }
 
-    return removeu;
+    return (removed);
 }
 
-int Memory_rebalancear(Memory **raiz, int info, Memory **maior)
+/**
+ * @brief Rebalanceia a árvore se ela ficar desequilibrada após uma remoção. Tenta realizar rotações e redistribuições nos nós.
+ * A função verifica recursivamente as subárvores para determinar se é necessário fazer ajustes e realiza os ajustes necessários.
+ *
+ * @param root Ponteiro para a raiz da árvore.
+ * @param info A informação usada para rebalancear a árvore.
+ * @param bigger Um ponteiro para armazenar o nó de memória maior, caso seja necessário durante o balanceamento.
+ * @return Retorna 0 se a árvore estiver balanceada, -1 se a árvore ainda estiver desequilibrada e precisar de mais ajustes.
+ */
+int memoryRebalance(Memory **root, int info, Memory **bigger)
 {
-    int balanceou = 0;
-    if (*raiz != NULL)
+    int balanced = 0;
+    if (*root != NULL)
     {
-        if (!eh_folha(**raiz))
+        if (!isLeaf(*root))
         {
-            if (info < (*raiz)->info1->start)
-                balanceou = Memory_rebalancear(&((*raiz)->left), info, maior);
-            else if ((*raiz)->numKeys == 1 || info < (*raiz)->info2->start)
+            if (info < (*root)->info1->start)
+                balanced = memoryRebalance(&((*root)->left), info, bigger);
+            else if ((*root)->numKeys == 1 || info < (*root)->info2->start)
             {
-                if ((*raiz)->left->numKeys == 2 && !possivel_remover((*raiz)->center))
-                    balanceou = -1;
+                if ((*root)->left->numKeys == 2 && !possibleRemove((*root)->center))
+                    balanced = -1;
                 else
-                    balanceou = Memory_rebalancear(&((*raiz)->center), info, maior);
+                    balanced = memoryRebalance(&((*root)->center), info, bigger);
             }
             else
             {
-                if ((*raiz)->center->numKeys == 2 && !possivel_remover((*raiz)->right))
-                    balanceou = -1;
+                if ((*root)->center->numKeys == 2 && !possibleRemove((*root)->right))
+                    balanced = -1;
                 else
-                    balanceou = Memory_rebalancear(&((*raiz)->right), info, maior);
+                    balanced = memoryRebalance(&((*root)->right), info, bigger);
             }
 
-            if (balanceou != -1)
+            if (balanced != -1)
             {
-                if ((*raiz)->numKeys == 1)
-                    balanceou = balanceamento(raiz, (*raiz)->left, &((*raiz)->center), *(*raiz)->info1, maior);
-                else if ((*raiz)->numKeys == 2)
-                    balanceou = balanceamento(raiz, (*raiz)->center, &((*raiz)->right), *(*raiz)->info2, maior);
+                if ((*root)->numKeys == 1)
+                    balanced = balancing(root, (*root)->left, &((*root)->center), *(*root)->info1, bigger);
+                else if ((*root)->numKeys == 2)
+                    balanced = balancing(root, (*root)->center, &((*root)->right), *(*root)->info2, bigger);
             }
         }
     }
 
-    return balanceou;
+    return (balanced);
 }
