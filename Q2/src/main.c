@@ -30,8 +30,9 @@ void ExibirMenu()
     printf("[2] Mostrar traduções a partir de uma palavra em português\n");
     printf("[3] Remover uma palavra em inglês de uma unidade\n");
     printf("[4] Remover uma palavra em português de uma unidade\n");
-    printf("[5] Metrificar tempo busca\n");
-    printf("[6] Sair\n");
+    printf("[5] Caminho Percorrido\n");
+    printf("[6] Metrificar\n");
+    printf("[7] Sair\n");
     printf("=================================================================\n");
     printf("Opção: ");
 }
@@ -47,13 +48,15 @@ int main()
     RBTree *root = NULL;
     char line[200];
     int currentUnit = 0, sucess = 1;
+    int contador = 0;
+    char palavrasPercorridas[400][50];
 
     FILE *file;
-    file = fopen("../../input.txt", "r");
+    file = fopen("../../input2.txt.txt", "r");
 
     if (file == NULL)
         sucess = 0;
-    
+
     if (sucess = 1)
     {
         while (fgets(line, sizeof(line), file) != NULL)
@@ -144,6 +147,19 @@ int main()
                 printf("Informe a palavra em portugues: ");
                 scanf("%[^\n]", palavra);
                 getchar();
+                findEnglishByPortuguesePath(root, palavra, palavrasPercorridas, &contador);
+
+                printf("Palavras percorridas:\n");
+                for (int i = 0; i < contador; i++)
+                {
+                    printf("%s\n", palavrasPercorridas[i]);
+                }
+                break;
+            
+            case 6: 
+                printf("Informe a palavra em portugues: ");
+                scanf("%[^\n]", palavra);
+                getchar();
                 
                 clock_t start, end;
                 double cpu_time_used;
@@ -155,14 +171,15 @@ int main()
                 cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
                 printf("Tempo gasto para executar a busca: %.6f segundos\n", cpu_time_used);
                 break;
-            case 6:
+
+            case 7:
                 printf("Saindo...\n");
                 break;
             default:
                 printf("Opcao invalida!\n");
                 break;
             }
-        } while (op != 6);
+        } while (op != 7);
     }
 
     return sucess == 1 ? 0 : 1;

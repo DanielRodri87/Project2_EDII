@@ -46,7 +46,6 @@ void displayUnit(RBTree *root, int unit, int *found);
 void findEnglishByPortuguese(RBTree *node, const char *portugueseWord);
 void removeFromRBTreeEN(RBTree **root, const char *englishWord, int unit);
 
-int insertIntoRBTree(RBTree **root, InfoBin info);
 void removeFromRBTreePT(RBTree **root, char *portugueseWord, int unit);
 
 // Auxiliares
@@ -66,5 +65,7 @@ int isUnitPresent(Units *units, int unit);
 void displayBinaryTree(EngPT *root, int unit);
 int searchUnit(EngPT *root, int unit);
 void displayUnit(RBTree *root, int unit, int *found);
+
+void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, char palavrasPercorridas[400][50], int *contador);
 
 #endif

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dict.h"
-
+#include <time.h>
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // I - informar uma unidade e então imprima todas as palavras da unidade em português seguida das
@@ -75,6 +75,33 @@ void findEnglishByPortuguese(RBTree *node, const char *portugueseWord)
         findEnglishByPortuguese(node->right, portugueseWord);
     }
 }
+
+void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, char palavrasPercorridas[400][50], int *contador)
+{
+    if (node != NULL)
+    {
+        if (*contador < 400)
+        {
+            strncpy(palavrasPercorridas[*contador], node->info.portugueseWord, 50);
+            palavrasPercorridas[*contador][49] = '\0';
+            (*contador)++;
+        }
+        if (strcmp(node->info.portugueseWord, portugueseWord) == 0)
+        {
+            printf("Palavra encontrada: %s\n", node->info.portugueseWord);
+            Units *current = node->info.binaryTreeEnglish->info.units;
+            while (current != NULL)
+            {
+                printWordsByUnit(node, current->unit);
+                current = current->next;
+            }
+        }
+
+        findEnglishByPortuguesePath(node->left, portugueseWord, palavrasPercorridas, contador);
+        findEnglishByPortuguesePath(node->right, portugueseWord, palavrasPercorridas, contador);
+    }
+}
+
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // III - informar uma palavra em inglês e a unidade a qual a mesma pertence removê-la das árvores binárias
@@ -709,7 +736,7 @@ int searchUnit(EngPT *root, int unit)
             found = 1;
         found = found || searchUnit(root->left, unit) || searchUnit(root->right, unit);
     }
-    return (found); 
+    return (found);
 }
 
 /**
