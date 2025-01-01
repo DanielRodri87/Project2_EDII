@@ -4,64 +4,6 @@
 #include <string.h>
 #include <dict.h>
 
-void imprimirArvore23(Portuguese23Tree *raiz, int nivel)
-{
-    if (raiz == NULL)
-        return;
-
-    // Indentacao para cada nível da arvore
-    for (int i = 0; i < nivel; i++)
-    {
-        printf("    "); // Indentacao
-    }
-
-    // Imprime as chaves do nó
-    if (raiz->infoCount == 1)
-    {
-        printf("[ %s ]\n", raiz->info1.portugueseWord);
-    }
-    else if (raiz->infoCount == 2)
-    {
-        printf("[ %s | %s ]\n", raiz->info1.portugueseWord, raiz->info2.portugueseWord);
-    }
-
-    // Se o nó tem filhos, imprime-os
-    if (raiz->left != NULL || raiz->middle != NULL || raiz->right != NULL)
-    {
-        // Imprime os filhos à leftuerda
-        if (raiz->left != NULL)
-        {
-            for (int i = 0; i < nivel + 1; i++)
-            {
-                printf("    ");
-            }
-            printf("left -> ");
-            imprimirArvore23(raiz->left, nivel + 1); // Filhos à leftuerda
-        }
-
-        // Imprime o filho middleral
-        if (raiz->middle != NULL)
-        {
-            for (int i = 0; i < nivel + 1; i++)
-            {
-                printf("    ");
-            }
-            printf("middle -> ");
-            imprimirArvore23(raiz->middle, nivel + 1); // Filho middleral
-        }
-
-        // Imprime os filhos à righteita
-        if (raiz->right != NULL)
-        {
-            for (int i = 0; i < nivel + 1; i++)
-            {
-                printf("    ");
-            }
-            printf("right -> ");
-            imprimirArvore23(raiz->right, nivel + 1); // Filho à righteita
-        }
-    }
-}
 void carregarArquivo(const char *nomeArquivo, Portuguese23Tree **arvore)
 {
     FILE *arquivo = fopen(nomeArquivo, "r");
@@ -75,10 +17,8 @@ void carregarArquivo(const char *nomeArquivo, Portuguese23Tree **arvore)
         {
 
             if (linha[0] == '%')
-            {
-                // Atualiza a unidade corretamente
                 sscanf(linha, "%% Unidade %[^\n]", unidadeAtual);
-            }
+            
             else
             {
                 char palavraIngles[50], traducoesPortugues[200];
@@ -101,19 +41,20 @@ void carregarArquivo(const char *nomeArquivo, Portuguese23Tree **arvore)
     }
 }
 
-void menu()
+void ExibirMenu()
 {
-    printf("\n------------------------------------------------------------------------------------------------- \n");
-    printf("\nMenu de opcoes:\n");
-    printf("1 - Informar uma unidade e imprimir todas as palavras em portugues e as equivalentes em ingles.\n");
-    printf("2 - Informar uma palavra em portugues e imprimir todas as palavras em ingles equivalentes.\n");
-    printf("3 - Informar uma palavra em ingles e a unidade, remove-la da arvore binaria e da arvore 2-3.\n");
-    printf("4 - Informar uma palavra em portugues e a unidade, remove-la da arvore binaria e da arvore 2-3.\n");
-    printf("5 - Imprimir a arvore completa\n");
-    printf("6 - Imprimir a arvore completa na ordem 2-3\n");
-    printf("0 - Sair\n");
-    printf("Escolha uma opcao: \n");
-    printf("\n------------------------------------------------------------------------------------------------- \n");
+    printf("\n===============================================================\n");
+    printf("                          MENU PRINCIPAL                         \n");
+    printf("=================================================================\n");
+    printf("[1] Exibir palavras em português e inglês por unidade\n");
+    printf("[2] Mostrar traduções a partir de uma palavra em português\n");
+    printf("[3] Remover uma palavra em inglês de uma unidade\n");
+    printf("[4] Remover uma palavra em português de uma unidade\n");
+    printf("[5] Caminho Percorrido\n");
+    printf("[6] Metrificar\n");
+    printf("[7] Sair\n");
+    printf("=================================================================\n");
+    printf("Opção: ");
 }
 
 int main()
@@ -128,74 +69,60 @@ int main()
 
     do
     {
-        menu();
+        ExibirMenu();
         scanf("%d", &op);
 
         switch (op)
         {
         case 1:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("Insira a unidade que deseja imprimir as palavras: ");
+            printf("Informe a Unidade: ");
             scanf("%s", unidade);
             displayWordsForUnit(raiz, unidade);
-            printf("\n--------------------------------------------------------------- \n");
             break;
+
         case 2:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("Insira a palavra em portugues que deseja imprimir as palavras em ingles: ");
+            printf("Informe a palavra em portugues: ");
             scanf("%s", palavra);
             displayTranslationPortuguese(&raiz, palavra);
-            printf("\n--------------------------------------------------------------- \n");
             break;
+
         case 3:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("Insira a palavra em ingles que deseja remover: ");
-            scanf("%s", palavra);
-            printf("Insira a unidade da palavra que deseja remover: ");
+            printf("Informe a palavra em ingles: ");
+            scanf("%[^\n]", palavra);
+            getchar();
+            printf("Informe a Unidade: ");
             scanf("%s", unidade);
             removido = removeEnglishFindUnit(&raiz, palavra, unidade);
             if (removido)
                 printf("A palavra %s foi removida com sucesso!\n\n", palavra);
-            printf("\n--------------------------------------------------------------- \n");
             break;
+
         case 4:
             printf("\n--------------------------------------------------------------- \n");
-            printf("Insira a palavra em portugues que deseja remover: ");
+            printf("Insira a palavra em portugues: ");
             setbuf(stdin, NULL);
             scanf("%[^\n]", palavra);
-            printf("Insira a unidade da palavra que deseja remover: ");
+            printf("Informe a Unidade: ");
             scanf("%s", unidade);
             removido = removePortugueseWordFindUnit(&raiz, palavra, unidade);
             if (removido)
                 printf("A palavra %s foi removida com sucesso!\n\n", palavra);
-            printf("\n--------------------------------------------------------------- \n");
             break;
-        case 5:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("\nArvore 2-3 em ordem:\n");
-            displayTree23(raiz);
 
-            printf("\n--------------------------------------------------------------- \n");
+        case 5:
             break;
         case 6:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("\nArvore 2-3:\n");
-            imprimirArvore23(raiz, 0);
-            printf("\n--------------------------------------------------------------- \n");
             break;
-        case 0:
-            printf("\n--------------------------------------------------------------- \n");
-            printf("Saindo do programa...\n");
-            printf("\n--------------------------------------------------------------- \n");
+        case 7:
+            printf("Saindo...\n");
             break;
         default:
             printf("Insira um valor valido. \n");
             break;
         }
-    } while (op != 0);
+    } while (op != 7);
 
     freeTree(raiz);
-
 
     return 0;
 }
