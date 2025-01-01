@@ -1,45 +1,56 @@
 #ifndef DICT_H
 #define DICT_H
 
-typedef struct units {
-    int unit;
-    struct units *next;
-} Units;
+typedef struct linkedUnitList {
+  char *unitName;
+  struct linkedUnitList *next;
+} LinkedUnitList;
 
-typedef struct InfoBin {
-    char *word;
-    Units *units;
-} InfoBin;
+typedef struct EnglishBinTree {
+    LinkedUnitList *units;
+    char *englishWord;
+    struct EnglishBinTree *right, *left;
+} EnglishBinTree;
 
-typedef struct engPT{
-    InfoBin *info;
-    struct engPT *left, *right;
-} EngPT;
+typedef struct translationInfo {
+    char *portugueseWord;
+    EnglishBinTree *englishWord;
+} TranslationInfo;
 
-typedef struct info {
-    char *word;
-    EngPT *versionEnglish;
-} Info;
-
-typedef struct Tree23{
-    Info info1;
-    Info info2;
-    struct tree23 *center;
-    struct tree23 *left;
-    struct tree23 *right;
+typedef struct Portuguese23Tree {
+    TranslationInfo info1;
+    TranslationInfo info2;
+    struct Portuguese23Tree *middle;
+    struct Portuguese23Tree *right;
+    struct Portuguese23Tree *left;
     int infoCount;
-} Tree23;
+} Portuguese23Tree;
 
-Tree23 *createNode(Info info, Tree23 *leftChild, Tree23 *centerChild);
-Tree23 *insertTree23(Tree23 **node, Info info, Info *promote, Tree23 **father);
-int insereArvBin(EngPT **root, const char *word);
 
-int removerArv23(Tree23 **root, const char *info, const Tree23 *father, Tree23 **ref);
-void freeTree(Tree23 *no);
-void toupperString(char *string);
+// Main.c
+int insertPortugueseWord(Portuguese23Tree **tree, char *portugueseWord, char *englishWord, char *unit);
+void displayWordsForUnit(Portuguese23Tree *tree, char *unit);
+void displayTranslationPortuguese(Portuguese23Tree **root, const char *portugueseWord);
 
-void displayBinary(const EngPT *root);
-void displayWordForUnit(Tree23 *root, int unit);
-void displayWordsEnglishFindPortuguese(Tree23 *root, char *portugueseWord);
+int removeEnglishFindUnit(Portuguese23Tree **root, const char *englishWord, const char *unit);
+int removePortugueseWordFindUnit(Portuguese23Tree **root, char *portugueseWord, const char *unit);
+void displayTree23(const Portuguese23Tree *root);
+void freeTree(Portuguese23Tree *no);
+
+// Auxiliares
+int insertenglishWord(EnglishBinTree **root, TranslationInfo *info);
+Portuguese23Tree *InsertTree23(Portuguese23Tree **no, TranslationInfo *info, TranslationInfo *promote, Portuguese23Tree **father);
+int InsertLinkedList(LinkedUnitList **list, char *name);
+
+void printBinaryTree(EnglishBinTree *root);
+void displayTranslacions(EnglishBinTree *node, char *unit, const char *portugueseWord);
+int sourceLinkedList(const LinkedUnitList *list, const char *name_unit);
+
+void showLinkedList(const LinkedUnitList *list);
+void freeBinaryTree(EnglishBinTree *root);
+int auxRemoveEnglishFindUnit(Portuguese23Tree *root, const char *englishWord, const char *unit, Portuguese23Tree **top);
+
+int tree23Remove1(Portuguese23Tree **root, char *info, Portuguese23Tree *father, Portuguese23Tree **origin, Portuguese23Tree **maior);
+int tree23Remove2(Portuguese23Tree **root, char *info, Portuguese23Tree *father, Portuguese23Tree **origin, Portuguese23Tree **maior);
 
 #endif

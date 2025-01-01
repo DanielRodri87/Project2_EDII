@@ -1,3 +1,42 @@
+a partir desse arquivo dict.h
+typedef struct linkedUnitList {
+  char *unitName;
+  struct linkedUnitList *next;
+} LinkedUnitList;
+
+typedef struct EnglishBinTree {
+    LinkedUnitList *units;
+    char *englishWord;
+    struct EnglishBinTree *right, *left;
+} EnglishBinTree;
+
+typedef struct translationInfo {
+    char *portugueseWord;
+    EnglishBinTree *englishWord;
+} TranslationInfo;
+
+typedef struct Portuguese23Tree {
+    TranslationInfo info1;
+    TranslationInfo info2;
+    struct Portuguese23Tree *middle;
+    struct Portuguese23Tree *right;
+    struct Portuguese23Tree *left;
+    int infoCount;
+} Portuguese23Tree;
+
+
+// Main.c
+int insertPortugueseWord(Portuguese23Tree **tree, char *portugueseWord, char *englishWord, char *unit);
+void displayWordsForUnit(Portuguese23Tree *tree, char *unit);
+void displayTranslationPortuguese(Portuguese23Tree **root, const char *portugueseWord);
+
+int removeEnglishFindUnit(Portuguese23Tree **root, const char *englishWord, const char *unit);
+int removePortugueseWordFindUnit(Portuguese23Tree **root, char *portugueseWord, const char *unit);
+void displayTree23(const Portuguese23Tree *root);
+void freeTree(Portuguese23Tree *no);
+
+
+Faça um main semelhante a esse, mas com a árvore 2-3
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

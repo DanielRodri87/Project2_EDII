@@ -1,0 +1,8 @@
+% Unidade 1
+Latency: latência;
+Throughput: vazão;
+Protocol: protocolo;
+Handshake: saudação;
+Bandwidth: alcance;
+Frame: moldura;
+Segment: seção;
