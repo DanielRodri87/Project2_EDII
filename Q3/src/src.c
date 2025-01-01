@@ -408,26 +408,85 @@ void mergeNodesStart(Memory **root, int *return_start)
     }
 }
 
+/*
+
+20-80-0
+
+
+aux1 = 41
+aux2 = 61
+
+
+*/
+
 // ============================
 // HARD CODING TÁ ERRADO NÃO PEGUEM
+Info *returnEnd(Memory *root, int valor)
+{
+    printf("%d\n", valor);
+    if (root != NULL)
+    {
+        if (root->info1->start == valor)
+        {
+            return root->info1;
+        }
+        else if (root->numKeys == 2)
+        {
+            if (root->info2->start == valor)
+                return root->info2;
+        }
+
+        if (root->left)
+            return returnEnd(root->left, valor);
+        if (root->center)
+            return returnEnd(root->center, valor);
+        if (root->right)
+            return returnEnd(root->right, valor);
+    }
+    
+    // Return NULL if nothing was found
+    return NULL;
+}
+
+
+
 void mergeNodesMiddle(Memory **root, int *aux1, int *aux2)
 {
     if (root != NULL && *root != NULL)
     {
         Memory *current = *root;
 
+        // Verifica se ambos os intervalos (info1 e info2) existem
         if (current->info1 && current->info2)
         {
+            // Verifica se os intervalos são contínuos e tem o mesmo status
             if (current->info1->status == current->info2->status &&
                 current->info1->end + 1 == current->info2->start)
             {
                 *aux1 = current->info1->start;
                 *aux2 = current->info2->start;
             }
+
+            // Verifica se o valor de aux1-1 foi encontrado e atualiza o 'end' do nó
             if (current->info1->end < current->info2->end && current->info1->status == current->info2->status)
-                current->info1->end = current->info2->end;
+            {
+                // Procura pelo valor de aux1 - 1 para localizar o nó onde devemos inserir o valor de aux2
+                Info *found = returnEnd(*root, *aux1 - 1);
+                
+                // Se o nó for encontrado, substituímos o valor de 'end' do nó com o valor de 'info2->end'
+                if (found)
+                {
+                    found->end = current->info2->end;
+                    printf("Substituição realizada: novo 'end' = %d\n", found->end);  // Para depuração
+                }
+                else
+                {
+                    printf("Valor %d não encontrado para substituição.\n", *aux1 - 1);  // Para depuração
+                }
+            }
         }
 
+        // Recursão para os filhos (esquerda, centro, direita)
         if (current->left)
             mergeNodesMiddle(&current->left, aux1, aux2);
 
@@ -438,6 +497,8 @@ void mergeNodesMiddle(Memory **root, int *aux1, int *aux2)
             mergeNodesMiddle(&current->right, aux1, aux2);
     }
 }
+
+
 
 /**
  * @brief Une nós consecutivos na árvore 2-3 que possuem status e intervalos contíguos.

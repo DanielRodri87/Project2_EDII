@@ -147,7 +147,7 @@ int main()
                 {
                     int aux1, aux2;
                     mergeNodesMiddle(&tree, &aux1, &aux2);
-                    printf("%d %d\n", aux1, aux2);
+                    printf("comeco1 %d comeco 2 %d\n", aux1, aux2);
 
                     removeMemory(&tree, aux1);
                     removeMemory(&tree, aux2);

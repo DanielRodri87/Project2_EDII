@@ -376,7 +376,6 @@ int removeRBTree(RBTree **root, char *wordPT)
 
     return (removed);
 }
-
 /**
  * @brief Remove uma palavra em inglês e suas correspondências em português da árvore rubro-negra.
  *
