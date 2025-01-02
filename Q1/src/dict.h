@@ -35,7 +35,9 @@ void displayTranslationPortuguese(Portuguese23Tree **root, const char *portugues
 int removeEnglishFindUnit(Portuguese23Tree **root, const char *englishWord, const char *unit);
 int removePortugueseWordFindUnit(Portuguese23Tree **root, char *portugueseWord, const char *unit);
 void displayTree23(const Portuguese23Tree *root);
+
 void freeTree(Portuguese23Tree *no);
+void displayTranslationPortuguesePath(Portuguese23Tree *root, int nivel);
 
 // Auxiliares
 int insertenglishWord(EnglishBinTree **root, TranslationInfo *info);

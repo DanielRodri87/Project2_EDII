@@ -66,6 +66,6 @@ void displayBinaryTree(EngPT *root, int unit);
 int searchUnit(EngPT *root, int unit);
 void displayUnit(RBTree *root, int unit, int *found);
 
-void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, char palavrasPercorridas[400][50], int *contador);
+void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, int nivel);
 
 #endif

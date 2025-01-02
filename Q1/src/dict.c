@@ -10,7 +10,7 @@
 
 /**
  * @brief Cria uma estrutura TranslationInfo com a palavra em português, palavra em inglês e unidade fornecidas.
- * 
+ *
  * @param palavra Ponteiro para a palavra em português.
  * @param englishWord Ponteiro para a palavra em inglês.
  * @param unit Ponteiro para a unidade associada à tradução.
@@ -33,10 +33,9 @@ TranslationInfo createInfo(char *palavra, char *englishWord, char *unit)
     return (info);
 }
 
-
 /**
  * @brief Insere uma palavra em português e sua respectiva tradução e unidade na árvore 2-3.
- * 
+ *
  * @param tree Ponteiro para a raiz da árvore 2-3 em português.
  * @param portugueseWord Ponteiro para a palavra em português a ser inserida.
  * @param englishWord Ponteiro para a palavra em inglês associada à palavra em português.
@@ -58,7 +57,7 @@ int insertPortugueseWord(Portuguese23Tree **tree, char *portugueseWord, char *en
 
 /**
  * @brief Cria um novo nó para a árvore 2-3 com o TranslationInfo fornecido e os ponteiros para os filhos.
- * 
+ *
  * @param info Ponteiro para a estrutura TranslationInfo.
  * @param leftChild Ponteiro para o filho esquerdo do novo nó.
  * @param centerChild Ponteiro para o filho central do novo nó.
@@ -67,7 +66,7 @@ int insertPortugueseWord(Portuguese23Tree **tree, char *portugueseWord, char *en
 Portuguese23Tree *createNode(const TranslationInfo *info, Portuguese23Tree *leftChild, Portuguese23Tree *centerChild)
 {
     Portuguese23Tree *no;
-    no = (Portuguese23Tree *)malloc(sizeof(Portuguese23Tree)); 
+    no = (Portuguese23Tree *)malloc(sizeof(Portuguese23Tree));
 
     no->info1 = *info;
     no->left = leftChild;
@@ -83,7 +82,7 @@ Portuguese23Tree *createNode(const TranslationInfo *info, Portuguese23Tree *left
 
 /**
  * @brief Adiciona uma chave a um nó da árvore 2-3 com uma única chave, atualizando seus filhos conforme necessário.
- * 
+ *
  * @param no Ponteiro para o nó a ser atualizado.
  * @param info Ponteiro para o TranslationInfo a ser adicionado.
  * @param child Ponteiro para o nó filho associado à nova chave.
@@ -93,7 +92,7 @@ void addKey(Portuguese23Tree **no, const TranslationInfo *info, Portuguese23Tree
     if (strcmp(info->portugueseWord, (*no)->info1.portugueseWord) > 0)
     {
         (*no)->info2 = *info;
-        (*no)->right = child; 
+        (*no)->right = child;
     }
     else
     {
@@ -102,12 +101,12 @@ void addKey(Portuguese23Tree **no, const TranslationInfo *info, Portuguese23Tree
         (*no)->right = (*no)->middle;
         (*no)->middle = child;
     }
-    (*no)->infoCount = 2; 
+    (*no)->infoCount = 2;
 }
 
 /**
  * @brief Divide um nó da árvore 2-3 que contém duas chaves e insere uma nova chave, promovendo uma delas.
- * 
+ *
  * @param no Ponteiro para o nó a ser dividido.
  * @param info Ponteiro para o TranslationInfo a ser inserido.
  * @param promote Ponteiro para armazenar a chave promovida.
@@ -141,14 +140,14 @@ Portuguese23Tree *breakNode(Portuguese23Tree **no, const TranslationInfo *info, 
     (*no)->info2.portugueseWord = NULL;
 
     (*no)->infoCount = 1;
-    (*no)->right = NULL; 
+    (*no)->right = NULL;
 
     return (bigger);
 }
 
 /**
  * @brief Verifica se um nó da árvore 2-3 é uma folha.
- * 
+ *
  * @param no Ponteiro para o nó a ser verificado.
  * @return int Retorna 1 se o nó é uma folha, 0 caso contrário.
  */
@@ -158,7 +157,7 @@ int isLeaf(const Portuguese23Tree *no)
 
     if (no->left == NULL)
     {
-        troughet = 1; 
+        troughet = 1;
     }
 
     return (troughet);
@@ -166,7 +165,7 @@ int isLeaf(const Portuguese23Tree *no)
 
 /**
  * @brief Insere um TranslationInfo na árvore 2-3.
- * 
+ *
  * @param no Ponteiro para o nó raiz da árvore 2-3.
  * @param info Ponteiro para o TranslationInfo a ser inserido.
  * @param promote Ponteiro para armazenar a chave promovida em caso de divisão.
@@ -187,31 +186,31 @@ Portuguese23Tree *InsertTree23(Portuguese23Tree **no, TranslationInfo *info, Tra
     else
     {
         if (isLeaf(*no))
-        { 
+        {
             if ((*no)->infoCount == 1)
                 addKey(no, info, NULL);
             else
             {
                 Portuguese23Tree *novo;
-                novo = breakNode(no, info, promote, NULL); 
+                novo = breakNode(no, info, promote, NULL);
                 if (*father == NULL)
                 {
                     Portuguese23Tree *newroot;
-                    newroot = createNode(promote, *no, novo); 
+                    newroot = createNode(promote, *no, novo);
                     *no = newroot;
                 }
                 else
-                    biggerNode = novo; 
+                    biggerNode = novo;
             }
         }
         else
-        { 
+        {
             if (strcmp(info->portugueseWord, (*no)->info1.portugueseWord) < 0)
-                biggerNode = InsertTree23(&((*no)->left), info, promote, no); 
+                biggerNode = InsertTree23(&((*no)->left), info, promote, no);
             else if ((*no)->infoCount == 1 || strcmp(info->portugueseWord, (*no)->info2.portugueseWord) < 0)
-                biggerNode = InsertTree23(&((*no)->middle), info, promote, no); 
+                biggerNode = InsertTree23(&((*no)->middle), info, promote, no);
             else
-                biggerNode = InsertTree23(&((*no)->right), info, promote, no); 
+                biggerNode = InsertTree23(&((*no)->right), info, promote, no);
 
             if (biggerNode != NULL)
             {
@@ -221,13 +220,13 @@ Portuguese23Tree *InsertTree23(Portuguese23Tree **no, TranslationInfo *info, Tra
                     biggerNode = NULL;
                 }
                 else
-                { 
+                {
                     Portuguese23Tree *novo;
-                    novo = breakNode(no, promote, &promote1, biggerNode); 
+                    novo = breakNode(no, promote, &promote1, biggerNode);
                     if (*father == NULL)
                     {
                         Portuguese23Tree *newroot;
-                        newroot = createNode(&promote1, *no, novo); 
+                        newroot = createNode(&promote1, *no, novo);
                         *no = newroot;
                         biggerNode = NULL;
                     }
@@ -246,7 +245,7 @@ Portuguese23Tree *InsertTree23(Portuguese23Tree **no, TranslationInfo *info, Tra
 
 /**
  * @brief Exibe o conteúdo da árvore 2-3 em ordem, mostrando as palavras em português e suas traduções.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore.
  */
 void displayTree23(const Portuguese23Tree *root)
@@ -270,7 +269,7 @@ void displayTree23(const Portuguese23Tree *root)
 
 /**
  * @brief Exibe as palavras em português associadas a uma unidade específica.
- * 
+ *
  * @param tree Ponteiro para a raiz da árvore 2-3.
  * @param unit Ponteiro para a unidade a ser buscada.
  */
@@ -290,7 +289,7 @@ void displayWordsForUnit(Portuguese23Tree *tree, char *unit)
 }
 /**
  * @brief Exibe as traduções associadas a uma palavra em português específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore 2-3.
  * @param portugueseWord Ponteiro para a palavra em português a ser buscada.
  */
@@ -310,16 +309,16 @@ void displayTranslacions(EnglishBinTree *node, char *unit, const char *portugues
 
 /**
  * @brief Procura uma palavra em português na árvore 2-3 e retorna o nó onde ela está localizada.
- * 
+ *
  * @param no Ponteiro para o nó raiz da árvore.
  * @param portugueseWord Palavra em português a ser buscada.
  * @return Portuguese23Tree* Ponteiro para o nó contendo a palavra buscada, ou NULL se não for encontrada.
  */
 Portuguese23Tree *sourceWords(Portuguese23Tree **no, const char *portugueseWord)
 {
-    Portuguese23Tree *insered = NULL; 
+    Portuguese23Tree *insered = NULL;
 
-    if (no != NULL)
+    if (no != NULL && *no != NULL) // Adicionado para verificar se *no não é NULL
     {
         if (strcmp(portugueseWord, (*no)->info1.portugueseWord) == 0)
         {
@@ -339,13 +338,18 @@ Portuguese23Tree *sourceWords(Portuguese23Tree **no, const char *portugueseWord)
                 insered = sourceWords(&(*no)->right, portugueseWord);
         }
     }
-
-    return (insered);
+    else
+    {
+        printf("Palavra não encontrada\n");
+    }
+    
+    return insered;
 }
+
 
 /**
  * @brief Exibe as traduções associadas a uma palavra em português específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore 2-3.
  * @param portugueseWord Palavra em português cujas traduções serão exibidas.
  */
@@ -369,9 +373,58 @@ void displayTranslationPortuguese(Portuguese23Tree **root, const char *portugues
     }
 }
 
+void displayTranslationPortuguesePath(Portuguese23Tree *root, int nivel)
+{
+    if (root != NULL)
+    {
+        for (int i = 0; i < nivel; i++)
+            printf("    ");
+
+        if (root->infoCount == 1)
+            printf("Palavra: %s\n", root->info1.portugueseWord);
+        else if (root->infoCount == 2)
+            printf("Palavra: %s | %s\n", root->info1.portugueseWord, root->info2.portugueseWord);
+
+        for (int i = 0; i < nivel; i++)
+            printf("    ");
+        printf("Esquerda ->\n");
+        if (root->left != NULL)
+            displayTranslationPortuguesePath(root->left, nivel + 1);
+        else
+        {
+            for (int i = 0; i <= nivel; i++)
+                printf("    ");
+            printf("NULL\n");
+        }
+
+        if (root->middle != NULL)
+        {
+            for (int i = 0; i < nivel; i++)
+                printf("    ");
+            printf("Centro ->\n");
+            displayTranslationPortuguesePath(root->middle, nivel + 1);
+        }
+
+        if (root->infoCount == 2)
+        {
+            for (int i = 0; i < nivel; i++)
+                printf("    ");
+            printf("Direita ->\n");
+            if (root->right != NULL)
+                displayTranslationPortuguesePath(root->right, nivel + 1);
+            else
+            {
+                for (int i = 0; i <= nivel; i++)
+                    printf("    ");
+                printf("NULL\n");
+            }
+        }
+    }
+}
+
 /**
  * @brief Libera a memória alocada para um nó da árvore 2-3.
- * 
+ *
  * @param no Ponteiro para o nó a ser desalocado.
  */
 void deallocateNode(Portuguese23Tree **no)
@@ -397,7 +450,7 @@ static int isInfo2(Portuguese23Tree no, char *info)
 
 /**
  * @brief Localiza o maior filho de um nó e armazena o valor promovido.
- * 
+ *
  * @param root Ponteiro para o nó raiz.
  * @param father Ponteiro para armazenar o pai do maior filho.
  * @param bigger_valor Ponteiro para armazenar a maior chave encontrada.
@@ -425,7 +478,7 @@ static Portuguese23Tree *sourceBiggerChild(Portuguese23Tree *root, Portuguese23T
 
 /**
  * @brief Localiza o menor filho de um nó.
- * 
+ *
  * @param root Ponteiro para o nó raiz.
  * @param father Ponteiro para armazenar o pai do menor filho.
  * @return Portuguese23Tree* Ponteiro para o menor filho encontrado.
@@ -446,7 +499,7 @@ static Portuguese23Tree *sourceMinorChild(Portuguese23Tree *root, Portuguese23Tr
 
 /**
  * @brief Executa o movimento de onda para reorganizar os nós ao remover uma chave.
- * 
+ *
  * @param leaving Chave a ser removida.
  * @param input Ponteiro para armazenar a nova chave promovida.
  * @param father Ponteiro para o pai do nó atual.
@@ -466,7 +519,7 @@ static int waveMoviment(TranslationInfo leaving, TranslationInfo *input, Portugu
 
 /**
  * @brief Localiza o pai de um nó que contém uma chave específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore.
  * @param info Palavra a ser buscada.
  * @return Portuguese23Tree* Ponteiro para o nó pai, ou NULL se não for encontrado.
@@ -497,7 +550,7 @@ static Portuguese23Tree *sourceFather(Portuguese23Tree *root, char *info)
 
 /**
  * @brief Localiza o pai do maior nó com base em uma palavra específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore.
  * @param info Palavra a ser buscada.
  * @return Portuguese23Tree* Ponteiro para o nó pai, ou NULL se não for encontrado.
@@ -529,7 +582,7 @@ static Portuguese23Tree *sourceBiggerFather(Portuguese23Tree *root, char *info)
 
 /**
  * @brief Localiza o pai do menor nó contendo duas informações, com base em uma palavra específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore.
  * @param info Palavra a ser buscada.
  * @return Portuguese23Tree* Ponteiro para o nó pai, ou NULL se não for encontrado.
@@ -560,7 +613,7 @@ static Portuguese23Tree *sourceMinorFather2Infos(Portuguese23Tree *root, char *i
 
 /**
  * @brief Localiza o menor pai de um nó com base em uma palavra específica.
- * 
+ *
  * @param root Ponteiro para a raiz da árvore.
  * @param info Palavra a ser buscada.
  * @return Portuguese23Tree* Ponteiro para o nó pai, ou NULL se não for encontrado.
@@ -591,7 +644,7 @@ static Portuguese23Tree *sourcerMinorFather(Portuguese23Tree *root, char *info)
 
 /**
  * @brief Remove uma chave de um nó folha e reorganiza a árvore.
- * 
+ *
  * @param origin Ponteiro para o nó de origem.
  * @param root Ponteiro para o nó raiz.
  * @param info Ponteiro para armazenar a chave removida.
@@ -627,14 +680,14 @@ int removeNoLeaf1(Portuguese23Tree **origin, Portuguese23Tree *root, Translation
 
 /**
  * @brief Remove um nó folha da árvore 2-3 (caso 2).
- * 
+ *
  * @param origin Endereço da raiz da árvore.
  * @param root Nó atual da árvore.
  * @param info Informação removida do nó.
  * @param child1 Filho à esquerda ou ao meio.
  * @param child2 Filho à direita ou ao meio.
  * @param bigger Ponteiro para armazenar o maior nó afetado.
- * 
+ *
  * @return Retorna 1 se a remoção foi bem-sucedida, ou -1 se uma operação especial foi requerida.
  */
 int removeNoLeaf2(Portuguese23Tree **origin, Portuguese23Tree *root, TranslationInfo *info, Portuguese23Tree *child1, Portuguese23Tree *child2, Portuguese23Tree **bigger)
@@ -665,13 +718,13 @@ int removeNoLeaf2(Portuguese23Tree **origin, Portuguese23Tree *root, Translation
 
 /**
  * @brief Remove uma informação de um nó da árvore 2-3 (caso geral 1).
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param info Palavra em português a ser removida.
  * @param father Nó pai do nó atual.
  * @param origin Endereço da raiz original da árvore.
  * @param bigger Ponteiro para armazenar o maior nó afetado.
- * 
+ *
  * @return Retorna 1 se a remoção foi bem-sucedida, ou -1 se uma operação especial foi requerida.
  */
 int tree23Remove1(Portuguese23Tree **root, char *info, Portuguese23Tree *father, Portuguese23Tree **origin, Portuguese23Tree **bigger)
@@ -761,13 +814,13 @@ int tree23Remove1(Portuguese23Tree **root, char *info, Portuguese23Tree *father,
 
 /**
  * @brief Remove uma informação de um nó da árvore 2-3 (caso geral 2).
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param info Palavra em português a ser removida.
  * @param father Nó pai do nó atual.
  * @param origin Endereço da raiz original da árvore.
  * @param bigger Ponteiro para armazenar o maior nó afetado.
- * 
+ *
  * @return Retorna 1 se a remoção foi bem-sucedida, ou -1 se uma operação especial foi requerida.
  */
 int tree23Remove2(Portuguese23Tree **root, char *info, Portuguese23Tree *father, Portuguese23Tree **origin, Portuguese23Tree **bigger)
@@ -857,9 +910,9 @@ int tree23Remove2(Portuguese23Tree **root, char *info, Portuguese23Tree *father,
 
 /**
  * @brief Verifica se é possível realizar uma remoção em uma subárvore.
- * 
+ *
  * @param root Ponteiro para a raiz da subárvore.
- * 
+ *
  * @return Retorna 1 se for possível realizar uma remoção, ou 0 caso contrário.
  */
 int possibleRemove(Portuguese23Tree *root)
@@ -884,12 +937,12 @@ int possibleRemove(Portuguese23Tree *root)
 
 /**
  * @brief Junta dois nós da árvore 2-3 e reduz a contagem de chaves do nó raiz.
- * 
+ *
  * @param child1 Primeiro nó filho.
  * @param info Informação de tradução a ser adicionada.
  * @param bigger Maior nó afetado pela operação.
  * @param root Endereço do nó raiz da árvore.
- * 
+ *
  * @return Retorna o ponteiro para o nó combinado.
  */
 Portuguese23Tree *togetherNode(Portuguese23Tree *child1, TranslationInfo info, Portuguese23Tree *bigger, Portuguese23Tree **root)
@@ -906,13 +959,13 @@ Portuguese23Tree *togetherNode(Portuguese23Tree *child1, TranslationInfo info, P
 
 /**
  * @brief Equilibra a árvore 2-3 após uma remoção.
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param child1 Primeiro nó filho.
  * @param child2 Segundo nó filho.
  * @param info Informação de tradução a ser utilizada no equilíbrio.
  * @param bigger Maior nó afetado pela operação.
- * 
+ *
  * @return Retorna 1 se o equilíbrio foi realizado, ou 0 se não foi necessário.
  */
 static int balance(Portuguese23Tree **root, Portuguese23Tree *child1, Portuguese23Tree **child2, TranslationInfo info, Portuguese23Tree **bigger)
@@ -931,11 +984,11 @@ static int balance(Portuguese23Tree **root, Portuguese23Tree *child1, Portuguese
 
 /**
  * @brief Reequilibra a árvore 2-3 após a remoção de uma chave.
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param info Palavra em português a ser reequilibrada.
  * @param bigger Maior nó afetado pela operação.
- * 
+ *
  * @return Retorna 1 se o reequilíbrio foi bem-sucedido, ou -1 em caso de falha.
  */
 int rebalance(Portuguese23Tree **root, char *info, Portuguese23Tree **bigger)
@@ -978,10 +1031,10 @@ int rebalance(Portuguese23Tree **root, char *info, Portuguese23Tree **bigger)
 
 /**
  * @brief Remove uma chave da árvore 2-3.
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param info Palavra em português a ser removida.
- * 
+ *
  * @return Retorna 1 se a remoção foi bem-sucedida, ou -1 em caso de falha.
  */
 int removeTree23(Portuguese23Tree **root, char *info)
@@ -1029,7 +1082,7 @@ int removeTree23(Portuguese23Tree **root, char *info)
 
 /**
  * @brief Libera os recursos alocados para uma estrutura de informações de tradução.
- * 
+ *
  * @param info Estrutura de informações de tradução a ser liberada.
  */
 void freeInfo2_3(TranslationInfo *info)
@@ -1040,7 +1093,7 @@ void freeInfo2_3(TranslationInfo *info)
 
 /**
  * @brief Libera todos os nós da árvore 2-3.
- * 
+ *
  * @param no Ponteiro para o nó da árvore.
  */
 void freeTree(Portuguese23Tree *no)
@@ -1065,10 +1118,10 @@ void freeTree(Portuguese23Tree *no)
 
 /**
  * @brief Cria um nó na árvore binária de busca.
- * 
+ *
  * @param englishWord Palavra em inglês para o nó.
  * @param unit Unidade associada à palavra.
- * 
+ *
  * @return Retorna o ponteiro para o nó criado, ou NULL em caso de falha.
  */
 EnglishBinTree *createNodeBin(const char *englishWord, char *unit)
@@ -1087,10 +1140,10 @@ EnglishBinTree *createNodeBin(const char *englishWord, char *unit)
 
 /**
  * @brief Insere uma palavra em inglês na árvore binária de busca.
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param info Estrutura de informações de tradução.
- * 
+ *
  * @return Retorna 1 se a inserção foi bem-sucedida, ou 0 caso contrário.
  */
 int insertenglishWord(EnglishBinTree **root, TranslationInfo *info)
@@ -1114,25 +1167,25 @@ int insertenglishWord(EnglishBinTree **root, TranslationInfo *info)
 
 /**
  * @brief Imprime todas as palavras e unidades associadas na árvore binária de busca.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore.
  */
 void printBinaryTree(EnglishBinTree *root)
 {
     if (root != NULL)
     {
-        printBinaryTree(root->left); 
+        printBinaryTree(root->left);
         printf("ENG: %s \n", root->englishWord);
         showLinkedList(root->units);
-        printBinaryTree(root->right); 
+        printBinaryTree(root->right);
     }
 }
 
 /**
  * @brief Verifica se um nó da árvore binária de busca é folha.
- * 
+ *
  * @param root Ponteiro para o nó.
- * 
+ *
  * @return Retorna 1 se o nó é folha, ou 0 caso contrário.
  */
 int isLeafBin(EnglishBinTree *root)
@@ -1142,9 +1195,9 @@ int isLeafBin(EnglishBinTree *root)
 
 /**
  * @brief Obtém o único filho de um nó na árvore binária de busca.
- * 
+ *
  * @param root Endereço do nó.
- * 
+ *
  * @return Retorna o ponteiro para o filho, ou NULL se o nó não tiver exatamente um filho.
  */
 EnglishBinTree *oneChild(EnglishBinTree **root)
@@ -1162,9 +1215,9 @@ EnglishBinTree *oneChild(EnglishBinTree **root)
 
 /**
  * @brief Encontra o menor filho em uma subárvore binária.
- * 
+ *
  * @param root Ponteiro para o nó raiz da subárvore.
- * 
+ *
  * @return Retorna o ponteiro para o menor filho.
  */
 EnglishBinTree *minorChild(EnglishBinTree *root)
@@ -1183,10 +1236,10 @@ EnglishBinTree *minorChild(EnglishBinTree *root)
 
 /**
  * @brief Remove uma palavra em inglês da árvore binária de busca.
- * 
+ *
  * @param root Endereço do nó raiz da árvore.
  * @param word Palavra a ser removida.
- * 
+ *
  * @return Retorna 1 se a palavra foi encontrada e removida, ou 0 caso contrário.
  */
 int removerenglishWord(EnglishBinTree **root, const char *word)
@@ -1230,7 +1283,7 @@ int removerenglishWord(EnglishBinTree **root, const char *word)
 
 /**
  * @brief Libera todos os nós de uma árvore binária de busca.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore.
  */
 void freeBinaryTree(EnglishBinTree *root)
@@ -1250,7 +1303,7 @@ void freeBinaryTree(EnglishBinTree *root)
 
 /**
  * @brief Aloca memória para uma lista encadeada de unidades.
- * 
+ *
  * @param list Endereço do ponteiro para a lista.
  */
 void alocateLinkedListUnit(LinkedUnitList **list)
@@ -1262,7 +1315,7 @@ void alocateLinkedListUnit(LinkedUnitList **list)
 
 /**
  * @brief Define o nome de uma unidade em uma lista encadeada.
- * 
+ *
  * @param list Ponteiro para a lista encadeada onde o nome será definido.
  * @param unitName Nome da unidade a ser atribuída.
  */
@@ -1274,7 +1327,7 @@ void defineLinkedListUnit(LinkedUnitList *list, const char *unitName)
 
 /**
  * @brief Verifica se uma unidade existe na lista encadeada.
- * 
+ *
  * @param list Ponteiro constante para a lista encadeada.
  * @param unitName Nome da unidade a ser procurada.
  * @return int 1 se a unidade existe, 0 caso contrário.
@@ -1295,7 +1348,7 @@ void showLinkedList(const LinkedUnitList *list)
 
 /**
  * @brief Libera a memória ocupada por uma lista encadeada.
- * 
+ *
  * @param list Ponteiro para a lista encadeada a ser liberada.
  */
 int sourceLinkedList(const LinkedUnitList *list, const char *unitName)
@@ -1313,7 +1366,7 @@ int sourceLinkedList(const LinkedUnitList *list, const char *unitName)
 
 /**
  * @brief Insere um novo elemento na lista encadeada.
- * 
+ *
  * @param list Ponteiro para o ponteiro da lista encadeada.
  * @param name Nome do elemento a ser inserido.
  * @return int 1 se a inserção for bem-sucedida, 0 caso o elemento já exista.
@@ -1331,7 +1384,7 @@ void freeLinkedList(LinkedUnitList *list)
 
 /**
  * @brief Remove um elemento da lista encadeada.
- * 
+ *
  * @param list Ponteiro para o ponteiro da lista encadeada.
  * @param name Nome do elemento a ser removido.
  * @return int 1 se a remoção for bem-sucedida, 0 caso o elemento não exista.
@@ -1355,7 +1408,7 @@ int InsertLinkedList(LinkedUnitList **list, char *name)
 
 /**
  * @brief Remove uma unidade associada a uma palavra em inglês.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore 2-3 de palavras em português.
  * @param palavras_ingles Palavra em inglês a ser removida.
  * @param unit Nome da unidade a ser removida.
@@ -1386,7 +1439,7 @@ int removeLinkedList(LinkedUnitList **list, const char *name)
 
 /**
  * @brief Remove uma unidade de uma palavra em inglês da árvore binária.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore binária de palavras em inglês.
  * @param englishWord Palavra em inglês associada à unidade.
  * @param unit Nome da unidade a ser removida.
@@ -1423,7 +1476,7 @@ int removeUnit(EnglishBinTree **root, const char *englishWord, const char *unit)
 
 /**
  * @brief Função auxiliar para remover uma unidade associada a uma palavra em inglês.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore 2-3.
  * @param englishWord Palavra em inglês a ser removida.
  * @param unit Nome da unidade a ser removida.
@@ -1459,7 +1512,7 @@ int auxRemoveEnglishFindUnit(Portuguese23Tree *root, const char *englishWord, co
 
 /**
  * @brief Remove unidades associadas a palavras em inglês em uma árvore binária.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore binária.
  * @param portugueseWord Palavra em português associada à unidade.
  * @param unit Nome da unidade a ser removida.
@@ -1483,7 +1536,7 @@ int removednitFromEnglishWord(EnglishBinTree **root, const char *portugueseWord,
 
 /**
  * @brief Função auxiliar para remover palavras em português associadas a uma unidade.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore 2-3.
  * @param portugueseWord Palavra em português a ser removida.
  * @param unit Nome da unidade a ser removida.
@@ -1521,7 +1574,7 @@ int auxRemovePortugueseWordFindUnit(Portuguese23Tree *root, char *portugueseWord
 
 /**
  * @brief Remove uma palavra em português associada a uma unidade da árvore 2-3.
- * 
+ *
  * @param root Ponteiro para o nó raiz da árvore 2-3.
  * @param portugueseWord Palavra em português a ser removida.
  * @param unit Nome da unidade a ser removida.

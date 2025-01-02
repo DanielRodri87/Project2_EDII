@@ -48,8 +48,6 @@ int main()
     RBTree *root = NULL;
     char line[200];
     int currentUnit = 0, sucess = 1;
-    int contador = 0;
-    char palavrasPercorridas[400][50];
 
     FILE *file;
     file = fopen("../../input2.txt.txt", "r");
@@ -147,13 +145,7 @@ int main()
                 printf("Informe a palavra em portugues: ");
                 scanf("%[^\n]", palavra);
                 getchar();
-                findEnglishByPortuguesePath(root, palavra, palavrasPercorridas, &contador);
-
-                printf("Palavras percorridas:\n");
-                for (int i = 0; i < contador; i++)
-                {
-                    printf("%s\n", palavrasPercorridas[i]);
-                }
+                findEnglishByPortuguesePath(root, palavra, 0);
                 break;
             
             case 6: 

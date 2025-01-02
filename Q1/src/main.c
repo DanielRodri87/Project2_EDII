@@ -18,7 +18,7 @@ void carregarArquivo(const char *nomeArquivo, Portuguese23Tree **arvore)
 
             if (linha[0] == '%')
                 sscanf(linha, "%% Unidade %[^\n]", unidadeAtual);
-            
+
             else
             {
                 char palavraIngles[50], traducoesPortugues[200];
@@ -75,18 +75,23 @@ int main()
         switch (op)
         {
         case 1:
+            getchar();
+
             printf("Informe a Unidade: ");
             scanf("%s", unidade);
             displayWordsForUnit(raiz, unidade);
             break;
 
         case 2:
+            getchar();
+
             printf("Informe a palavra em portugues: ");
             scanf("%s", palavra);
             displayTranslationPortuguese(&raiz, palavra);
             break;
 
         case 3:
+            getchar();
             printf("Informe a palavra em ingles: ");
             scanf("%[^\n]", palavra);
             getchar();
@@ -110,8 +115,22 @@ int main()
             break;
 
         case 5:
+            displayTranslationPortuguesePath(raiz, 0);
             break;
         case 6:
+            printf("Informe a palavra em portugues: ");
+            scanf("%s", palavra);
+            getchar();
+
+            clock_t start, end;
+            double cpu_time_used;
+
+            start = clock();
+            displayTranslationPortuguese(&raiz, palavra);
+            end = clock();
+
+            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+            printf("Tempo gasto para executar a busca: %.6f segundos\n", cpu_time_used);
             break;
         case 7:
             printf("Saindo...\n");
