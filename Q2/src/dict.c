@@ -76,32 +76,51 @@ void findEnglishByPortuguese(RBTree *node, const char *portugueseWord)
     }
 }
 
-void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, char palavrasPercorridas[400][50], int *contador)
+void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, int nivel)
 {
     if (node != NULL)
     {
-        if (*contador < 400)
+        for (int i = 0; i < nivel; i++)
         {
-            strncpy(palavrasPercorridas[*contador], node->info.portugueseWord, 50);
-            palavrasPercorridas[*contador][49] = '\0';
-            (*contador)++;
+            printf("    ");
         }
+
+        const char *cor = (node->color == RED) ? "Vermelho" : "Preto";
+        printf("Palavra: %s, Cor: %s\n", node->info.portugueseWord, cor);
+
         if (strcmp(node->info.portugueseWord, portugueseWord) == 0)
         {
-            printf("Palavra encontrada: %s\n", node->info.portugueseWord);
+            printf("\n=== Palavra encontrada: %s ===\n", portugueseWord);
+
             Units *current = node->info.binaryTreeEnglish->info.units;
+            printf("Unidades associadas:\n");
             while (current != NULL)
-            {
-                printWordsByUnit(node, current->unit);
                 current = current->next;
-            }
         }
 
-        findEnglishByPortuguesePath(node->left, portugueseWord, palavrasPercorridas, contador);
-        findEnglishByPortuguesePath(node->right, portugueseWord, palavrasPercorridas, contador);
+        for (int i = 0; i < nivel + 1; i++)
+        {
+            printf("    ");
+        }
+        printf("Esquerda ->\n");
+        findEnglishByPortuguesePath(node->left, portugueseWord, nivel + 1);
+
+        for (int i = 0; i < nivel + 1; i++)
+        {
+            printf("    ");
+        }
+        printf("Direita ->\n");
+        findEnglishByPortuguesePath(node->right, portugueseWord, nivel + 1);
+    }
+    else
+    {
+        for (int i = 0; i < nivel; i++)
+        {
+            printf("    ");
+        }
+        printf("NULL\n");
     }
 }
-
 
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
 // III - informar uma palavra em inglês e a unidade a qual a mesma pertence removê-la das árvores binárias
