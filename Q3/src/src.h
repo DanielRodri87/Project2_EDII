@@ -25,7 +25,7 @@ typedef struct Memory
 } Memory;
 
 Info *CreateInfo(int start, int end, int status);
-Memory *insertTree23(Memory **node, Info *info, Info *promote, Memory **father);
+Memory *insertTree23(Memory **raiz, Info info, Memory *pai, Info *promove);
 void displayInfos(Memory *root);
 
 int removeMemory(Memory **root, int info);

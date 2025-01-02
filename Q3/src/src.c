@@ -38,13 +38,17 @@ Memory *createNode(const Info *info, Memory *leftChild, Memory *centerChild)
 {
     Memory *node = (Memory *)malloc(sizeof(Memory));
     if (node == NULL)
+    {
         printf("Erro ao alocar memória para o nó.\n");
+        return NULL;
+    }
 
     node->info1 = (Info *)malloc(sizeof(Info));
     if (node->info1 == NULL)
     {
         printf("Erro ao alocar memória para info1.\n");
         free(node);
+        return NULL;
     }
     *(node->info1) = *info;
 
@@ -54,9 +58,8 @@ Memory *createNode(const Info *info, Memory *leftChild, Memory *centerChild)
     node->right = NULL;
     node->numKeys = 1;
 
-    return (node);
+    return node;
 }
-
 /**
  * @brief Verifica se o nó é uma folha na árvore 2-3.
  *
@@ -102,6 +105,28 @@ Memory *addKey(Memory *node, const Info *info, Memory *child)
     return (node);
 }
 
+void addInfo(Memory *no, Info info, Memory *biggerChild)
+{
+    Info *newInfo = (Info *)malloc(sizeof(Info));
+    if (newInfo != NULL)
+    {
+        *newInfo = info;
+
+        if (info.start > no->info1->start)
+        {
+            no->info2 = newInfo;
+            no->right = biggerChild;
+        }
+        else
+        {
+            no->info2 = no->info1;
+            no->right = no->center;
+            no->center = biggerChild;
+            no->info1 = newInfo;
+        }
+        no->numKeys = 2;
+    }
+}
 
 /**
  * @brief Realiza a divisão de um nó 2-3, promotendo uma chave e criando um novo nó.
@@ -112,35 +137,30 @@ Memory *addKey(Memory *node, const Info *info, Memory *child)
  * @param biggerChild Ponteiro para o filho bigger após a divisão.
  * @return Memory* Retorna um ponteiro para o novo nó criado durante a divisão.
  */
-Memory *nodeBreak(Memory *node, Info info, Info *promote, Memory *biggerChild)
+Memory *nodeBreak(Memory *no, Info info, Info *promote, Memory *biggerChild)
 {
     Memory *bigger;
-
-    if (info.start > node->info2->start)
+    if (info.start > no->info2->start)
     {
-        *promote = *(node->info2);
-        bigger = createNode(&info, node->right, biggerChild);
+        *promote = *(no->info2);
+        bigger = createNode(&info, no->right, biggerChild);
     }
-    else if (info.start > node->info1->start)
+    else if (info.start > no->info1->start)
     {
         *promote = info;
-        bigger = createNode(&(*(node->info2)), biggerChild, node->right);
+        bigger = createNode(no->info2, biggerChild, no->right);
     }
     else
     {
-        *promote = *(node->info1);
-        bigger = createNode(&(*(node->info2)), node->center, node->right);
-
-        *(node->info1) = info;
-
-        node->center = biggerChild;
+        *promote = *(no->info1);
+        bigger = createNode(no->info2, no->center, no->right);
+        no->info1 = &info;
+        no->center = biggerChild;
     }
-
-    node->numKeys = 1;
+    no->numKeys = 1;
 
     return (bigger);
 }
-
 
 /**
  * @brief Insere uma nova chave na árvore 2-3.
@@ -151,59 +171,61 @@ Memory *nodeBreak(Memory *node, Info info, Info *promote, Memory *biggerChild)
  * @param father Ponteiro duplo para o nó father.
  * @return Ponteiro para o nó criado ou modificado durante a inserção.
  */
-
-Memory *insertTree23(Memory **node, Info *info, Info *promote, Memory **father)
+Memory *insertTree23(Memory **root, Info info, Memory *father, Info *promote)
 {
-    Info promote1;
-    Memory *biggerNode = NULL;
-    if (*node == NULL)
-        *node = createNode(info, NULL, NULL);
+    Memory *bigger;
+    bigger = NULL;
 
+    if (*root == NULL)
+        *root = createNode(&info, NULL, NULL);
     else
     {
-        if (isLeaf(*node))
+        if (isLeaf(*root))
         {
-            if ((*node)->numKeys == 1)
-                *node = addKey(*node, info, NULL);
+            if ((*root)->numKeys == 1)
+                addInfo(*root, info, NULL);
             else
             {
-                biggerNode = nodeBreak(*node, *info, promote, NULL);
+                bigger = nodeBreak(*root, info, promote, NULL);
                 if (father == NULL)
                 {
-                    *node = createNode(promote, *node, biggerNode);
-                    biggerNode = NULL;
+                    *root = createNode(promote, *root, bigger);
+                    bigger = NULL;
                 }
             }
         }
         else
         {
-            if (info->start < (*node)->info1->start)
-                biggerNode = insertTree23(&((*node)->left), info, promote, node);
-            else if ((*node)->numKeys == 1 || info->start < (*node)->info2->start)
-                biggerNode = insertTree23(&((*node)->center), info, promote, node);
+            if (info.start < (*root)->info1->start)
+                bigger = insertTree23(&((*root)->left), info, *root, promote);
+            else if ((*root)->numKeys == 1 || info.start < (*root)->info2->start)
+                bigger = insertTree23(&((*root)->center), info, *root, promote);
             else
-                biggerNode = insertTree23(&((*node)->right), info, promote, node);
-            if (biggerNode)
+                bigger = insertTree23(&((*root)->right), info, *root, promote);
+
+            if (bigger != NULL)
             {
-                if ((*node)->numKeys == 1)
+                if ((*root)->numKeys == 1)
                 {
-                    *node = addKey(*node, promote, biggerNode);
-                    biggerNode = NULL;
+                    addInfo(*root, *promote, bigger);
+                    bigger = NULL;
                 }
                 else
                 {
-                    biggerNode = nodeBreak(*node, *promote, &promote1, biggerNode);
+                    Info promote_aux;
+                    bigger = nodeBreak(*root, *promote, &promote_aux, bigger);
+                    *promote = promote_aux;
                     if (father == NULL)
                     {
-                        *node = createNode(&promote1, *node, biggerNode);
-                        biggerNode = NULL;
+                        *root = createNode(&promote_aux, *root, bigger);
+                        bigger = NULL;
                     }
                 }
             }
         }
     }
 
-    return (biggerNode);
+    return (bigger);
 }
 
 int availableQuant(Info info)
@@ -211,17 +233,16 @@ int availableQuant(Info info)
     return (info.end - info.start + 1);
 }
 
-
 Memory *findSpace(Memory **tree, int quant, int status, Info **info)
 {
     Memory *no;
-    if(*tree != NULL)
+    if (*tree != NULL)
     {
         no = findSpace(&((*tree)->left), quant, status, info);
 
-        if(*info == NULL)
+        if (*info == NULL)
         {
-            if((*tree)->info1->status == status && availableQuant(*((*tree)->info1)) >= quant)
+            if ((*tree)->info1->status == status && availableQuant(*((*tree)->info1)) >= quant)
             {
                 *info = (*tree)->info1;
                 no = *tree;
@@ -229,14 +250,14 @@ Memory *findSpace(Memory **tree, int quant, int status, Info **info)
             else
             {
                 no = findSpace(&((*tree)->center), quant, status, info);
-                if((*tree)->numKeys == 2)
+                if ((*tree)->numKeys == 2)
                 {
-                    if((*tree)->info2->status == status && availableQuant(*((*tree)->info2)) >= quant)
+                    if ((*tree)->info2->status == status && availableQuant(*((*tree)->info2)) >= quant)
                     {
                         *info = (*tree)->info2;
                         no = *tree;
                     }
-                    else if(*info == NULL)
+                    else if (*info == NULL)
                         no = findSpace(&((*tree)->right), quant, status, info);
                 }
             }
@@ -245,7 +266,7 @@ Memory *findSpace(Memory **tree, int quant, int status, Info **info)
     else
         *info = NULL;
 
-    return no;
+    return (no);
 }
 
 /**
@@ -269,23 +290,23 @@ void displayInfos(Memory *root)
     }
 }
 
-Memory *MemoryInsertNode(Memory **root, Info info, Memory *pai, Info *promote)
+Memory *MemoryInsertNode(Memory **root, Info info, Memory *father, Info *promote)
 {
     Memory *bigger;
     bigger = NULL;
 
-    if(*root == NULL)
+    if (*root == NULL)
         *root = createNode(&info, NULL, NULL);
     else
     {
-        if(isLeaf(*root))
+        if (isLeaf(*root))
         {
-            if((*root)->numKeys == 1)
+            if ((*root)->numKeys == 1)
                 nodeAddInfo(*root, info, NULL);
             else
             {
                 bigger = nodeBreak(*root, info, promote, NULL);
-                if(pai == NULL)
+                if (father == NULL)
                 {
                     *root = createNode(&(*promote), *root, bigger);
                     bigger = NULL;
@@ -294,16 +315,16 @@ Memory *MemoryInsertNode(Memory **root, Info info, Memory *pai, Info *promote)
         }
         else
         {
-            if(info.start < (*root)->info1->start)
+            if (info.start < (*root)->info1->start)
                 bigger = MemoryInsertNode(&((*root)->left), info, *root, promote);
-            else if((*root)->numKeys == 1 || info.start < (*root)->info2->start)
+            else if ((*root)->numKeys == 1 || info.start < (*root)->info2->start)
                 bigger = MemoryInsertNode(&((*root)->center), info, *root, promote);
             else
                 bigger = MemoryInsertNode(&((*root)->right), info, *root, promote);
 
-            if(bigger != NULL)
+            if (bigger != NULL)
             {
-                if((*root)->numKeys == 1)
+                if ((*root)->numKeys == 1)
                 {
                     nodeAddInfo(*root, *promote, bigger);
                     bigger = NULL;
@@ -313,7 +334,7 @@ Memory *MemoryInsertNode(Memory **root, Info info, Memory *pai, Info *promote)
                     Info promote_aux;
                     bigger = nodeBreak(*root, *promote, &promote_aux, bigger);
                     *promote = promote_aux;
-                    if(pai == NULL)
+                    if (father == NULL)
                     {
                         *root = createNode(&promote_aux, *root, bigger);
                         bigger = NULL;
@@ -332,28 +353,27 @@ Memory *insertMemory(Memory **root, Info info)
     return MemoryInsertNode(root, info, NULL, &promote);
 }
 
-
 Memory *sourceMinorBlock(Memory **root, Memory *no, Info *info, Info **minorValue)
 {
     Memory *minor, *father;
     *minorValue = NULL;
 
-    if(isLeaf(no))
+    if (isLeaf(no))
     {
-        if(no->info1->start != info->start)
+        if (no->info1->start != info->start)
             minor = no;
         else
             minor = sourceMinorFather(*root, info->start);
 
-        if(minor != NULL)
+        if (minor != NULL)
         {
-            if(minor->numKeys == 2 && minor->info2->start < info->start)
+            if (minor->numKeys == 2 && minor->info2->start < info->start)
                 *minorValue = minor->info2;
             else
                 *minorValue = minor->info1;
         }
     }
-    else if(no->info1->start == info->start)
+    else if (no->info1->start == info->start)
         minor = lookBiggerChild(no->left, &father, *minorValue);
     else
         minor = lookBiggerChild(no->center, &father, *minorValue);
@@ -370,15 +390,16 @@ Memory *sourceBiggerBlock(Memory **root, Memory *no, Info *info, Info **biggerVa
     if(isLeaf(no))
     {
         if(no->numKeys == 2 && no->info1->start == info->start)
-        {
             bigger = no;
-            *biggerValue = no->info2;
-        }
         else
-        {
             bigger = sourceBiggerFather(*root, info->start);
-            if(bigger != NULL)
-                *biggerValue = node23BiggerInfo(bigger);
+
+        if(bigger != NULL)
+        {
+            if(bigger->info1->start > info->start)
+                *biggerValue = bigger->info1;
+            else
+                *biggerValue = bigger->info2;
         }
     }
     else
@@ -392,7 +413,7 @@ Memory *sourceBiggerBlock(Memory **root, Memory *no, Info *info, Info **biggerVa
             *biggerValue = bigger->info1;
     }
 
-    return bigger;
+    return (bigger);
 }
 
 void concatenateNode(Memory **root, int *lastNumber, int limit, int removeValue)
@@ -401,7 +422,6 @@ void concatenateNode(Memory **root, int *lastNumber, int limit, int removeValue)
     removeMemory(root, removeValue);
 }
 
-
 void modifyNode(Memory **root, Memory *no, Info *info, int quant)
 {
     Memory *minor;
@@ -409,9 +429,9 @@ void modifyNode(Memory **root, Memory *no, Info *info, int quant)
 
     minor = sourceMinorBlock(root, no, info, &minorValue);
 
-    if(quant < availableQuant(*info))
+    if (quant < availableQuant(*info))
     {
-        if(minor == NULL)
+        if (minor == NULL)
         {
             Info Info;
             Info.start = info->start;
@@ -434,16 +454,16 @@ void modifyNode(Memory **root, Memory *no, Info *info, int quant)
 
         bigger = sourceBiggerBlock(root, no, info, &biggerValue);
 
-        if(minor == NULL && bigger == NULL)
+        if (minor == NULL && bigger == NULL)
             info->status = !(info->status);
         else
         {
-            if(minor == NULL)
+            if (minor == NULL)
             {
                 info->status = !(info->status);
                 concatenateNode(root, &(info->end), biggerValue->end, biggerValue->start);
             }
-            else if(bigger == NULL)
+            else if (bigger == NULL)
                 concatenateNode(root, &(minorValue->end), info->end, info->start);
             else
             {
@@ -455,8 +475,6 @@ void modifyNode(Memory **root, Memory *no, Info *info, int quant)
     }
 }
 
-
-
 void allocateAndDesallocate(Memory **tree, int quantNodes, int status)
 {
     Info *info;
@@ -464,7 +482,7 @@ void allocateAndDesallocate(Memory **tree, int quantNodes, int status)
     Memory *node;
     node = findSpace(tree, quantNodes, status, &info);
 
-    if(info != NULL)
+    if (info != NULL)
         modifyNode(tree, node, info, quantNodes);
     else
         printf("\nNão há espaço disponível\n");

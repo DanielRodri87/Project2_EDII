@@ -16,7 +16,6 @@ void displayMenu()
     printf("Escolha uma opção (1-4): ");
 }
 
-
 int main()
 {
     Memory *tree = NULL;
@@ -61,7 +60,7 @@ int main()
     } while (status != FREE && status != OCCUPIED);
 
     newInfo = CreateInfo(start, end, status);
-    insertTree23(&tree, newInfo, &promove, NULL);
+    insertTree23(&tree, *newInfo, NULL, &promove);
     start = end + 1;
 
     while (end != block)
@@ -77,7 +76,7 @@ int main()
                 status = FREE;
 
             newInfo = CreateInfo(start, end, status);
-            insertTree23(&tree, newInfo, &promove, NULL);
+            insertTree23(&tree, *newInfo, NULL, &promove);
             start = end + 1;
         }
         else
