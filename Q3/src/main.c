@@ -3,41 +3,6 @@
 #include <time.h>
 #include "src.h"
 
-int findFirstStart(Memory *root)
-{
-    int result = -1;
-
-    if (root != NULL)
-    {
-        Memory *current = root;
-
-        while (current->left != NULL)
-            current = current->left;
-        result = current->info1->start;
-    }
-
-    return (result);
-}
-
-int findLastStart(Memory *root)
-{
-    int result = -1;
-
-    if (root != NULL)
-    {
-        Memory *current = root;
-        while (current->right != NULL)
-            current = current->right;
-
-        if (current->numKeys == 2 && current->info2 != NULL)
-            result = current->info2->start;
-        else
-            result = current->info1->start;
-    }
-
-    return (result);
-}
-
 void displayMenu()
 {
     printf("\n===============================================================\n");
@@ -57,7 +22,7 @@ int main()
     Memory *tree = NULL;
     Info *newInfo;
     Info promove;
-    int start = 0, end = 0, status = 2, requiredSpace, menuControl = 0, block, space, start2 = 0, removeStart;
+    int start = 0, end = 0, status = 2, requiredSpace, menuControl = 0, block;
     char opc;
 
     srand(time(NULL));
@@ -128,61 +93,13 @@ int main()
         case 1:
             printf("\nInforme o espaço necessário para alocação: ");
             scanf("%d", &requiredSpace);
-            space = allocateSpace(&tree, requiredSpace, &start2);
-            if (space == requiredSpace)
-            {
-                if (findFirstStart(tree) == start2)
-                {
-                    mergeNodesStart(&tree, &removeStart);
-                    removeMemory(&tree, removeStart);
-                    printf("Compactação realizada no início da memória.\n");
-                }
-                else if (findLastStart(tree) == start2)
-                {
-                    mergeNodesEnd(&tree, &removeStart);
-                    removeMemory(&tree, removeStart);
-                    printf("Compactação realizada no fim da memória.\n");
-                }
-                else
-                {
-                    int aux1, aux2;
-                    mergeNodesMiddle(&tree, &aux1, &aux2);
-                    printf("comeco1 %d comeco 2 %d\n", aux1, aux2);
-
-                    removeMemory(&tree, aux1);
-                    removeMemory(&tree, aux2);
-                    printf("Compactação realizada no meio da memória.\n");
-                }
-            }
+            allocateAndDesallocate(&tree, requiredSpace, FREE);
             break;
 
         case 2:
-            printf("\nInforme o início da memória a ser desocupada: ");
-            scanf("%d", &start);
-            printf("Informe o fim da memória a ser desocupada: ");
-            scanf("%d", &end);
-            freeSpace(tree, start, end);
-            if (findFirstStart(tree) == start)
-            {
-                int removeStart;
-                mergeNodesStart(&tree, &removeStart);
-                removeMemory(&tree, removeStart);
-                printf("Compactação realizada no início da memória.\n");
-            }
-            else if (findLastStart(tree) == start)
-            {
-                mergeNodesEnd(&tree, &removeStart);
-                removeMemory(&tree, removeStart);
-                printf("Compactação realizada no fim da memória.\n");
-            }
-            else
-            {
-                int aux1, aux2;
-                mergeNodesMiddle(&tree, &aux1, &aux2);
-                removeMemory(&tree, aux1);
-                removeMemory(&tree, aux2);
-                printf("Compactação realizada no meio da memória.\n");
-            }
+            printf("\nInforme o espaço necessário para alocação: ");
+            scanf("%d", &requiredSpace);
+            allocateAndDesallocate(&tree, requiredSpace, OCCUPIED);
             break;
 
         case 3:

@@ -28,19 +28,23 @@ Info *CreateInfo(int start, int end, int status);
 Memory *insertTree23(Memory **node, Info *info, Info *promote, Memory **father);
 void displayInfos(Memory *root);
 
-int allocateSpace(Memory **root, int requiredSpace, int *return_start);
-void freeSpace(Memory *memory, int start, int end);
 int removeMemory(Memory **root, int info);
-
-void mergeNodesStart(Memory **root, int *return_start);
-void mergeNodesMiddle(Memory **root, int *aux1, int *aux2);
-void mergeNodesEnd(Memory **root, int *return_start);
 
 int removeMemory1(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger);
 int memoryRemove2(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger);
+Memory *sourceMinorFather(Memory *root, int info);
 
 int memoryRebalance(Memory **root, int info, Memory **bigger);
 void node23Deallocate(Memory **node);
 Memory *node23Together(Memory *child1, Info info, Memory *bigger, Memory **root);
 
+
+// update
+void allocateAndDesallocate(Memory **tree, int quantNodes, int status);
+Memory *sourceFather(Memory *root, int info);
+void nodeAddInfo(Memory *node, Info info, Memory *biggerChild);
+Memory *lookBiggerChild(Memory *root, Memory **father, Info *bigger_valor);
+Memory *lookMinorChild(Memory *root, Memory **father);
+Memory *sourceBiggerFather(Memory *root, int info);
+Info *node23BiggerInfo(Memory *root);
 #endif
