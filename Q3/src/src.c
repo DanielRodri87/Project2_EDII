@@ -374,9 +374,9 @@ Memory *sourceMinorBlock(Memory **root, Memory *no, Info *info, Info **minorValu
         }
     }
     else if (no->info1->start == info->start)
-        minor = lookBiggerChild(no->left, &father, *minorValue);
+        minor = lookBiggerChild(no->left, &father, minorValue);
     else
-        minor = lookBiggerChild(no->center, &father, *minorValue);
+        minor = lookBiggerChild(no->center, &father, minorValue);
 
     return minor;
 }
@@ -681,25 +681,26 @@ Memory *lookMinorChild(Memory *root, Memory **father)
  * @param bigger_valor Ponteiro para armazenar a bigger informação encontrada.
  * @return Ponteiro para o bigger nó folha encontrado.
  */
-Memory *lookBiggerChild(Memory *root, Memory **father, Info *bigger_valor)
+Memory *lookBiggerChild(Memory *raiz, Memory **pai, Info **maior_valor)
 {
-    Memory *child;
-    child = root;
+    Memory *filho;
+    filho = raiz;
 
-    while (!isLeaf(child))
+    while(!isLeaf(filho))
     {
-        *father = child;
-        if (child->numKeys == 1)
-            child = child->center;
+        *pai = filho;
+        if(filho->numKeys == 1)
+            filho = filho->center;
         else
-            child = child->right;
+            filho = filho->right;
     }
 
-    if (child != NULL)
-        *bigger_valor = *node23BiggerInfo(child);
+    if(filho != NULL)
+        *maior_valor = node23BiggerInfo(filho);
 
-    return (child);
+    return filho;
 }
+
 
 /**
  * @brief Encontra o father de um nó contendo uma informação específica.
@@ -939,15 +940,14 @@ int memoryRemoveNoLeaf1(Memory **origin, Memory *root, Info *info, Memory *child
 {
     int removed;
     Memory *child, *father;
-    Info info_child;
+    Info *info_child;
 
     father = root;
-
     child = lookBiggerChild(child1, &father, &info_child);
 
     if (child->numKeys == 2)
     {
-        *info = info_child;
+        info = info_child;
         child->numKeys = 1;
     }
     else
@@ -977,7 +977,7 @@ int memoryRemoveNoLeaf2(Memory **origin, Memory *root, Info *info, Memory *child
 {
     int removed;
     Memory *child, *father;
-    Info info_child;
+    Info *info_child;
 
     father = root;
 
@@ -992,7 +992,7 @@ int memoryRemoveNoLeaf2(Memory **origin, Memory *root, Info *info, Memory *child
     else
     {
         child = lookBiggerChild(child2, &father, &info_child);
-        removed = waveMoviment(info_child, info, father, origin, &child, bigger, memoryRemove2);
+        removed = waveMoviment(*info_child, info, father, origin, &child, bigger, memoryRemove2);
     }
 
     return removed;

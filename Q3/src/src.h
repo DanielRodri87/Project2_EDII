@@ -43,7 +43,7 @@ Memory *node23Together(Memory *child1, Info info, Memory *bigger, Memory **root)
 void allocateAndDesallocate(Memory **tree, int quantNodes, int status);
 Memory *sourceFather(Memory *root, int info);
 void nodeAddInfo(Memory *node, Info info, Memory *biggerChild);
-Memory *lookBiggerChild(Memory *root, Memory **father, Info *bigger_valor);
+Memory *lookBiggerChild(Memory *raiz, Memory **pai, Info **maior_valor);
 Memory *lookMinorChild(Memory *root, Memory **father);
 Memory *sourceBiggerFather(Memory *root, int info);
 Info *node23BiggerInfo(Memory *root);
