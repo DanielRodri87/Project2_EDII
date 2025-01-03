@@ -28,7 +28,6 @@ Info *CreateInfo(int start, int end, int status);
 Memory *insertTree23(Memory **raiz, Info info, Memory *pai, Info *promove);
 void displayInfos(Memory *root);
 
-int removeMemory(Memory **root, int info);
 
 int removeMemory1(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger);
 int memoryRemove2(Memory **root, int info, Memory *father, Memory **origin, Memory **bigger);
@@ -38,13 +37,15 @@ int memoryRebalance(Memory **root, int info, Memory **bigger);
 void node23Deallocate(Memory **node);
 Memory *node23Together(Memory *child1, Info info, Memory *bigger, Memory **root);
 
-
-// update
 void allocateAndDesallocate(Memory **tree, int quantNodes, int status);
 Memory *sourceFather(Memory *root, int info);
 void nodeAddInfo(Memory *node, Info info, Memory *biggerChild);
+
 Memory *lookBiggerChild(Memory *raiz, Memory **pai, Info **maior_valor);
 Memory *lookMinorChild(Memory *root, Memory **father);
 Memory *sourceBiggerFather(Memory *root, int info);
+
 Info *node23BiggerInfo(Memory *root);
+int removeMemory(Memory **root, int info);
+
 #endif

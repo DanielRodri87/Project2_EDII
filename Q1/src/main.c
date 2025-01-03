@@ -86,7 +86,7 @@ int main()
             getchar();
 
             printf("Informe a palavra em portugues: ");
-            scanf("%s", palavra);
+            scanf("%[^\n]", palavra);
             displayTranslationPortuguese(&raiz, palavra);
             break;
 
@@ -119,7 +119,7 @@ int main()
             break;
         case 6:
             printf("Informe a palavra em portugues: ");
-            scanf("%s", palavra);
+            scanf("%[^\n]", palavra);
             getchar();
 
             clock_t start, end;
