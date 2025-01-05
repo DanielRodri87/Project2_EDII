@@ -64,8 +64,8 @@ int insertIntoRBTree(RBTree **root, InfoBin info);
 int isUnitPresent(Units *units, int unit);
 void displayBinaryTree(EngPT *root, int unit);
 int searchUnit(EngPT *root, int unit);
-void displayUnit(RBTree *root, int unit, int *found);
 
+void displayUnit(RBTree *root, int unit, int *found);
 void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, int nivel);
 
 #endif
