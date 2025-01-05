@@ -50,7 +50,7 @@ int main()
     int currentUnit = 0, sucess = 1;
 
     FILE *file;
-    file = fopen("../../input2.txt.txt", "r");
+    file = fopen("../../input.txt", "r");
 
     if (file == NULL)
         sucess = 0;
@@ -69,9 +69,8 @@ int main()
 
                 char *token = strtok(line, ":");
                 if (token != NULL)
-                {
                     strcpy(WordIN, token);
-                }
+
                 removeSpace(WordIN);
 
                 token = strtok(NULL, ";");

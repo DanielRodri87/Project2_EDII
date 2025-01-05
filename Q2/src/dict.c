@@ -127,11 +127,13 @@ void findEnglishByPortuguesePath(RBTree *node, const char *portugueseWord, int n
 // das quais ela pertence. Caso ela seja a única palavra em uma das árvores binárias, remover também da
 // árvore 2-3
 // ---------------------------------------------------- XXXXXX -------------------------------------------------
+
+
 /**
- * @brief Verifica se o nó é uma folha (sem filhos).
- *
- * @param root Ponteiro para o nó a ser verificado.
- * @return 1 se é uma folha, 0 caso contrário.
+ * @brief Verifica se o nó é uma folha.
+ * 
+ * @param root Ponteiro para o nó da árvore binária de busca em inglês.
+ * @return int Retorna 1 se o nó for folha, 0 caso contrário.
  */
 int isLeaf(EngPT *root)
 {
@@ -139,10 +141,10 @@ int isLeaf(EngPT *root)
 }
 
 /**
- * @brief Retorna o único filho de um nó.
- *
- * @param root Ponteiro para o nó a ser analisado.
- * @return Ponteiro para o filho único ou NULL se não houver.
+ * @brief Verifica se o nó tem apenas um filho e retorna esse filho.
+ * 
+ * @param root Ponteiro para o nó da árvore binária de busca em inglês.
+ * @return EngPT* Ponteiro para o único filho do nó ou NULL se não tiver apenas um filho.
  */
 EngPT *oneChild(EngPT *root)
 {
@@ -156,18 +158,18 @@ EngPT *oneChild(EngPT *root)
 }
 
 /**
- * @brief Retorna o menor nó da subárvore à esquerda.
- *
- * @param root Ponteiro para a raiz da subárvore.
- * @return Ponteiro para o menor nó.
+ * @brief Encontra o menor filho à esquerda na subárvore.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @return EngPT* Ponteiro para o nó com a menor chave à esquerda.
  */
-EngPT *smallLeftChild(EngPT *root)
+EngPT *minorLeftChild(EngPT *root)
 {
     EngPT *aux;
     aux = NULL;
     if (root)
     {
-        aux = smallLeftChild(root->left);
+        aux = minorLeftChild(root->left);
         if (!aux)
             aux = root;
     }
@@ -175,47 +177,47 @@ EngPT *smallLeftChild(EngPT *root)
 }
 
 /**
- * @brief Remove uma unidade da lista de unidades recursivamente.
- *
- * @param var_units Ponteiro para a lista de unidades.
+ * @brief Remove recursivamente uma unidade da lista encadeada de unidades.
+ * 
+ * @param units Ponteiro para a cabeça da lista encadeada.
  * @param unit Unidade a ser removida.
- * @param removed Ponteiro para indicar se a unidade foi removida.
- * @return Ponteiro para a lista de unidades atualizada.
+ * @param removed Ponteiro para uma flag que indica se a unidade foi removida (1 para sucesso, 0 para falha).
+ * @return Units* Ponteiro para a lista atualizada.
  */
-Units *removeUnitRecursive(Units *var_units, int unit, int *removed)
+Units *removeRecursive(Units *units, int unit, int *removed)
 {
-    Units *next = var_units;
-    if (var_units != NULL)
+    Units *next = units;
+    if (units != NULL)
     {
-        if (var_units->unit == unit)
+        if (units->unit == unit)
         {
-            next = var_units->next;
-            free(var_units);
+            next = units->next;
+            free(units);
             *removed = 1;
         }
         else
-            var_units->next = removeUnitRecursive(var_units->next, unit, removed);
+            units->next = removeRecursive(units->next, unit, removed);
     }
     return (next);
 }
 
 /**
- * @brief Remove uma palavra em inglês da árvore binária.
- *
- * @param root Ponteiro duplo para a raiz da árvore binária.
- * @param wordEN Palavra em inglês a ser removida.
- * @param unit Unidade da palavra em inglês.
- * @return 1 se a palavra foi encontrada e removida, 0 caso contrário.
+ * @brief Remove uma palavra em inglês da árvore binária de busca com base em uma unidade específica.
+ * 
+ * @param root Ponteiro para o nó raiz da árvore binária de busca em inglês.
+ * @param englishWord Palavra em inglês a ser removida.
+ * @param unit Unidade associada à palavra a ser removida.
+ * @return int Retorna 1 se a remoção for bem-sucedida, 0 caso contrário.
  */
-int removeWordEN(EngPT **root, const char *wordEN, int unit)
+int removeWordEnglish(EngPT **root, const char *englishWord, int unit)
 {
     int find = 0;
     if ((*root) != NULL)
     {
-        if (strcmp((*root)->info.englishWord, wordEN) == 0)
+        if (strcmp((*root)->info.englishWord, englishWord) == 0)
         {
             int removedUnit = 0;
-            (*root)->info.units = removeUnitRecursive((*root)->info.units, unit, &removedUnit);
+            (*root)->info.units = removeRecursive((*root)->info.units, unit, &removedUnit);
             if (removedUnit)
             {
                 find = 1;
@@ -235,53 +237,53 @@ int removeWordEN(EngPT **root, const char *wordEN, int unit)
                     }
                     else
                     {
-                        EngPT *aux = smallLeftChild((*root)->right);
+                        EngPT *aux = minorLeftChild((*root)->right);
                         (*root)->info = aux->info;
-                        removeWordEN(&(*root)->right, aux->info.englishWord, unit);
+                        removeWordEnglish(&(*root)->right, aux->info.englishWord, unit);
                     }
                 }
             }
         }
-        else if (strcmp((*root)->info.englishWord, wordEN) > 0)
-            find = removeWordEN(&(*root)->left, wordEN, unit);
+        else if (strcmp((*root)->info.englishWord, englishWord) > 0)
+            find = removeWordEnglish(&(*root)->left, englishWord, unit);
         else
-            find = removeWordEN(&(*root)->right, wordEN, unit);
+            find = removeWordEnglish(&(*root)->right, englishWord, unit);
     }
     return (find);
 }
 
 /**
- * @brief Percorre a árvore rubro-negra e remove palavras em inglês e suas correspondências em português.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
- * @param wordEN Palavra em inglês a ser removida.
- * @param unit Unidade da palavra em inglês.
- * @param wordsPT Array para armazenar palavras em português removidas.
- * @param remove Ponteiro para indicar se a remoção ocorreu.
- * @param removeCount Contador de palavras removidas.
+ * @brief Percorre a árvore Rubro-Negra para remover uma palavra em inglês e rastrear palavras associadas em português.
+ * 
+ * @param root Ponteiro para a raiz da árvore Rubro-Negra.
+ * @param wordEnglish Palavra em inglês a ser removida.
+ * @param unit Unidade associada à palavra a ser removida.
+ * @param wordPT Matriz para armazenar palavras em português associadas.
+ * @param remove Ponteiro para uma flag indicando se a palavra em português foi encontrada e marcada para remoção.
+ * @param removeCount Ponteiro para o contador de palavras em português marcadas para remoção.
  */
-void traverseRBTree(RBTree **root, const char *wordEN, int unit, char wordsPT[][50], int *remove, int *removeCount)
+void traverseRedBlack(RBTree **root, const char *wordEnglish, int unit, char wordPT[][50], int *remove, int *removeCount)
 {
     if ((*root) != NULL)
     {
-        traverseRBTree(&(*root)->left, wordEN, unit, wordsPT, remove, removeCount);
-        int find = removeWordEN(&(*root)->info.binaryTreeEnglish, wordEN, unit);
-        if (find && (*root)->info.binaryTreeEnglish == NULL)
+        traverseRedBlack(&(*root)->left, wordEnglish, unit, wordPT, remove, removeCount);
+        int encontrou = removeWordEnglish(&(*root)->info.binaryTreeEnglish, wordEnglish, unit);
+        if (encontrou && (*root)->info.binaryTreeEnglish == NULL)
         {
             *remove = 1;
-            strcpy(wordsPT[*removeCount], (*root)->info.portugueseWord);
+            strcpy(wordPT[*removeCount], (*root)->info.portugueseWord);
             (*removeCount)++;
         }
-        traverseRBTree(&(*root)->right, wordEN, unit, wordsPT, remove, removeCount);
+        traverseRedBlack(&(*root)->right, wordEnglish, unit, wordPT, remove, removeCount);
     }
 }
 
 /**
- * @brief Realiza a rotação para a esquerda para mover uma cor vermelha para a esquerda.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
+ * @brief Move um nó da árvore Rubro-Negra para a esquerda em um cenário de remoção.
+ * 
+ * @param root Ponteiro para a raiz da árvore Rubro-Negra.
  */
-void move2leftRed(RBTree **root)
+void moveLeftRed(RBTree **root)
 {
     flipColors(root);
     if (getColor((*root)->right->left) == RED)
@@ -293,11 +295,11 @@ void move2leftRed(RBTree **root)
 }
 
 /**
- * @brief Realiza a rotação para a direita para mover uma cor vermelha para a direita.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
+ * @brief Move um nó da árvore Rubro-Negra para a direita em um cenário de remoção.
+ * 
+ * @param root Ponteiro para a raiz da árvore Rubro-Negra.
  */
-void move2rightRed(RBTree **root)
+void moveRightRed(RBTree **root)
 {
     flipColors(root);
     if (getColor((*root)->left->left) == RED)
@@ -308,12 +310,12 @@ void move2rightRed(RBTree **root)
 }
 
 /**
- * @brief Encontra o menor nó em uma árvore rubro-negra.
- *
- * @param root Ponteiro para a raiz da árvore rubro-negra.
- * @return Ponteiro para o menor nó encontrado.
+ * @brief Encontra o menor nó na subárvore esquerda de um nó da árvore Rubro-Negra.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @return RBTree* Ponteiro para o menor nó da subárvore.
  */
-RBTree *findSmall(RBTree *root)
+RBTree *sourceMinor(RBTree *root)
 {
     RBTree *no1 = root;
     RBTree *no2 = root->left;
@@ -322,15 +324,17 @@ RBTree *findSmall(RBTree *root)
         no1 = no2;
         no2 = no2->left;
     }
-    return no1;
+    return (no1);
 }
 
+
 /**
- * @brief Remove o menor nó da árvore rubro-negra.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
+ * @brief Remove o menor nó de uma subárvore Rubro-Negra.
+ * 
+ * @param root Ponteiro para o nó raiz da subárvore.
+ * @return int Retorna 1 se o nó foi removido com sucesso.
  */
-void removeSmall(RBTree **root)
+int removeMinor(RBTree **root)
 {
     if (!(*root)->left)
     {
@@ -340,19 +344,20 @@ void removeSmall(RBTree **root)
     else
     {
         if (getColor((*root)->left) == BLACK && getColor((*root)->left->left) == BLACK)
-            move2leftRed(root);
-        removeSmall(&(*root)->left);
+            moveLeftRed(root);
+        
+        removeMinor(&(*root)->left);
     }
     if (*root)
         balanceTree(root);
 }
 
 /**
- * @brief Remove uma palavra em português da árvore rubro-negra.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
+ * @brief Remove uma palavra em português da árvore Rubro-Negra.
+ * 
+ * @param root Ponteiro para a raiz da árvore Rubro-Negra.
  * @param wordPT Palavra em português a ser removida.
- * @return 1 se a palavra foi removida, 0 caso contrário.
+ * @return int Retorna 1 se a remoção for bem-sucedida, 0 caso contrário.
  */
 int removeRBTree(RBTree **root, char *wordPT)
 {
@@ -362,7 +367,7 @@ int removeRBTree(RBTree **root, char *wordPT)
         if (strcmp(wordPT, (*root)->info.portugueseWord) < 0)
         {
             if (getColor((*root)->left) == BLACK && getColor((*root)->left->left) == BLACK)
-                move2leftRed(root);
+                moveLeftRed(root);
             removed = removeRBTree(&(*root)->left, wordPT);
         }
         else
@@ -375,18 +380,19 @@ int removeRBTree(RBTree **root, char *wordPT)
                 *root = NULL;
                 removed = 1;
             }
-            if (getColor((*root)->right) == BLACK && getColor((*root)->right->left) == BLACK)
-                move2rightRed(root);
-            if (!strcmp(wordPT, (*root)->info.portugueseWord))
-            {
-                RBTree *aux = findSmall((*root)->right);
-                (*root)->info = aux->info;
-                removeSmall(&(*root)->right);
-                removed = 1;
-            }
             else
             {
-                removed = removeRBTree(&(*root)->right, wordPT);
+                if (getColor((*root)->right) == BLACK && getColor((*root)->right->left) == BLACK)
+                    moveRightRed(root);
+                if (!strcmp(wordPT, (*root)->info.portugueseWord))
+                {
+                    RBTree *aux = sourceMinor((*root)->right);
+                    (*root)->info = aux->info;
+                    removeMinor(&(*root)->right);
+                    removed = 1;
+                }
+                else
+                    removed = removeRBTree(&(*root)->right, wordPT);
             }
         }
     }
@@ -395,19 +401,20 @@ int removeRBTree(RBTree **root, char *wordPT)
 
     return (removed);
 }
+
 /**
- * @brief Remove uma palavra em inglês e suas correspondências em português da árvore rubro-negra.
- *
- * @param root Ponteiro duplo para a raiz da árvore rubro-negra.
- * @param wordEN Palavra em inglês a ser removida.
- * @param unit Unidade da palavra em inglês.
+ * @brief Remove uma palavra em inglês e suas associações na árvore Rubro-Negra.
+ * 
+ * @param root Ponteiro para a raiz da árvore Rubro-Negra.
+ * @param englishWord Palavra em inglês a ser removida.
+ * @param unit Unidade associada à palavra a ser removida.
  */
-void removeFromRBTreeEN(RBTree **root, const char *wordEN, int unit)
+void removeFromRBTreeEN(RBTree **root, const char *englishWord, int unit)
 {
     char wordPT[100][50];
     int remove = 0;
     int removeCount = 0;
-    traverseRBTree(root, wordEN, unit, wordPT, &remove, &removeCount);
+    traverseRedBlack(root, englishWord, unit, wordPT, &remove, &removeCount);
     if (remove)
     {
         for (int i = 0; i < removeCount; i++)
@@ -497,7 +504,7 @@ int traverseRBTreePTBR(RBTree **root, char *wordPT, int unit, int *remove)
 
             if (find == 1)
             {
-                find = removeWordEN(&(*root)->info.binaryTreeEnglish, wordEN, unit);
+                find = removeWordEnglish(&(*root)->info.binaryTreeEnglish, wordEN, unit);
                 if (find == 1 && (*root)->info.binaryTreeEnglish == NULL)
                     *remove = 1;
             }

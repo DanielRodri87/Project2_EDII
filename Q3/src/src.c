@@ -34,30 +34,41 @@ Info *CreateInfo(int start, int end, int status)
  */
 Memory *createNode(const Info *info, Memory *leftChild, Memory *centerChild)
 {
-    Memory *node = (Memory *)malloc(sizeof(Memory));
+    Memory *node = NULL;
+    int success = 1; // Variável de controle para rastrear sucesso na criação do nó.
+
+    node = (Memory *)malloc(sizeof(Memory));
     if (node == NULL)
     {
         printf("Erro ao alocar memória para o nó.\n");
-        return NULL;
+        success = 0;
     }
 
-    node->info1 = (Info *)malloc(sizeof(Info));
-    if (node->info1 == NULL)
+    if (success)
     {
-        printf("Erro ao alocar memória para info1.\n");
-        free(node);
-        return NULL;
+        node->info1 = (Info *)malloc(sizeof(Info));
+        if (node->info1 == NULL)
+        {
+            printf("Erro ao alocar memória para info1.\n");
+            free(node);
+            node = NULL;
+            success = 0;
+        }
     }
-    *(node->info1) = *info;
 
-    node->info2 = NULL;
-    node->left = leftChild;
-    node->center = centerChild;
-    node->right = NULL;
-    node->numKeys = 1;
+    if (success)
+    {
+        *(node->info1) = *info;
+        node->info2 = NULL;
+        node->left = leftChild;
+        node->center = centerChild;
+        node->right = NULL;
+        node->numKeys = 1;
+    }
 
     return node;
 }
+
 /**
  * @brief Verifica se o nó é uma folha na árvore 2-3.
  *
@@ -422,7 +433,7 @@ Memory *sourceMinorBlock(Memory **root, Memory *no, Info *info, Info **minorValu
     else
         minor = lookBiggerChild(no->center, &father, minorValue);
 
-    return minor;
+    return (minor);
 }
 
 /**
@@ -629,7 +640,7 @@ Memory *node23Allocate()
         exit(EXIT_FAILURE);
     }
 
-    return node;
+    return (node);
 }
 
 /**

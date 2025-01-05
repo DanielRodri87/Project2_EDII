@@ -76,7 +76,6 @@ int main()
         {
         case 1:
             getchar();
-
             printf("Informe a Unidade: ");
             scanf("%s", unidade);
             displayWordsForUnit(raiz, unidade);
@@ -84,7 +83,6 @@ int main()
 
         case 2:
             getchar();
-
             printf("Informe a palavra em portugues: ");
             scanf("%[^\n]", palavra);
             displayTranslationPortuguese(&raiz, palavra);
@@ -118,9 +116,10 @@ int main()
             displayTranslationPortuguesePath(raiz, 0);
             break;
         case 6:
+            getchar();
+
             printf("Informe a palavra em portugues: ");
             scanf("%[^\n]", palavra);
-            getchar();
 
             clock_t start, end;
             double cpu_time_used;
