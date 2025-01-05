@@ -1,0 +1,64 @@
+1 indicação 0.000058 
+2 melhorar 0.000100 
+3 recuperação 0.000066
+4 segmento 0.000096 0.000049
+5 ventilador 0.000060
+6 condensar 0.000079
+7 carregador 0.000096
+8 textura 0.000063
+9 colapso 0.000098
+10 motor 0.000077
+11 polimorfismo 0.000097
+12 barramento 0.000134
+13 característica 0.000061
+14 ventilador 0.000085
+15 interruptor 0.000081
+16 otimizar 0.000098
+17 compilar 0.000099
+18 rodar 0.000063
+19 cache 0.000049
+20 transporte 0.000059
+21 assíncrono 0.000085
+22 depurar 0.000098
+23 analisar 0.000059
+24 interpretar 0.000092
+25 monte 0.000066
+26 pixel 0.000101
+27 informações 0.000065
+28 entrada 0.000076
+29 roteador 0.000082
+30 guia 0.000071
+
+
+
+2-3
+1 indicação 0,000029
+2 melhorar 0,000065
+3 recuperação 0,000035
+4 segmento 0,000047
+5 ventilador 0,000066
+6 condensar 0,000047
+7 carregador 0,000030
+8 textura 0,000045
+9 colapso 0,000032
+10 motor 0,000029
+11 polimorfismo 0,000028
+12 barramento 0,000042
+13 característica 0,000073
+14 saudação 0,000029
+15 interruptor 0,000027
+16 otimizar 0,000095
+17 compilar 0,000027
+18 rodar 0,000029
+19 cache 0,000027
+20 transporte 0,000029
+21 assíncrono 0,000032
+22 depurar 0,000062
+23 analisar 0,000031
+24 interpretar 0,000044
+25 monte 0,000031
+26 pixel 0,000029
+27 informações 0,000034
+28 entrada 0,000045
+29 roteador 0,000063
+30 guia 0,000029
