@@ -69,9 +69,8 @@ int main()
 
                 char *token = strtok(line, ":");
                 if (token != NULL)
-                {
                     strcpy(WordIN, token);
-                }
+
                 removeSpace(WordIN);
 
                 token = strtok(NULL, ";");
